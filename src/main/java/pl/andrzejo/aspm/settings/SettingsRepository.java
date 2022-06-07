@@ -47,15 +47,6 @@ public class SettingsRepository {
         save();
     }
 
-    private void saveObject(String key, Serializable object) {
-        try {
-            props.setProperty(key, Serializer.serialize(object));
-            save();
-        } catch (IOException e) {
-            System.err.println("Failed to save " + key + " " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     private <T> T readObject(String key, T def) {
         try {
