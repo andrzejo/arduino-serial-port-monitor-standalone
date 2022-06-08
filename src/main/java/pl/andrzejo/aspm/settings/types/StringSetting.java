@@ -1,4 +1,6 @@
-package pl.andrzejo.aspm.settings;
+package pl.andrzejo.aspm.settings.types;
+
+import pl.andrzejo.aspm.settings.Setting;
 
 public class StringSetting extends Setting<String> {
     public StringSetting(String key) {

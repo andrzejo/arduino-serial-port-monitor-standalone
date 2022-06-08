@@ -1,7 +1,13 @@
 package pl.andrzejo.aspm.gui;
 
+import com.google.common.eventbus.Subscribe;
+import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.settings.appsettings.AutoscrollSetting;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import java.awt.*;
 
 public class SendCommandPanel extends ContentPanel {
@@ -19,6 +25,7 @@ public class SendCommandPanel extends ContentPanel {
         add(lePanel, BorderLayout.WEST);
         add(commandPanel, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.EAST);
-    }
 
+        ApplicationEventBus.instance().register(this);
+    }
 }

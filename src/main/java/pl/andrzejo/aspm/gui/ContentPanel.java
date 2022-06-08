@@ -1,7 +1,8 @@
 package pl.andrzejo.aspm.gui;
 
-import pl.andrzejo.aspm.settings.BoolSetting;
-import pl.andrzejo.aspm.settings.StringSetting;
+import pl.andrzejo.aspm.settings.appsettings.AppSetting;
+import pl.andrzejo.aspm.settings.types.BoolSetting;
+import pl.andrzejo.aspm.settings.types.StringSetting;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ public class ContentPanel extends JPanel {
         });
     }
 
-    protected void handleCheckboxSetting(JCheckBox box, BoolSetting setting) {
+    protected void handleCheckboxSetting(JCheckBox box, AppSetting<Boolean> setting) {
         box.setSelected(setting.get());
         box.addActionListener(new AbstractAction() {
             @Override

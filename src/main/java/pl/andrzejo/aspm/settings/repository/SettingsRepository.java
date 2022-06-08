@@ -1,8 +1,7 @@
-package pl.andrzejo.aspm.settings;
+package pl.andrzejo.aspm.settings.repository;
 
 import org.apache.commons.io.FileUtils;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +9,6 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 public class SettingsRepository {
     private static final SettingsRepository inst = new SettingsRepository();

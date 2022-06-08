@@ -1,10 +1,8 @@
-package pl.andrzejo.aspm.settings;
+package pl.andrzejo.aspm.settings.types;
+
+import pl.andrzejo.aspm.settings.Setting;
 
 public class BoolSetting extends Setting<Boolean> {
-
-    public BoolSetting(String key) {
-        super(key, false);
-    }
 
     public BoolSetting(String key, Boolean defValue) {
         super(key, defValue);

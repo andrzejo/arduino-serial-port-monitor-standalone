@@ -2,6 +2,7 @@ package pl.andrzejo.aspm.eventbus;
 
 import com.google.common.eventbus.EventBus;
 import pl.andrzejo.aspm.eventbus.events.BusMessage;
+import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 
 public class ApplicationEventBus {
     private static final ApplicationEventBus instance = new ApplicationEventBus();
@@ -20,6 +21,10 @@ public class ApplicationEventBus {
     }
 
     public void post(BusMessage msg) {
+        eventBus.post(msg);
+    }
+
+    public void post(AppSetting<?> msg) {
         eventBus.post(msg);
     }
 }

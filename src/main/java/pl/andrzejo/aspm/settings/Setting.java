@@ -1,9 +1,11 @@
 package pl.andrzejo.aspm.settings;
 
+import pl.andrzejo.aspm.settings.repository.SettingsRepository;
+
 public abstract class Setting<T> {
     private final SettingsRepository repository;
     private final String key;
-    private T defValue;
+    private final T defValue;
 
     public Setting(String key) {
         this(key, null);

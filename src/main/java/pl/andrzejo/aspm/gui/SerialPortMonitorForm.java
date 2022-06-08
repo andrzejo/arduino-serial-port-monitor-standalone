@@ -5,12 +5,12 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.SerialMessageReceived;
-import pl.andrzejo.aspm.settings.RectSetting;
+import pl.andrzejo.aspm.settings.appsettings.AutoscrollSetting;
+import pl.andrzejo.aspm.settings.types.RectSetting;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -21,6 +21,7 @@ public class SerialPortMonitorForm {
     private JScrollPane scroll;
     private DeviceSelectorPanel deviceSelector;
     private SendCommandPanel sendCommandPanel;
+    private boolean autoScroll;
 
     public SerialPortMonitorForm() {
         RectSetting sizeSetting = new RectSetting("gui.main.rect", new Rectangle(10, 10, 400, 400));
@@ -37,11 +38,8 @@ public class SerialPortMonitorForm {
 //        textArea.set
 
         deviceSelector = new DeviceSelectorPanel();
-
         sendCommandPanel = new SendCommandPanel();
 
-        //textArea = new JTextArea();
-        //textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         scroll = new JScrollPane(textArea);
         RTextScrollPane sp = new RTextScrollPane(textArea);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -67,11 +65,20 @@ public class SerialPortMonitorForm {
             Document document = textArea.getDocument();
             try {
                 document.insertString(document.getLength(), event.getValue(), null);
+                if (autoScroll) {
+                    textArea.setCaretPosition(document.getLength());
+                }
             } catch (BadLocationException e) {
                 throw new RuntimeException(e);
             }
         });
         System.out.println(event.getValue());
+    }
+
+
+    @Subscribe
+    public void handleEvent(AutoscrollSetting event) {
+        autoScroll = event.get();
     }
 
     public void show() {

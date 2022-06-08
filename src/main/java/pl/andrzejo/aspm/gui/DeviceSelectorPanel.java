@@ -1,8 +1,10 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.serial.SerialPortList;
-import pl.andrzejo.aspm.settings.BoolSetting;
-import pl.andrzejo.aspm.settings.StringSetting;
+import pl.andrzejo.aspm.settings.appsettings.AddTimestampSetting;
+import pl.andrzejo.aspm.settings.appsettings.AutoOpenSetting;
+import pl.andrzejo.aspm.settings.appsettings.AutoscrollSetting;
+import pl.andrzejo.aspm.settings.types.StringSetting;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -52,9 +54,9 @@ public class DeviceSelectorPanel extends ContentPanel {
         setPreferredComboBoxSize(deviceComboBox);
         setPreferredComboBoxSize(baudComboBox);
 
-        handleCheckboxSetting(autoOpenBox, new BoolSetting("device.autoOpen"));
-        handleCheckboxSetting(autoScroll, new BoolSetting("gui.settings.autoScroll"));
-        handleCheckboxSetting(addTimestamp, new BoolSetting("gui.settings.addTimestamp"));
+        handleCheckboxSetting(autoOpenBox, new AutoOpenSetting());
+        handleCheckboxSetting(autoScroll, new AutoscrollSetting());
+        handleCheckboxSetting(addTimestamp, new AddTimestampSetting());
 
         handleComboSetting(deviceComboBox, new StringSetting("gui.settings.device"));
         handleComboSetting(baudComboBox, new StringSetting("gui.settings.baud", "9600"));
