@@ -81,6 +81,10 @@ public class Serial implements SerialPortEventListener {
         }
     }
 
+    public Serial(String iname, int irate) throws SerialException {
+        this(iname, irate, 'N', 8, 1, false, false);
+    }
+
     protected Serial(String iname, int irate, char iparity, int idatabits, float istopbits, boolean setRTS, boolean setDTR) throws SerialException {
         //if (port != null) port.close();
         //this.parent = parent;

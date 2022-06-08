@@ -2,6 +2,7 @@ package pl.andrzejo.aspm;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import pl.andrzejo.aspm.gui.SerialPortMonitorForm;
+import pl.andrzejo.aspm.service.SerialHandlerService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +21,8 @@ public class Main {
             SerialPortMonitorForm form = new SerialPortMonitorForm();
             form.show();
         });
+
+        new SerialHandlerService();
 
     }
 
