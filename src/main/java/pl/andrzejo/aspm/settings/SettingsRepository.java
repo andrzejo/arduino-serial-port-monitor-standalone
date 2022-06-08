@@ -39,47 +39,13 @@ public class SettingsRepository {
         return inst;
     }
 
-    public void saveRect(String key, Rectangle rec) {
-        saveInt(key + ".x", rec.x);
-        saveInt(key + ".y", rec.y);
-        saveInt(key + ".w", rec.width);
-        saveInt(key + ".h", rec.height);
-    }
-
-    public Rectangle getRect(String key, Rectangle def) {
-        int x = getInt(key + ".x", def.x);
-        int y = getInt(key + ".y", def.y);
-        int w = getInt(key + ".w", def.width);
-        int h = getInt(key + ".h", def.height);
-        return new Rectangle(x, y, w, h);
-    }
-
-    public void saveInt(String key, int value) {
-        saveString(key, String.valueOf(value));
-    }
-
-    public int getInt(String key, int defValue) {
-        return readOrDefault(defValue, () -> {
-            String value = getString(key, String.valueOf(defValue));
-            return Integer.valueOf(value);
-        });
-    }
-
-    private void saveString(String key, String value) {
+    public void saveString(String key, String value) {
         props.setProperty(key, value);
         isDirty = true;
     }
 
-    private String getString(String key, String defValue) {
+    public String getString(String key, String defValue) {
         return props.getProperty(key, defValue);
-    }
-
-    private <T> T readOrDefault(T defValue, Supplier<T> converter) {
-        try {
-            return converter.get();
-        } catch (Exception e) {
-            return defValue;
-        }
     }
 
     private void read() {
@@ -92,7 +58,7 @@ public class SettingsRepository {
     }
 
     public void save() {
-        if (isDirty) {
+        if (!isDirty) {
             return;
         }
         try {

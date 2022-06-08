@@ -16,12 +16,9 @@ public class Main {
             System.err.println("Failed to initialize theme. Using fallback.");
         }
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                SerialPortMonitorForm form = new SerialPortMonitorForm();
-                form.show();
-            }
+        EventQueue.invokeLater(() -> {
+            SerialPortMonitorForm form = new SerialPortMonitorForm();
+            form.show();
         });
 
     }
