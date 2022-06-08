@@ -3,13 +3,19 @@ package pl.andrzejo.aspm.settings;
 public abstract class Setting<T> {
     private final SettingsRepository repository;
     private final String key;
+    private T defValue;
 
     public Setting(String key) {
+        this(key, null);
+    }
+
+    public Setting(String key, T defValue) {
         this.key = key;
+        this.defValue = defValue;
         this.repository = SettingsRepository.instance();
     }
 
-    public T get(T defValue) {
+    public T get() {
         String val = repository.getString(key, null);
         if (val == null) {
             return defValue;

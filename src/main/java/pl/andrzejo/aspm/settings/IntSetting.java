@@ -6,6 +6,10 @@ public class IntSetting extends Setting<Integer> {
         super(key);
     }
 
+    public IntSetting(String key, Integer defValue) {
+        super(key, defValue);
+    }
+
     @Override
     protected String serialize(Integer value) {
         return String.valueOf(value);

@@ -10,6 +10,10 @@ public class RectSetting extends Setting<Rectangle> {
         super(key);
     }
 
+    public RectSetting(String key, Rectangle defValue) {
+        super(key, defValue);
+    }
+
     @Override
     protected String serialize(Rectangle value) {
         return String.format("%d|%d|%s|%s", value.x, value.y, value.width, value.height);

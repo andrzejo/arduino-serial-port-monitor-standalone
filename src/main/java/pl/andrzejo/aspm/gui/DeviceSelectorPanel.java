@@ -1,12 +1,14 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.serial.SerialPortList;
+import pl.andrzejo.aspm.settings.BoolSetting;
+import pl.andrzejo.aspm.settings.StringSetting;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-public class DeviceSelectorPanel extends JPanel {
+public class DeviceSelectorPanel extends ContentPanel {
     private final JCheckBox autoScroll;
     private final JCheckBox addTimestamp;
     private final JCheckBox autoOpenBox;
@@ -17,7 +19,6 @@ public class DeviceSelectorPanel extends JPanel {
 
     public DeviceSelectorPanel() {
         loadItems();
-//        setBackground(Color.pink);
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(1, 5, 15, 5));
 
@@ -31,7 +32,6 @@ public class DeviceSelectorPanel extends JPanel {
         btnPanel.setLayout(new GridLayout(2, 1, 15, 0));
         btnPanel.add(autoOpenBox);
         btnPanel.add(openBtn);
-
 
         JPanel dev = new JPanel();
         dev.setLayout(new GridLayout(1, 3, 15, 0));
@@ -49,32 +49,21 @@ public class DeviceSelectorPanel extends JPanel {
         boxes.add(addTimestamp);
         add(boxes, BorderLayout.EAST);
 
-        Dimension dimension = new Dimension(120, baudComboBox.getMinimumSize().height);
-        baudComboBox.setMinimumSize(dimension);
-        deviceComboBox.setMinimumSize(dimension);
+        setPreferredComboBoxSize(deviceComboBox);
+        setPreferredComboBoxSize(baudComboBox);
 
-        baudComboBox.setPreferredSize(dimension);
-        deviceComboBox.setPreferredSize(dimension);
-    }
+        handleCheckboxSetting(autoOpenBox, new BoolSetting("device.autoOpen"));
+        handleCheckboxSetting(autoScroll, new BoolSetting("gui.settings.autoScroll"));
+        handleCheckboxSetting(addTimestamp, new BoolSetting("gui.settings.addTimestamp"));
 
-    private JPanel createLabeled(String label, JComponent component) {
-        JPanel panel = new JPanel();
-        GridLayout layout = new GridLayout(2, 1);
-        panel.setLayout(layout);
-        panel.add(new JLabel(label));
-        panel.add(component);
-        return panel;
+        handleComboSetting(deviceComboBox, new StringSetting("gui.settings.device"));
+        handleComboSetting(baudComboBox, new StringSetting("gui.settings.baud", "9600"));
     }
 
     private void loadItems() {
         String[] portNames = SerialPortList.getPortNames();
-        setComboItems(deviceComboBox, portNames, "");
-        setComboItems(baudComboBox, serialRateStrings, "9600");
+        setComboItems(deviceComboBox, portNames);
+        setComboItems(baudComboBox, serialRateStrings);
     }
 
-    private void setComboItems(JComboBox<String> combo, String[] items, String selected) {
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(items);
-        combo.setModel(model);
-        combo.setSelectedItem(selected);
-    }
 }
