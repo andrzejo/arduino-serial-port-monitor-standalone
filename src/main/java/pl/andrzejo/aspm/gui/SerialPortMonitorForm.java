@@ -12,6 +12,7 @@ public class SerialPortMonitorForm {
     private final JFrame mainFrame;
     private final JTextArea textArea;
     private JScrollPane scroll;
+    private DeviceSelectorPanel deviceSelector;
 
     public SerialPortMonitorForm() {
         mainFrame = new JFrame("Arduino Serial Port Monitor - Standalone");
@@ -20,13 +21,14 @@ public class SerialPortMonitorForm {
         jep.setContentType("text/html");
         jep.setText("<html>Could not load webpage</html>");
 
+        deviceSelector = new DeviceSelectorPanel(this);
+
         textArea = new JTextArea();
         textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         scroll = new JScrollPane(jep);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Label emptyLabel = new Label("Editor");
-        mainFrame.getContentPane().add(emptyLabel, BorderLayout.NORTH);
+        mainFrame.getContentPane().add(deviceSelector, BorderLayout.NORTH);
         mainFrame.getContentPane().add(scroll, BorderLayout.CENTER);
         mainFrame.pack();
         mainFrame.setBounds(SettingsRepository.instance().getRect(SR_GUI_MAIN_RECT, new Rectangle(10, 10, 400, 400)));

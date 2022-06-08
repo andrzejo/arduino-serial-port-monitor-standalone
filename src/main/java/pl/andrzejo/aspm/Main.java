@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import pl.andrzejo.aspm.gui.SerialPortMonitorForm;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class Main {
 
@@ -15,8 +16,14 @@ public class Main {
             System.err.println("Failed to initialize theme. Using fallback.");
         }
 
-        SerialPortMonitorForm form = new SerialPortMonitorForm();
-        form.show();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                SerialPortMonitorForm form = new SerialPortMonitorForm();
+                form.show();
+            }
+        });
+
     }
 
 }
