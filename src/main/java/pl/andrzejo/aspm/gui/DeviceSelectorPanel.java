@@ -6,11 +6,11 @@ import pl.andrzejo.aspm.eventbus.events.SettingsResetToDefaultEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;
-import pl.andrzejo.aspm.gui.setting.*;
+import pl.andrzejo.aspm.gui.setting.device.*;
+import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoscrollSetting;
-import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.guihandlers.CheckBoxSettingsHandler;
 import pl.andrzejo.aspm.settings.guihandlers.ListSettingHandler;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
@@ -34,8 +34,8 @@ public class DeviceSelectorPanel extends ContentPanel {
     private final ImageIcon imageIcon;
     private final JButton openBtn;
     private final JLabel picLabel;
-    private boolean isSettingsOpen;
     private final ApplicationEventBus eventBus;
+    private boolean isSettingsOpen;
 
     public DeviceSelectorPanel() {
         eventBus = ApplicationEventBus.instance();
@@ -112,7 +112,7 @@ public class DeviceSelectorPanel extends ContentPanel {
         openBtn.setText(buttonAction);
         picLabel.repaint();
         picLabel.setToolTipText(hint);
-}
+    }
 
     private void setupTtySettingsPanel() {
         String[] labels = new String[]{"close device settings ▲", "open device settings ▼"};

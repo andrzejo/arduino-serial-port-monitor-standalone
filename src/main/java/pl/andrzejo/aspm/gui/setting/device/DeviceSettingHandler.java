@@ -1,4 +1,4 @@
-package pl.andrzejo.aspm.gui.setting;
+package pl.andrzejo.aspm.gui.setting.device;
 
 import com.google.common.eventbus.Subscribe;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;

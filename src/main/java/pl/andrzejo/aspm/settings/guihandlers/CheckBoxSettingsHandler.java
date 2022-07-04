@@ -37,6 +37,7 @@ public class CheckBoxSettingsHandler {
         box.setSelected(initialValue);
         box.addActionListener(handleAction((e) -> onChange()));
     }
+
     private void onChange() {
         boolean val = checkBox.isSelected();
         setter.accept(val);

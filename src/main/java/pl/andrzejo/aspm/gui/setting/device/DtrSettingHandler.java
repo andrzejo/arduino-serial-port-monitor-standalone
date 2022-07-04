@@ -1,4 +1,4 @@
-package pl.andrzejo.aspm.gui.setting;
+package pl.andrzejo.aspm.gui.setting.device;
 
 import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.guihandlers.CheckBoxSettingsHandler;

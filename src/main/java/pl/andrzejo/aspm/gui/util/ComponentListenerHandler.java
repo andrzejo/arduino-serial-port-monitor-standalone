@@ -1,8 +1,5 @@
 package pl.andrzejo.aspm.gui.util;
 
-import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.ApplicationClosingEvent;
-
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;

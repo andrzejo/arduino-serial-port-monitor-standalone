@@ -1,32 +1,15 @@
 package pl.andrzejo.aspm.gui.viewer;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Styles {
-    private StyledDocument doc;
-
-
-    public enum MessageType {
-        TIME,
-        INTERNAL_MESSAGE,
-        INTERNAL_ERROR,
-        SERIAL_MESSAGE,
-        SERIAL_DEBUG,
-        SERIAL_INFO,
-        SERIAL_WARN,
-        SERIAL_ERROR;
-    }
-
     private final Map<MessageType, Style> styles = new HashMap<>();
+    private StyledDocument doc;
 
     public Styles(StyledDocument doc) {
         this.doc = doc;
@@ -70,5 +53,16 @@ public class Styles {
     private Color getColor(String color) {
         int colorAsInt = Integer.parseInt(color.substring(1), 16);
         return new Color(colorAsInt);
+    }
+
+    public enum MessageType {
+        TIME,
+        INTERNAL_MESSAGE,
+        INTERNAL_ERROR,
+        SERIAL_MESSAGE,
+        SERIAL_DEBUG,
+        SERIAL_INFO,
+        SERIAL_WARN,
+        SERIAL_ERROR;
     }
 }

@@ -20,6 +20,10 @@ public class AppSetting<T> {
         debouncer.debounce(this);
     }
 
+    private static String createKey(String component, String name) {
+        return component + "." + name;
+    }
+
     @SuppressWarnings("unchecked")
     private Setting<T> createSettingInstance(String key, Class<? extends Setting<T>> settingType, T def) {
         Optional<Constructor<?>> constructor = Arrays
@@ -36,10 +40,6 @@ public class AppSetting<T> {
         } else {
             throw new RuntimeException("Failed to create setting item " + settingType.getCanonicalName());
         }
-    }
-
-    private static String createKey(String component, String name) {
-        return component + "." + name;
     }
 
     public T get() {

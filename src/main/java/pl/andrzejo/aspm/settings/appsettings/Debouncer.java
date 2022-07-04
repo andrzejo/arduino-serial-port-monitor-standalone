@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 
 public class Debouncer<T> {
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private Consumer<AppSetting<T>> handler;
     private final int millis;
+    private Consumer<AppSetting<T>> handler;
     private long nextExecTimestamp;
     private AppSetting<T> current;
 

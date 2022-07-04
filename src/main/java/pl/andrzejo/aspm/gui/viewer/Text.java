@@ -3,32 +3,14 @@ package pl.andrzejo.aspm.gui.viewer;
 import java.util.Date;
 
 public class Text {
-    public Date getDate() {
-        return date;
-    }
-
-    public enum Type {
-        SERIAL_MESSAGE, INTERNAL_MESSAGE, INTERNAL_ERROR
-    }
-
     private final String text;
     private final Type type;
     private final Date date;
-
-    public String getText() {
-        return text;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
     public Text(String text, Type type, Date date) {
         this.text = text;
         this.type = type;
         this.date = date;
     }
-
     public Text(String text, Type type) {
         this(text, type, new Date());
     }
@@ -43,5 +25,21 @@ public class Text {
 
     public static Text error(String text) {
         return new Text(text, Type.INTERNAL_ERROR);
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public enum Type {
+        SERIAL_MESSAGE, INTERNAL_MESSAGE, INTERNAL_ERROR
     }
 }

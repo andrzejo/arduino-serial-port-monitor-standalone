@@ -23,6 +23,10 @@ public class SettingsRepository {
         startDirtyWatcher();
     }
 
+    public static SettingsRepository instance() {
+        return inst;
+    }
+
     private void startDirtyWatcher() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -31,10 +35,6 @@ public class SettingsRepository {
 
     private File getSettingsPath() {
         return new File(FileUtils.getUserDirectory(), ".arduino-serial-port-monitor-st.properties");
-    }
-
-    public static SettingsRepository instance() {
-        return inst;
     }
 
     public void saveString(String key, String value) {

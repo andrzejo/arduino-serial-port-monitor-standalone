@@ -1,6 +1,5 @@
 package pl.andrzejo.aspm.settings.appsettings.items.device;
 
-import pl.andrzejo.aspm.settings.appsettings.items.device.GroupDeviceSetting;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 import pl.andrzejo.aspm.settings.types.DeviceSetting;
 
