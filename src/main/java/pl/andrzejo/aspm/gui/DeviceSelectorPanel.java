@@ -33,6 +33,7 @@ public class DeviceSelectorPanel extends ContentPanel {
     private final JLabel statLabel;
     private final ImageIcon imageIcon;
     private final JButton openBtn;
+    private final JLabel picLabel;
     private boolean isSettingsOpen;
     private final ApplicationEventBus eventBus;
 
@@ -59,17 +60,16 @@ public class DeviceSelectorPanel extends ContentPanel {
         dev.setLayout(new GridLayout(1, 3, 15, 0));
 
         JPanel statusPanel = new JPanel();
-        statusPanel.setLayout(new BorderLayout());
-        statusPanel.setBorder(new EmptyBorder(1, 5, 1, 15));
+        statusPanel.setLayout(new GridLayout(2, 1, 0, 0));
+        statusPanel.setBorder(new EmptyBorder(1, 5, 1, 0));
 
         imageIcon = new ImageIcon();
-        JLabel picLabel = new JLabel(imageIcon);
+        picLabel = new JLabel(imageIcon);
         statLabel = new JLabel("");
-        statusPanel.add(picLabel, BorderLayout.NORTH);
-        statusPanel.add(statLabel, BorderLayout.EAST);
-        statusPanel.setMinimumSize(new Dimension(100, statusPanel.getHeight()));
-        statusPanel.setMaximumSize(new Dimension(100, statusPanel.getHeight()));
-        statusPanel.setPreferredSize(new Dimension(100, statusPanel.getHeight()));
+        statusPanel.add(picLabel);
+        statusPanel.add(statLabel);
+        statLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        statusPanel.setPreferredSize(new Dimension(70, 60));
 
         dev.add(statusPanel);
         dev.add(btnPanel);
@@ -104,12 +104,15 @@ public class DeviceSelectorPanel extends ContentPanel {
     private void setDeviceStatus(boolean isOpen) {
         String path = isOpen ? "./images/controller-on.png" : "./images/controller-off.png";
         String label = isOpen ? "OPEN" : "CLOSED";
+        String hint = isOpen ? "Device is open" : "Device is closed";
         String buttonAction = isOpen ? "Close" : "Open";
         BufferedImage controllerImg = Images.fromResource(path);
         imageIcon.setImage(controllerImg);
         statLabel.setText(label);
         openBtn.setText(buttonAction);
-    }
+        picLabel.repaint();
+        picLabel.setToolTipText(hint);
+}
 
     private void setupTtySettingsPanel() {
         String[] labels = new String[]{"close device settings ▲", "open device settings ▼"};

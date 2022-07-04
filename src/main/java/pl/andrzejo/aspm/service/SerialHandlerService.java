@@ -21,8 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class SerialHandlerService {
-    private static Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);
     private final ScheduledExecutorService executor;
     private final ApplicationEventBus eventBus;
     private Serial serial;
@@ -41,7 +40,7 @@ public class SerialHandlerService {
             serial = new Serial(config.getDevice(), config.getBaud(), config.getParity(), config.getDataBits(),
                     config.getStopBits(), config.isRTS(), config.isDTR()) {
                 @Override
-                protected void message(char buff[], int n) {
+                protected void message(char[] buff, int n) {
                     String msg = new String(buff);
                     eventBus.post(new SerialMessageReceivedEvent(msg));
                 }

@@ -3,9 +3,7 @@ package pl.andrzejo.aspm.gui.util;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.function.Consumer;
 
 public class ComponentListenerHandler {
@@ -39,6 +37,22 @@ public class ComponentListenerHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                handler.accept(e);
+            }
+        };
+    }
+
+    public static ComponentAdapter handleMoved(Consumer<ComponentEvent> handler) {
+        return new ComponentAdapter() {
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                super.componentMoved(e);
+                handler.accept(e);
+            }
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
                 handler.accept(e);
             }
         };
