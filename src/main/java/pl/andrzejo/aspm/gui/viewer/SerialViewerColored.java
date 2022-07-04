@@ -1,5 +1,6 @@
 package pl.andrzejo.aspm.gui.viewer;
 
+import org.apache.commons.lang.StringUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
@@ -60,7 +61,10 @@ public class SerialViewerColored {
 
     public void appendText(Text text) {
         if (isAddTimestamp) {
-            insertText(TimestampHelper.getTimestamp(text.getDate()) + ": ", styles.get(TIME));
+            String c = getCurrentText();
+            boolean isNewLineEnded = StringUtils.endsWithAny(c, new String[]{"\n", "\r"});
+            String prefix = StringUtils.isBlank(c) || isNewLineEnded ? "" : "\n";
+            insertText(prefix + TimestampHelper.getTimestamp(text.getDate()) + ": ", styles.get(TIME));
         }
 
         switch (text.getType()) {
@@ -79,6 +83,14 @@ public class SerialViewerColored {
                 throw new ColorFormatterException("Unsupported text type: " + text.getType().name());
         }
         scrollDown();
+    }
+
+    private String getCurrentText() {
+        try {
+            return doc.getText(0, doc.getLength());
+        } catch (BadLocationException e) {
+            return "";
+        }
     }
 
     private void scrollDown() {
