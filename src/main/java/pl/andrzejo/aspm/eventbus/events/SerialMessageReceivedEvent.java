@@ -1,9 +1,9 @@
 package pl.andrzejo.aspm.eventbus.events;
 
-public class SerialMessageReceived extends BusMessage {
+public class SerialMessageReceivedEvent extends BusEvent {
     private final String value;
 
-    public SerialMessageReceived(String value) {
+    public SerialMessageReceivedEvent(String value) {
         this.value = value;
     }
 

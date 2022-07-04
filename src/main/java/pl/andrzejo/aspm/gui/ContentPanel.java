@@ -1,7 +1,6 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
-import pl.andrzejo.aspm.settings.types.BoolSetting;
 import pl.andrzejo.aspm.settings.types.StringSetting;
 
 import javax.swing.*;
@@ -45,12 +44,12 @@ public class ContentPanel extends JPanel {
         combo.setModel(model);
     }
 
-    protected void setComboBoxSize(JComboBox<String> box, Dimension dimension) {
+    protected void setComboBoxSize(JComponent box, Dimension dimension) {
         box.setMinimumSize(dimension);
         box.setPreferredSize(dimension);
     }
 
-    protected void setPreferredComboBoxSize(JComboBox<String> box) {
+    protected void setPreferredWidthSize(JComponent box) {
         Dimension dimension = new Dimension(PREFERRED_COMBO_WIDTH, box.getPreferredSize().height);
         setComboBoxSize(box, dimension);
     }

@@ -2,6 +2,7 @@ package pl.andrzejo.aspm;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import pl.andrzejo.aspm.gui.SerialPortMonitorForm;
+import pl.andrzejo.aspm.service.DeviceWatcherService;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 
 import javax.swing.*;
@@ -10,6 +11,9 @@ import java.awt.*;
 public class Main {
 
     public static void main(String[] args) {
+        new SerialHandlerService().start();
+        new DeviceWatcherService().start();
+
         try {
             System.setProperty("awt.useSystemAAFontSettings", "on");
             UIManager.setLookAndFeel(new FlatLightLaf());
@@ -21,9 +25,6 @@ public class Main {
             SerialPortMonitorForm form = new SerialPortMonitorForm();
             form.show();
         });
-
-        new SerialHandlerService();
-
     }
 
 }

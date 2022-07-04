@@ -43,8 +43,11 @@ public class AppSetting<T> {
     }
 
     public void set(T value) {
+        T last = setting.get();
         setting.set(value);
-        sentEventBusEvent();
+        if (last != null && !last.equals(value)) {
+            sentEventBusEvent();
+        }
     }
 
     private void sentEventBusEvent() {

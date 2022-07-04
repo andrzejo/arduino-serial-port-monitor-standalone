@@ -37,7 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-import static pl.andrzejo.aspm.utils.StringUtils.format;
+import static pl.andrzejo.aspm.utils.StringFormatter.format;
 
 
 public class Serial implements SerialPortEventListener {
