@@ -5,7 +5,7 @@ import pl.andrzejo.aspm.settings.types.DeviceSetting;
 
 public class TtyDeviceSetting extends GroupDeviceSetting<DeviceConfig> {
 
-    public TtyDeviceSetting() {
+    protected TtyDeviceSetting() {
         super(DeviceSetting.class, "tty", DeviceConfig.defaultConfig());
     }
 }

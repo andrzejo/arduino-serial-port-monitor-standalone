@@ -6,7 +6,7 @@ public class LineEndingSetting extends GroupMonitorSetting<String> {
 
     public static final String DEF_VALUE = "\n";
 
-    public LineEndingSetting() {
+    protected LineEndingSetting() {
         super(StringSetting.class, "lineEnding", DEF_VALUE);
     }
 

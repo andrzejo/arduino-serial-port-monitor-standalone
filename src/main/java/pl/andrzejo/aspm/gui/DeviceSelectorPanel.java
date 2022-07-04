@@ -7,6 +7,7 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;
 import pl.andrzejo.aspm.gui.setting.device.*;
+import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
@@ -41,7 +42,7 @@ public class DeviceSelectorPanel extends ContentPanel {
         eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
 
-        setting = new TtyDeviceSetting();
+        setting = AppSettingsFactory.create(TtyDeviceSetting.class);
         initialConfig = setting.get();
         defConfig = DeviceConfig.defaultConfig();
 
@@ -93,9 +94,9 @@ public class DeviceSelectorPanel extends ContentPanel {
 
         setupTtySettingsPanel();
 
-        handleCheckboxSetting(autoOpenBox, new AutoOpenSetting());
-        handleCheckboxSetting(autoScroll, new AutoscrollSetting());
-        handleCheckboxSetting(addTimestamp, new AddTimestampSetting());
+        handleCheckboxSetting(autoOpenBox, AppSettingsFactory.create(AutoOpenSetting.class));
+        handleCheckboxSetting(autoScroll, AppSettingsFactory.create(AutoscrollSetting.class));
+        handleCheckboxSetting(addTimestamp, AppSettingsFactory.create(AddTimestampSetting.class));
 
         setDeviceStatus(false);
         openBtn.addActionListener(handleAction((e) -> eventBus.post(new ToggleDeviceStatusEvent())));

@@ -11,8 +11,10 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.gui.viewer.SerialViewer;
 import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
+import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoscrollSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.monitor.WindowPositionSetting;
 import pl.andrzejo.aspm.settings.types.RectSetting;
 
 import javax.swing.*;
@@ -26,8 +28,7 @@ public class SerialPortMonitorForm {
     private final SerialViewer viewer;
 
     public SerialPortMonitorForm() {
-        //todo: move to app settings
-        RectSetting sizeSetting = new RectSetting("gui.main.rect", new Rectangle(10, 10, 400, 400));
+        WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
 
         mainFrame = new JFrame("Arduino Serial Port Monitor - Standalone");
 

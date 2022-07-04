@@ -9,7 +9,7 @@ import static java.lang.Integer.parseInt;
 
 public class RectSetting extends Setting<Rectangle> {
 
-    public RectSetting(String key) {
+    private RectSetting(String key) {
         super(key);
     }
 

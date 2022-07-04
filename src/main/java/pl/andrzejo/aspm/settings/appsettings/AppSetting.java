@@ -7,15 +7,15 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class AppSetting<T> {
+public abstract class AppSetting<T> {
     private final Setting<T> setting;
     private final Debouncer<T> debouncer;
     private final ApplicationEventBus eventBus;
 
-    public AppSetting(Class<? extends Setting<T>> settingType, String component, String name, T def) {
+    protected AppSetting(Class<? extends Setting<T>> settingType, String component, String name, T def) {
         String key = createKey(component, name);
         setting = createSettingInstance(key, settingType, def);
-        debouncer = new Debouncer<T>(this::sendEvent, 500);
+        debouncer = new Debouncer<>(this::sendEvent, 500);
         eventBus = ApplicationEventBus.instance();
         debouncer.debounce(this);
     }

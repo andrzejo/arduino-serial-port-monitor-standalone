@@ -7,11 +7,11 @@ public abstract class Setting<T> {
     protected final String key;
     protected final T defValue;
 
-    public Setting(String key) {
+    protected Setting(String key) {
         this(key, null);
     }
 
-    public Setting(String key, T defValue) {
+    protected Setting(String key, T defValue) {
         this.key = key;
         this.defValue = defValue;
         this.repository = SettingsRepository.instance();
