@@ -4,3 +4,6 @@ COM6
 
 ###
 POST http://localhost:4255/api/close/
+
+###
+POST http://localhost:4255/api/status/

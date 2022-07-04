@@ -29,16 +29,24 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 public class SerialHandlerService {
     private static final Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);
+    private static SerialHandlerService inst;
     private final ApplicationEventBus eventBus;
     private final LastDeviceSetting lastDeviceSetting;
     private Serial serial;
     private DeviceConfig config;
     private boolean autoOpen;
 
-    public SerialHandlerService() {
+    private SerialHandlerService() {
         eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
         lastDeviceSetting = AppSettingsFactory.create(LastDeviceSetting.class);
+    }
+
+    public static SerialHandlerService instance() {
+        if (inst == null) {
+            inst = new SerialHandlerService();
+        }
+        return inst;
     }
 
     private void openSerial() {
@@ -191,5 +199,51 @@ public class SerialHandlerService {
 
     public void start() {
 
+    }
+
+    public Status getStatus() {
+        return new Status(config, isOpen());
+    }
+
+    public static class Status {
+        private final DeviceConfig config;
+        private final boolean isOpen;
+
+        public Status(DeviceConfig config, boolean isOpen) {
+            this.config = config;
+            this.isOpen = isOpen;
+        }
+
+        public DeviceConfig getConfig() {
+            return config;
+        }
+
+        public boolean isOpen() {
+            return isOpen;
+        }
+
+        public String toHumanReadableString() {
+            StringBuilder builder = new StringBuilder();
+            addLine(builder, "DeviceOpen", isOpen);
+            if (isOpen) {
+                addLine(builder, "Device", config.getDevice());
+                addLine(builder, "Baud", config.getBaud());
+                addLine(builder, "Parity", config.getParity());
+                addLine(builder, "DataBits", config.getDataBits());
+                addLine(builder, "StopBits", config.getStopBits());
+                addLine(builder, "DTR", config.isDTR());
+                addLine(builder, "RTS", config.isRTS());
+            }
+
+            return builder.toString();
+        }
+
+        private void addLine(StringBuilder builder, String label, Object value) {
+            builder
+                    .append(label)
+                    .append(": ")
+                    .append(value)
+                    .append("\n");
+        }
     }
 }

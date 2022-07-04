@@ -37,7 +37,7 @@ public class SimpleHttpServer {
             String body = IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8);
             logger.info("Rest api request: " + exchange.getRequestMethod() + " " + exchange.getRequestURI() + " [" + body + "]");
             if (!StringUtils.equalsIgnoreCase(exchange.getRequestMethod(), "POST")) {
-                sendResponse(exchange, 405, "Invalid method. Use POST.");
+                sendResponse(exchange, 405, "Invalid HTTP method " + exchange.getRequestMethod() + ". Use POST.");
                 return;
             }
             try {

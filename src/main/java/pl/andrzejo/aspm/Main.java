@@ -13,9 +13,9 @@ import java.awt.*;
 public class Main {
 
     public static void main(String[] args) {
-        new SerialHandlerService().start();
-        new DeviceWatcherService().start();
-        new RestApiService().start();
+        SerialHandlerService.instance().start();
+        DeviceWatcherService.instance().start();
+        RestApiService.instance().start();
 
         try {
             System.setProperty("awt.useSystemAAFontSettings", "on");

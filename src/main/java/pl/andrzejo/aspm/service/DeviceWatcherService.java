@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
-import pl.andrzejo.aspm.eventbus.events.device.DeviceListChangedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceDescriptionEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceListChangedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.serial.PortDescriptionFetcher;
 import pl.andrzejo.aspm.serial.SerialPorts;
@@ -18,6 +18,7 @@ import java.util.concurrent.*;
 
 public class DeviceWatcherService {
     private static final Logger logger = LoggerFactory.getLogger(DeviceWatcherService.class);
+    private static DeviceWatcherService inst;
     private final ScheduledExecutorService watcherExecutor;
     private final ExecutorService descProviderExecutor;
     private final ApplicationEventBus eventBus;
@@ -26,12 +27,19 @@ public class DeviceWatcherService {
     private final PortDescriptionFetcher descriptionFetcher;
     private Future<?> descFetcherFuture;
 
-    public DeviceWatcherService() {
+    private DeviceWatcherService() {
         watcherExecutor = Executors.newSingleThreadScheduledExecutor();
         descProviderExecutor = Executors.newSingleThreadExecutor();
         eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
         descriptionFetcher = new PortDescriptionFetcher();
+    }
+
+    public static DeviceWatcherService instance() {
+        if (inst == null) {
+            inst = new DeviceWatcherService();
+        }
+        return inst;
     }
 
     public void start() {

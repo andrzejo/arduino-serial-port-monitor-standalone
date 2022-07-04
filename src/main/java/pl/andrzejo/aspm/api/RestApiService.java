@@ -4,20 +4,30 @@ import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
+import pl.andrzejo.aspm.service.SerialHandlerService;
 
 import java.util.function.Function;
 
 public class RestApiService {
+    private static RestApiService inst;
     private final ApplicationEventBus eventBus;
 
-    public RestApiService() {
+    private RestApiService() {
         eventBus = ApplicationEventBus.instance();
+    }
+
+    public static RestApiService instance() {
+        if (inst == null) {
+            inst = new RestApiService();
+        }
+        return inst;
     }
 
     public void start() {
         SimpleHttpServer server = new SimpleHttpServer();
         setupEndpoint(server, "open", this::handleOpen);
         setupEndpoint(server, "close", this::handleClose);
+        setupEndpoint(server, "status", this::handleStatus);
     }
 
     private void setupEndpoint(SimpleHttpServer server, String path, Function<String, String> handler) {
@@ -35,6 +45,11 @@ public class RestApiService {
     private String handleOpen(String body) {
         eventBus.post(new ApiOpenDeviceEvent(body));
         return null;
+    }
+
+    private String handleStatus(String body) {
+        SerialHandlerService.Status status = SerialHandlerService.instance().getStatus();
+        return status.toHumanReadableString();
     }
 
 }
