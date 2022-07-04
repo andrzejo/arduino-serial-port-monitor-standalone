@@ -1,43 +1,65 @@
 package pl.andrzejo.aspm.service;
 
-import jssc.SerialPortList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.DeviceListChangedEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceDescriptionEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
+import pl.andrzejo.aspm.serial.PortDescriptionFetcher;
+import pl.andrzejo.aspm.serial.SerialPorts;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class DeviceWatcherService {
-    private static Logger logger = LoggerFactory.getLogger(DeviceWatcherService.class);
-    private final ScheduledExecutorService executor;
+    private static final Logger logger = LoggerFactory.getLogger(DeviceWatcherService.class);
+    private final ScheduledExecutorService watcherExecutor;
+    private final ExecutorService descProviderExecutor;
     private final ApplicationEventBus eventBus;
     private final List<String> lastDevices = new ArrayList<>();
+    private final Map<String, String> lastDesc = new HashMap<>();
+    private final PortDescriptionFetcher descriptionFetcher;
+    private Future<?> descFetcherFuture;
 
     public DeviceWatcherService() {
-        executor = Executors.newSingleThreadScheduledExecutor();
+        watcherExecutor = Executors.newSingleThreadScheduledExecutor();
+        descProviderExecutor = Executors.newSingleThreadExecutor();
         eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
+        descriptionFetcher = new PortDescriptionFetcher();
     }
 
     public void start() {
-        executor.scheduleAtFixedRate(this::checkDevices, 0, 3, TimeUnit.SECONDS);
+        watcherExecutor.scheduleAtFixedRate(this::checkDevices, 0, 3, TimeUnit.SECONDS);
     }
 
     public void checkDevices() {
-        List<String> newDevices = Arrays.asList(SerialPortList.getPortNames());
+        List<String> newDevices = SerialPorts.getList();
         if (!lastDevices.equals(newDevices)) {
             setNewDevices(newDevices);
+            fetchDeviceDescriptions(newDevices);
             logger.info("TTY devices list changed: {}", newDevices);
             triggerEvent();
         }
+    }
+
+    private void fetchDeviceDescriptions(List<String> newDevices) {
+        if (descFetcherFuture != null) {
+            descFetcherFuture.cancel(true);
+        }
+        descFetcherFuture = descProviderExecutor.submit(() -> {
+            Map<String, String> desc = descriptionFetcher.fetch(newDevices);
+            if (!lastDesc.equals(desc)) {
+                lastDesc.clear();
+                lastDesc.putAll(desc);
+                eventBus.post(new DeviceDescriptionEvent(lastDesc));
+            }
+        });
     }
 
     private void setNewDevices(List<String> newDevices) {

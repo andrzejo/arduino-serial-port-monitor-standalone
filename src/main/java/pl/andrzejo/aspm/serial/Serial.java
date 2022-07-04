@@ -34,8 +34,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 
 import static pl.andrzejo.aspm.utils.StringFormatter.format;
 
@@ -268,11 +266,6 @@ public class Serial implements SerialPortEventListener {
                 .onUnmappableCharacter(CodingErrorAction.REPLACE)
                 .replaceWith("\u2e2e");
     }
-
-    static public List<String> list() {
-        return Arrays.asList(SerialPortList.getPortNames());
-    }
-
 
     /**
      * General error reporting, all corraled here just in case

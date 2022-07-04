@@ -3,7 +3,7 @@ package pl.andrzejo.aspm.eventbus.events;
 import java.util.List;
 
 public class DeviceListChangedEvent extends BusEvent {
-    private List<String> devices;
+    private final List<String> devices;
 
     public DeviceListChangedEvent(List<String> devices) {
         this.devices = devices;
