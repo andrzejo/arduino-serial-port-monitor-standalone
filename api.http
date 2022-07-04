@@ -1,9 +1,9 @@
 POST http://localhost:4255/api/open/
 
-COM6
+COM11
 
 ###
 POST http://localhost:4255/api/close/
 
 ###
-POST http://localhost:4255/api/status/
+GET http://localhost:4255/api/status/

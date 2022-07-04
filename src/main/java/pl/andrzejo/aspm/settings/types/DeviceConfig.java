@@ -1,6 +1,6 @@
 package pl.andrzejo.aspm.settings.types;
 
-public class DeviceConfig {
+public class DeviceConfig implements Cloneable {
     private String device;
     private int baud;
     private char parity;
@@ -120,5 +120,22 @@ public class DeviceConfig {
         result = 31 * result + (RTS ? 1 : 0);
         result = 31 * result + (DTR ? 1 : 0);
         return result;
+    }
+
+    @Override
+    public DeviceConfig clone() {
+        try {
+            DeviceConfig clone = (DeviceConfig) super.clone();
+            clone.setDevice(device);
+            clone.setBaud(baud);
+            clone.setDataBits(dataBits);
+            clone.setStopBits(stopBits);
+            clone.setParity(parity);
+            clone.setDTR(DTR);
+            clone.setRTS(RTS);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

@@ -34,6 +34,8 @@ public class SerialHandlerService {
     private final LastDeviceSetting lastDeviceSetting;
     private Serial serial;
     private DeviceConfig config;
+
+    private DeviceConfig openDeviceConfig;
     private boolean autoOpen;
 
     private SerialHandlerService() {
@@ -50,10 +52,15 @@ public class SerialHandlerService {
     }
 
     private void openSerial() {
+        if (!isValidDevice()) {
+            return;
+        }
+        openSerial(config);
+    }
+
+    private void openSerial(DeviceConfig config) {
         try {
-            if (!isValidDevice()) {
-                return;
-            }
+            openDeviceConfig = config;
             logger.info("Open serial: {}", config);
             serial = new Serial(config.getDevice(), config.getBaud(), config.getParity(), config.getDataBits(), config.getStopBits(), config.isRTS(), config.isDTR()) {
                 @Override
@@ -68,14 +75,6 @@ public class SerialHandlerService {
         } catch (Exception e) {
             eventBus.post(new DeviceCloseEvent(config));
         }
-    }
-
-    private boolean isValidDevice() {
-        if (config != null) {
-            List<String> devices = SerialPorts.getList();
-            return devices.contains(config.getDevice());
-        }
-        return false;
     }
 
     @Subscribe
@@ -135,11 +134,28 @@ public class SerialHandlerService {
     @SuppressWarnings("unused")
     public void handleEvent(ApiOpenDeviceEvent event) {
         if (!isOpen()) {
-            if (isNotBlank(event.getDevice())) {
-                config.setDevice(event.getDevice());
+            String device = event.getDevice();
+            if (isNotBlank(device) && config != null) {
+                DeviceConfig clone = config.clone();
+                clone.setDevice(device);
+                openSerial(clone);
+            } else {
+                openSerial();
             }
-            openSerial();
         }
+    }
+
+    private boolean isValidDevice(String device) {
+        List<String> devices = SerialPorts.getList();
+        return devices.contains(device);
+    }
+
+
+    private boolean isValidDevice() {
+        if (config != null) {
+            return isValidDevice(config.getDevice());
+        }
+        return false;
     }
 
     private void reopenDevice() {
@@ -202,7 +218,7 @@ public class SerialHandlerService {
     }
 
     public Status getStatus() {
-        return new Status(config, isOpen());
+        return new Status(openDeviceConfig, isOpen());
     }
 
     public static class Status {

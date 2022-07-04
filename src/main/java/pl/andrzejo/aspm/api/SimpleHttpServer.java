@@ -15,6 +15,10 @@ import java.util.function.Function;
 import static org.apache.commons.lang.StringUtils.trimToEmpty;
 
 public class SimpleHttpServer {
+    public enum Method {
+        Get, Post
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(SimpleHttpServer.class);
     private HttpServer server;
 
@@ -28,16 +32,17 @@ public class SimpleHttpServer {
         }
     }
 
-    public void addEndpoint(String name, Function<String, String> handler) {
+    public void addEndpoint(Method method, String name, Function<String, String> handler) {
         if (server == null) {
             return;
         }
-
-        server.createContext("/api/" + name, exchange -> {
+        String path = "/api/" + name;
+        server.createContext(path, exchange -> {
             String body = IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8);
             logger.info("Rest api request: " + exchange.getRequestMethod() + " " + exchange.getRequestURI() + " [" + body + "]");
-            if (!StringUtils.equalsIgnoreCase(exchange.getRequestMethod(), "POST")) {
-                sendResponse(exchange, 405, "Invalid HTTP method " + exchange.getRequestMethod() + ". Use POST.");
+            if (!StringUtils.equalsIgnoreCase(exchange.getRequestMethod(), method.name())) {
+                String message = String.format("Invalid HTTP method '%s' For endpoint '%s'. Use '%s' instead.", exchange.getRequestMethod(), path, method.name().toUpperCase());
+                sendResponse(exchange, 405, message);
                 return;
             }
             try {

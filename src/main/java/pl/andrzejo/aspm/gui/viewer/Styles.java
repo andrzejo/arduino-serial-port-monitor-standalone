@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Styles {
     private final Map<MessageType, Style> styles = new HashMap<>();
-    private StyledDocument doc;
+    private final StyledDocument doc;
 
     public Styles(StyledDocument doc) {
         this.doc = doc;
@@ -25,11 +25,13 @@ public class Styles {
     }
 
     private Style serialMsgStyle() {
-        return createStyle(MessageType.SERIAL_MESSAGE, "#00000");
+        return createStyle(MessageType.SERIAL_MESSAGE, "#000000");
     }
 
     private Style intErrorStyle() {
-        return createStyle(MessageType.INTERNAL_ERROR, "#ffffff");
+        Style style = createStyle(MessageType.INTERNAL_MESSAGE, "#ffffff");
+        StyleConstants.setBackground(style, getColor("#ff3300"));
+        return style;
     }
 
     private Style intMessageStyle() {

@@ -8,6 +8,9 @@ import pl.andrzejo.aspm.service.SerialHandlerService;
 
 import java.util.function.Function;
 
+import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
+import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
+
 public class RestApiService {
     private static RestApiService inst;
     private final ApplicationEventBus eventBus;
@@ -25,13 +28,13 @@ public class RestApiService {
 
     public void start() {
         SimpleHttpServer server = new SimpleHttpServer();
-        setupEndpoint(server, "open", this::handleOpen);
-        setupEndpoint(server, "close", this::handleClose);
-        setupEndpoint(server, "status", this::handleStatus);
+        setupEndpoint(server, Post, "open", this::handleOpen);
+        setupEndpoint(server, Post, "close", this::handleClose);
+        setupEndpoint(server, Get, "status", this::handleStatus);
     }
 
-    private void setupEndpoint(SimpleHttpServer server, String path, Function<String, String> handler) {
-        server.addEndpoint(path, (body) -> {
+    private void setupEndpoint(SimpleHttpServer server, SimpleHttpServer.Method method, String path, Function<String, String> handler) {
+        server.addEndpoint(method, path, (body) -> {
             eventBus.post(new ApiExecuteCommand(path, body));
             return handler.apply(body);
         });

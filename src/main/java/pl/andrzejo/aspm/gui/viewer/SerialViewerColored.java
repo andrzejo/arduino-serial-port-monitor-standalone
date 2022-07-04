@@ -90,7 +90,7 @@ public class SerialViewerColored {
                 break;
 
             case INTERNAL_ERROR:
-                insertText(text.getText(), styles.get(INTERNAL_ERROR));
+                insertText(String.format(" \u26A0 %s \n", text.getText()), styles.get(INTERNAL_ERROR));
                 break;
             default:
                 throw new ColorFormatterException("Unsupported text type: " + text.getType().name());
