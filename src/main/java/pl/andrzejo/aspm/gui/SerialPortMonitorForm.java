@@ -21,6 +21,7 @@ import pl.andrzejo.aspm.utils.Images;
 import javax.swing.*;
 import java.awt.*;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleMoved;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleWindowClosed;
 
@@ -110,10 +111,9 @@ public class SerialPortMonitorForm {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(ApiExecuteCommand event) {
-        String body = event.getBody() == null ? "" : " - " + event.getBody();
+        String body = isBlank(event.getBody()) ? "" : " - " + event.getBody();
         addText(Text.info("Remote command: " + event.getCommand() + body));
     }
-
 
     public void show() {
         mainFrame.setVisible(true);

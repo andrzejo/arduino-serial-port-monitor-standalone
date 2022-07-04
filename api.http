@@ -1,3 +1,6 @@
 POST http://localhost:4255/api/open/
 
-/dev/ttyUSBS0
+COM6
+
+###
+POST http://localhost:4255/api/close/

@@ -25,6 +25,8 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 import java.io.IOException;
 import java.util.List;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 public class SerialHandlerService {
     private static final Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);
     private final ApplicationEventBus eventBus;
@@ -125,6 +127,9 @@ public class SerialHandlerService {
     @SuppressWarnings("unused")
     public void handleEvent(ApiOpenDeviceEvent event) {
         if (!isOpen()) {
+            if (isNotBlank(event.getDevice())) {
+                config.setDevice(event.getDevice());
+            }
             openSerial();
         }
     }
