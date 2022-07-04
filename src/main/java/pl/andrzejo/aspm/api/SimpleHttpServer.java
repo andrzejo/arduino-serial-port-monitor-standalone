@@ -15,6 +15,8 @@ import java.util.function.Function;
 import static org.apache.commons.lang.StringUtils.trimToEmpty;
 
 public class SimpleHttpServer {
+    public static final int PORT = 4255;
+
     public enum Method {
         Get, Post
     }
@@ -24,12 +26,16 @@ public class SimpleHttpServer {
 
     public SimpleHttpServer() {
         try {
-            server = HttpServer.create(new InetSocketAddress(4255), 0);
+            server = HttpServer.create(new InetSocketAddress(PORT), 0);
             server.setExecutor(null);
             server.start();
         } catch (Exception e) {
             logger.warn("Failed to start REST API server. API not available!", e);
         }
+    }
+
+    public static String getAddress() {
+        return String.format("http://localhost:%s", PORT);
     }
 
     public void addEndpoint(Method method, String name, Function<String, String> handler) {

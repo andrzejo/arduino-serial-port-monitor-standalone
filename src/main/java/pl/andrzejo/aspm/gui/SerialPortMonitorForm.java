@@ -27,7 +27,6 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
 public class SerialPortMonitorForm {
     private final JFrame mainFrame;
     private final SerialViewerColored viewer;
-    private final AboutForm aboutForm;
 
     public SerialPortMonitorForm() {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
@@ -69,7 +68,6 @@ public class SerialPortMonitorForm {
         eventBus.register(this);
         eventBus.post(new ApplicationStartedEvent());
         MainWindowContainer.setMainWindowComponent(mainFrame);
-        aboutForm = new AboutForm(mainFrame);
     }
 
     private void setupStatusPanel(JPanel statusPanel) {
@@ -79,7 +77,7 @@ public class SerialPortMonitorForm {
         statusPanel.setLayout(new BorderLayout());
         statusPanel.add(about, BorderLayout.EAST);
         statusPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, SystemColor.activeCaptionBorder));
-        about.addMouseListener(mouseClicked((e) -> aboutForm.showModal()));
+        about.addMouseListener(mouseClicked((e) -> new AboutForm(mainFrame).showModal()));
     }
 
     private void addText(String text) {

@@ -28,6 +28,10 @@ public class RestApiService {
         return inst;
     }
 
+    public static String getStatusEndpointAddress() {
+        return SimpleHttpServer.getAddress() + "/api/status";
+    }
+
     public void start() {
         SimpleHttpServer server = new SimpleHttpServer();
         setupEndpoint(server, Post, "open", this::handleOpen);

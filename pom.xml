@@ -6,7 +6,7 @@
 
     <groupId>pl.andrzejo</groupId>
     <artifactId>ArduinoSerialPortMonitorStandalone</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -44,12 +44,6 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
         </dependency>
-        <dependency>
-            <groupId>com.profesorfalken</groupId>
-            <artifactId>WMI4Java</artifactId>
-            <version>1.6.3</version>
-        </dependency>
-
         <!-- TEST -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
