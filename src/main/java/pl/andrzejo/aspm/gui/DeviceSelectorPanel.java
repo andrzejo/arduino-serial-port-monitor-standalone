@@ -45,10 +45,10 @@ public class DeviceSelectorPanel extends ContentPanel {
         JPanel dev = new JPanel();
         dev.setLayout(new GridLayout(1, 3, 15, 0));
 
+        dev.add(btnPanel);
+
         setupComboBoxSetting("Device:", dev, new DeviceSettingHandler(setting, initialConfig, defConfig));
         setupComboBoxSetting("Baud:", dev, new BaudSettingHandler(setting, initialConfig, defConfig));
-
-        dev.add(btnPanel);
 
         add(dev, BorderLayout.WEST);
         JPanel boxes = new JPanel();
@@ -58,7 +58,7 @@ public class DeviceSelectorPanel extends ContentPanel {
 
         boxes.add(autoScroll);
         boxes.add(addTimestamp);
-        add(boxes, BorderLayout.EAST);
+        add(boxes);
 
         setupTtySettingsPanel();
 
@@ -79,12 +79,8 @@ public class DeviceSelectorPanel extends ContentPanel {
         settingPanel.setBorder(border);
         settingPanel.setLayout(new BorderLayout(5, 5));
 
-        JPanel p = new JPanel();
-        p.setLayout(new BorderLayout());
-        p.add(openSettingsLbl, BorderLayout.NORTH);
-        p.add(settingPanel, BorderLayout.SOUTH);
-
-        add(p, BorderLayout.SOUTH);
+        add(createLabeled("", openSettingsLbl), BorderLayout.EAST);
+        add(settingPanel, BorderLayout.SOUTH);
 
         JPanel devSettingsPanel = new JPanel();
         devSettingsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
