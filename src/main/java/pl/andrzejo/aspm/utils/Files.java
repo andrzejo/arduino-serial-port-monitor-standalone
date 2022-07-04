@@ -4,16 +4,17 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class Files {
 
-    public static File fromResource(String path) {
+    public static InputStream resourceAsStream(String path) {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        URL url = Objects.requireNonNull(classloader.getResource(path), "Resource file '" + path + "' not found.");
-        return new File(url.getFile());
+        InputStream stream = classloader.getResourceAsStream(path);
+        Objects.requireNonNull(stream, "Resource file '" + path + "' not found.");
+        return stream;
     }
 
     public static void write(String path, String content) {

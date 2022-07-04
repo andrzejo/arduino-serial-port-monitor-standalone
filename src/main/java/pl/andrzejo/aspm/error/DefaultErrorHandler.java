@@ -14,6 +14,7 @@ public class DefaultErrorHandler implements Thread.UncaughtExceptionHandler {
         logger.error("Unhandled exception caught!", e);
         String trace = Throwables.getStackTraceAsString(e);
         JOptionPane.showMessageDialog(MainWindowContainer.getComponent(), e.getMessage() + "\nTrace:\n" + trace, "Unexpected error", JOptionPane.ERROR_MESSAGE);
+        System.exit(55);
     }
 
 }

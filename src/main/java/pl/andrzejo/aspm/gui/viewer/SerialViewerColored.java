@@ -1,7 +1,5 @@
-package pl.andrzejo.aspm.gui.viewer.color;
+package pl.andrzejo.aspm.gui.viewer;
 
-import pl.andrzejo.aspm.gui.viewer.SerialViewer;
-import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
 
 import javax.swing.*;
@@ -12,9 +10,9 @@ import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
-import static pl.andrzejo.aspm.gui.viewer.color.Styles.MessageType.*;
+import static pl.andrzejo.aspm.gui.viewer.Styles.MessageType.*;
 
-public class SerialViewerColor2 implements SerialViewer {
+public class SerialViewerColored implements SerialViewer {
     private final JTextPane editor;
     private final JScrollPane scroll;
     private final StyledDocument doc;
@@ -25,7 +23,7 @@ public class SerialViewerColor2 implements SerialViewer {
     private boolean isAddTimestamp;
     private boolean isAutoScroll;
 
-    public SerialViewerColor2() {
+    public SerialViewerColored() {
         editor = new JTextPane();
         doc = editor.getStyledDocument();
         scroll = new JScrollPane(editor);
@@ -35,7 +33,7 @@ public class SerialViewerColor2 implements SerialViewer {
         styles = new Styles(doc);
         editor.setBackground(SystemColor.window);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         scroll.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             private final BoundedRangeModel model = scroll.getVerticalScrollBar().getModel();

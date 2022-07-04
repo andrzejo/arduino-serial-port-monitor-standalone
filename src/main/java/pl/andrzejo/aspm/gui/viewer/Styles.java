@@ -1,4 +1,4 @@
-package pl.andrzejo.aspm.gui.viewer.color;
+package pl.andrzejo.aspm.gui.viewer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

@@ -1,5 +1,8 @@
 package pl.andrzejo.aspm.gui.util;
 
+import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.ApplicationClosingEvent;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -38,6 +41,45 @@ public class ComponentListenerHandler {
             @Override
             public void mouseClicked(MouseEvent e) {
                 handler.accept(e);
+            }
+        };
+    }
+
+    public static WindowListener handleWindowClosed(Consumer<WindowEvent> handler) {
+        return new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                handler.accept(e);
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+
             }
         };
     }

@@ -9,18 +9,17 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.gui.viewer.SerialViewer;
+import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
-import pl.andrzejo.aspm.gui.viewer.color.SerialViewerColor2;
 import pl.andrzejo.aspm.settings.appsettings.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.AutoscrollSetting;
 import pl.andrzejo.aspm.settings.types.RectSetting;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleMoved;
+import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleWindowClosed;
 
 public class SerialPortMonitorForm {
     private final JFrame mainFrame;
@@ -35,7 +34,7 @@ public class SerialPortMonitorForm {
         DeviceSelectorPanel deviceSelector = new DeviceSelectorPanel();
         SendCommandPanel sendCommandPanel = new SendCommandPanel();
 
-        viewer = new SerialViewerColor2();
+        viewer = new SerialViewerColored();
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -47,42 +46,7 @@ public class SerialPortMonitorForm {
         Rectangle r = sizeSetting.get();
         mainFrame.setBounds(r);
         mainFrame.addComponentListener(handleMoved(e -> sizeSetting.set(mainFrame.getBounds())));
-        mainFrame.addWindowListener(new WindowListener() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                ApplicationEventBus.instance().post(new ApplicationClosingEvent());
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-
-            }
-        });
+        mainFrame.addWindowListener(handleWindowClosed((e) -> ApplicationEventBus.instance().post(new ApplicationClosingEvent())));
 
         ApplicationEventBus eventBus = ApplicationEventBus.instance();
         eventBus.register(this);

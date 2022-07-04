@@ -74,7 +74,7 @@ public class SerialPortList {
     }
 
     //since 2.1.0 -> Fully rewritten port name comparator
-    private static final Comparator<String> PORTNAMES_COMPARATOR = new Comparator<>() {
+    private static final Comparator<String> PORTNAMES_COMPARATOR = new Comparator<String>() {
 
         @Override
         public int compare(String valueA, String valueB) {
