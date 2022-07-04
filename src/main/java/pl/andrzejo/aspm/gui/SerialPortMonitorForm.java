@@ -1,5 +1,6 @@
 package pl.andrzejo.aspm.gui;
 
+import pl.andrzejo.aspm.App;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
@@ -25,18 +26,16 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleWindowClo
 public class SerialPortMonitorForm {
     private final JFrame mainFrame;
     private final SerialViewerColored viewer;
-    private final OutputLogger outputLogger;
 
     public SerialPortMonitorForm() {
-        outputLogger = new OutputLogger();
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
 
-        mainFrame = new JFrame("Arduino Serial Port Monitor - Standalone");
+        mainFrame = new JFrame(App.Name);
         mainFrame.setIconImage(Images.fromResource("images/icon.png"));
         DeviceSelectorPanel deviceSelector = new DeviceSelectorPanel();
         SendCommandPanel sendCommandPanel = new SendCommandPanel();
 
-        viewer = new SerialViewerColored(outputLogger);
+        viewer = new SerialViewerColored(new OutputLogger());
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

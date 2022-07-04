@@ -1,6 +1,6 @@
 package pl.andrzejo.aspm.settings.repository;
 
-import org.apache.commons.io.FileUtils;
+import pl.andrzejo.aspm.utils.AppFiles;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class SettingsRepository {
     }
 
     private File getSettingsPath() {
-        return new File(FileUtils.getUserDirectory(), ".arduino-serial-port-monitor-st.properties");
+        return new File(AppFiles.getAppConfigDir(), "aspm.properties");
     }
 
     public void saveString(String key, String value) {

@@ -8,7 +8,7 @@ public class Images {
 
     public static BufferedImage fromResource(String path) {
         try {
-            return ImageIO.read(Files.resourceAsStream(path));
+            return ImageIO.read(AppFiles.resourceAsStream(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
