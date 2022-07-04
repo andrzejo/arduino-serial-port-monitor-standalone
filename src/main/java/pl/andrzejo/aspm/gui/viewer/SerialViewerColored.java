@@ -85,6 +85,10 @@ public class SerialViewerColored {
                 insertText(String.format(" \uD83D\uDEC8 %s \n", text.getText()), styles.get(INTERNAL_MESSAGE));
                 break;
 
+            case INTERNAL_INFO:
+                insertText(String.format(" \uD83D\uDEC8 %s \n", text.getText()), styles.get(INTERNAL_INFO));
+                break;
+
             case INTERNAL_ERROR:
                 insertText(text.getText(), styles.get(INTERNAL_ERROR));
                 break;

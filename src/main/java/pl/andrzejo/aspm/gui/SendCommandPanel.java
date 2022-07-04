@@ -2,6 +2,9 @@ package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.command.ExecuteCommandEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
+import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.setting.LineEndingSettingHandler;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.LineEndingSetting;
@@ -32,6 +35,7 @@ public class SendCommandPanel extends ContentPanel {
         add(btnPanel, BorderLayout.EAST);
         LineEndingSettingHandler handler = new LineEndingSettingHandler(AppSettingsFactory.create(LineEndingSetting.class));
         handler.setupComponent(lineEndingComboBox);
+        toggleEnabled(false);
         ApplicationEventBus.instance().register(this);
     }
 
@@ -43,5 +47,21 @@ public class SendCommandPanel extends ContentPanel {
 
     private String getLineEnding() {
         return "\n";
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(DeviceCloseEvent event) {
+        toggleEnabled(false);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(DeviceOpenEvent event) {
+        toggleEnabled(true);
+    }
+
+    private void toggleEnabled(boolean enabled) {
+        sendBtn.setEnabled(enabled);
     }
 }

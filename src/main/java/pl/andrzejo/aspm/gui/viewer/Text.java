@@ -27,6 +27,10 @@ public class Text {
         return new Text(text, Type.INTERNAL_ERROR);
     }
 
+    public static Text info(String text) {
+        return new Text(text, Type.INTERNAL_INFO);
+    }
+
     public Date getDate() {
         return date;
     }
@@ -40,6 +44,6 @@ public class Text {
     }
 
     public enum Type {
-        SERIAL_MESSAGE, INTERNAL_MESSAGE, INTERNAL_ERROR
+        SERIAL_MESSAGE, INTERNAL_MESSAGE, INTERNAL_ERROR, INTERNAL_INFO
     }
 }

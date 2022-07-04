@@ -73,7 +73,7 @@ public class SerialPortMonitorForm {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(CommandExecutedEvent event) {
-        addText("Execute command: [" + event.getCommand() + "]");
+        addText(Text.info("Execute command: [" + event.getCommand() + "]"));
     }
 
     @Subscribe
@@ -104,7 +104,7 @@ public class SerialPortMonitorForm {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(DeviceErrorEvent event) {
-        addText("Serial error: " + event.getMessage());
+        addText(Text.error("Serial error: " + event.getMessage()));
     }
 
     public void show() {

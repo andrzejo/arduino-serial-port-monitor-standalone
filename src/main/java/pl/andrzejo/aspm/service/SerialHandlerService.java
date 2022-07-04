@@ -39,7 +39,7 @@ public class SerialHandlerService {
 
     private void openSerial() {
         try {
-            if (isValidDevice()) {
+            if (!isValidDevice()) {
                 return;
             }
             logger.info("Open serial: {}", config);

@@ -15,6 +15,7 @@ public class Styles {
         this.doc = doc;
         styles.put(MessageType.TIME, timeStyle());
         styles.put(MessageType.INTERNAL_MESSAGE, intMessageStyle());
+        styles.put(MessageType.INTERNAL_INFO, intInfoStyle());
         styles.put(MessageType.INTERNAL_ERROR, intErrorStyle());
         styles.put(MessageType.SERIAL_MESSAGE, serialMsgStyle());
     }
@@ -34,6 +35,12 @@ public class Styles {
     private Style intMessageStyle() {
         Style style = createStyle(MessageType.INTERNAL_MESSAGE, "#076707");
         StyleConstants.setBackground(style, getColor("#a5ffa5"));
+        return style;
+    }
+
+    private Style intInfoStyle() {
+        Style style = createStyle(MessageType.INTERNAL_INFO, "#ffffff");
+        StyleConstants.setBackground(style, getColor("#3366ff"));
         return style;
     }
 
@@ -58,6 +65,7 @@ public class Styles {
     public enum MessageType {
         TIME,
         INTERNAL_MESSAGE,
+        INTERNAL_INFO,
         INTERNAL_ERROR,
         SERIAL_MESSAGE,
         SERIAL_DEBUG,
