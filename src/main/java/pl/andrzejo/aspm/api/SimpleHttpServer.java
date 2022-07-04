@@ -12,6 +12,8 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
+import static org.apache.commons.lang.StringUtils.trimToEmpty;
+
 public class SimpleHttpServer {
     private static final Logger logger = LoggerFactory.getLogger(SimpleHttpServer.class);
     private HttpServer server;
@@ -32,13 +34,13 @@ public class SimpleHttpServer {
         }
 
         server.createContext("/api/" + name, exchange -> {
-            logger.info("Rest api request: " + exchange.getRequestMethod() + " " + exchange.getRequestURI());
+            String body = IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8);
+            logger.info("Rest api request: " + exchange.getRequestMethod() + " " + exchange.getRequestURI() + " [" + body + "]");
             if (!StringUtils.equalsIgnoreCase(exchange.getRequestMethod(), "POST")) {
                 sendResponse(exchange, 405, "Invalid method. Use POST.");
                 return;
             }
             try {
-                String body = IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8);
                 String response = handler.apply(body);
                 sendResponse(exchange, 200, response);
             } catch (Exception e) {
@@ -50,9 +52,10 @@ public class SimpleHttpServer {
 
     private void sendResponse(HttpExchange exchange, int httpCode, String message) {
         try {
-            exchange.sendResponseHeaders(httpCode, message.getBytes().length);
+            String response = trimToEmpty(message);
+            exchange.sendResponseHeaders(httpCode, response.getBytes().length);
             OutputStream os = exchange.getResponseBody();
-            os.write(message.getBytes());
+            os.write(response.getBytes());
             os.close();
         } catch (Exception e) {
             throw new RuntimeException(e);

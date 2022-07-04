@@ -2,6 +2,7 @@ package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.App;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.command.CommandExecutedEvent;
@@ -105,6 +106,14 @@ public class SerialPortMonitorForm {
     public void handleEvent(DeviceErrorEvent event) {
         addText(Text.error("Serial error: " + event.getMessage()));
     }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(ApiExecuteCommand event) {
+        String body = event.getBody() == null ? "" : " - " + event.getBody();
+        addText(Text.info("Remote command: " + event.getCommand() + body));
+    }
+
 
     public void show() {
         mainFrame.setVisible(true);

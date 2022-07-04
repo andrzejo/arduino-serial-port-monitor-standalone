@@ -1,11 +1,11 @@
 package pl.andrzejo.aspm.eventbus.events.api.commands;
 
-import pl.andrzejo.aspm.eventbus.events.api.ApiCommandEvent;
+import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
-public class OpenDeviceEvent extends ApiCommandEvent {
+public class ApiOpenDeviceEvent extends BusEvent {
     private final String device;
 
-    public OpenDeviceEvent(String device) {
+    public ApiOpenDeviceEvent(String device) {
         this.device = device;
     }
 

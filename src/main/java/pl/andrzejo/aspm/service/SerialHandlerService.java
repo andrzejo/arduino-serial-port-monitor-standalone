@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
+import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.command.CommandExecutedEvent;
@@ -108,6 +110,22 @@ public class SerialHandlerService {
             String command = event.getCommand() + event.getLineEnding();
             serial.write(command);
             eventBus.post(new CommandExecutedEvent(event.getCommand()));
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(ApiCloseDeviceEvent event) {
+        if (isOpen()) {
+            closeSerial();
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(ApiOpenDeviceEvent event) {
+        if (!isOpen()) {
+            openSerial();
         }
     }
 
