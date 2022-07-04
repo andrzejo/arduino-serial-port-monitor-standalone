@@ -46,11 +46,11 @@ public class SerialHandlerService {
                     eventBus.post(new SerialMessageReceivedEvent(msg));
                 }
             };
-            eventBus.post(new DeviceOpenEvent());
+            eventBus.post(new DeviceOpenEvent(config));
         } catch (SerialException e) {
             eventBus.post(new DeviceErrorEvent(e.getMessage()));
         } catch (Exception e) {
-            eventBus.post(new DeviceCloseEvent());
+            eventBus.post(new DeviceCloseEvent(config));
         }
     }
 
@@ -92,7 +92,7 @@ public class SerialHandlerService {
                 logger.warn("Failed to close device: {0}", e);
             } finally {
                 serial = null;
-                eventBus.post(new DeviceCloseEvent());
+                eventBus.post(new DeviceCloseEvent(config));
             }
         }
     }

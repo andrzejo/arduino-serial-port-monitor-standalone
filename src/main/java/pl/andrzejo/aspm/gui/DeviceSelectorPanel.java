@@ -67,6 +67,9 @@ public class DeviceSelectorPanel extends ContentPanel {
         statLabel = new JLabel("");
         statusPanel.add(picLabel, BorderLayout.NORTH);
         statusPanel.add(statLabel, BorderLayout.EAST);
+        statusPanel.setMinimumSize(new Dimension(100, statusPanel.getHeight()));
+        statusPanel.setMaximumSize(new Dimension(100, statusPanel.getHeight()));
+        statusPanel.setPreferredSize(new Dimension(100, statusPanel.getHeight()));
 
         dev.add(statusPanel);
         dev.add(btnPanel);

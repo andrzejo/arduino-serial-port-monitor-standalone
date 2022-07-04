@@ -6,6 +6,9 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.SerialMessageReceivedEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.settings.appsettings.AutoscrollSetting;
 import pl.andrzejo.aspm.settings.types.RectSetting;
 
@@ -52,12 +55,12 @@ public class SerialPortMonitorForm {
         eventBus.post(new ApplicationStartedEvent());
     }
 
-    @Subscribe
-    public void stringEvent(SerialMessageReceivedEvent event) {
+
+    private void addText(String text) {
         EventQueue.invokeLater(() -> {
             Document document = textArea.getDocument();
             try {
-                document.insertString(document.getLength(), event.getValue(), null);
+                document.insertString(document.getLength(), text, null);
                 if (autoScroll) {
                     textArea.setCaretPosition(document.getLength());
                 }
@@ -65,13 +68,32 @@ public class SerialPortMonitorForm {
                 throw new RuntimeException(e);
             }
         });
-        System.out.println(event.getValue());
     }
 
 
     @Subscribe
     public void handleEvent(AutoscrollSetting event) {
         autoScroll = event.get();
+    }
+
+    @Subscribe
+    public void handleEvent(SerialMessageReceivedEvent event) {
+        addText(event.getValue());
+    }
+
+    @Subscribe
+    public void handleEvent(DeviceCloseEvent event) {
+        addText("Close serial: " + event.getConfig().getDevice() + "\n");
+    }
+
+    @Subscribe
+    public void handleEvent(DeviceOpenEvent event) {
+        addText("Open serial: " + event.getConfig().getDevice() + "\n");
+    }
+
+    @Subscribe
+    public void handleEvent(DeviceErrorEvent event) {
+        addText("Serial error: " + event.getMessage() + "\n");
     }
 
     public void show() {
