@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 public class ContentPanel extends JPanel {
     public static int PREFERRED_COMBO_WIDTH = 120;
 
-    protected void handleComboSetting(JComboBox<String> box, StringSetting setting) {
+    protected void handleComboSetting(JComboBox<String> box, AppSetting<String> setting) {
         box.setSelectedItem(setting.get());
         box.addActionListener(new AbstractAction() {
             @Override

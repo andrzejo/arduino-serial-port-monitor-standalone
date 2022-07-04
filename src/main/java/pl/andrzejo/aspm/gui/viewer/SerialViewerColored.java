@@ -2,11 +2,14 @@ package pl.andrzejo.aspm.gui.viewer;
 
 import org.apache.commons.lang.StringUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.OutputLogger;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
+import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AutoscrollSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontNameSetting;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -22,25 +25,30 @@ public class SerialViewerColored {
 
     private final StyledDocument doc;
     private final Styles styles;
+    private final JTextPane editor;
     private boolean isAutoScroll = get(AutoscrollSetting.class);
     private boolean isAddTimestamp = get(AddTimestampSetting.class);
     private final OutputLogger logger;
 
     public SerialViewerColored(OutputLogger logger) {
         this.logger = logger;
-        JTextPane editor = new JTextPane();
+        editor = new JTextPane();
         editor.setEditable(false);
         doc = editor.getStyledDocument();
         scroll = new JScrollPane(editor);
-        Font font = editor.getFont();
-        Font font1 = new Font("monospaced", font.getStyle(), font.getSize());
-        editor.setFont(font1);
+        setFont(AppSettingsFactory.create(FontNameSetting.class).get());
         styles = new Styles(doc);
         editor.setBackground(SystemColor.window);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         ApplicationEventBus.instance().register(this);
+    }
+
+    private void setFont(String name) {
+        Font font = editor.getFont();
+        Font font1 = new Font(name, font.getStyle(), font.getSize());
+        editor.setFont(font1);
     }
 
     @Subscribe
@@ -55,6 +63,11 @@ public class SerialViewerColored {
         isAddTimestamp = event.get();
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(FontChangedEvent event) {
+        setFont(event.getName());
+    }
 
     public JComponent getComponent() {
         return scroll;
