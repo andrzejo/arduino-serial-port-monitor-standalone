@@ -11,8 +11,8 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.gui.viewer.SerialViewer;
 import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
-import pl.andrzejo.aspm.settings.appsettings.AddTimestampSetting;
-import pl.andrzejo.aspm.settings.appsettings.AutoscrollSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.monitor.AddTimestampSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoscrollSetting;
 import pl.andrzejo.aspm.settings.types.RectSetting;
 
 import javax.swing.*;

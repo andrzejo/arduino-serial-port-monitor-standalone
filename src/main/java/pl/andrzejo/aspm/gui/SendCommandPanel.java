@@ -2,7 +2,7 @@ package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.gui.setting.LineEndingSettingHandler;
-import pl.andrzejo.aspm.settings.appsettings.LineEndingSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.monitor.LineEndingSetting;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

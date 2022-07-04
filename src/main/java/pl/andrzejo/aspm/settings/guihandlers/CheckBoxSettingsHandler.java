@@ -3,7 +3,7 @@ package pl.andrzejo.aspm.settings.guihandlers;
 import com.google.common.eventbus.Subscribe;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.SettingsResetToDefaultEvent;
-import pl.andrzejo.aspm.settings.appsettings.TtyDeviceSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import javax.swing.*;

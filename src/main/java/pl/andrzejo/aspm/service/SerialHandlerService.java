@@ -13,8 +13,8 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;
 import pl.andrzejo.aspm.serial.Serial;
 import pl.andrzejo.aspm.serial.SerialException;
-import pl.andrzejo.aspm.settings.appsettings.AutoOpenSetting;
-import pl.andrzejo.aspm.settings.appsettings.TtyDeviceSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.io.IOException;

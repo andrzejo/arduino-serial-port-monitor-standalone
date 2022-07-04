@@ -1,6 +1,6 @@
 package pl.andrzejo.aspm.gui.setting;
 
-import pl.andrzejo.aspm.settings.appsettings.TtyDeviceSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.guihandlers.ListSettingHandler;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 

@@ -1,6 +1,6 @@
 package pl.andrzejo.aspm.gui.setting;
 
-import pl.andrzejo.aspm.settings.appsettings.LineEndingSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.monitor.LineEndingSetting;
 import pl.andrzejo.aspm.settings.guihandlers.ListSettingHandler;
 
 import java.util.LinkedHashMap;
