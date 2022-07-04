@@ -1,14 +1,19 @@
 package pl.andrzejo.aspm.gui.viewer;
 
+import java.util.Date;
+
 public class Text {
-    public enum Type {
-        SERIAL_MESSAGE,
-        INTERNAL_MESSAGE,
-        INTERNAL_ERROR
+    public Date getDate() {
+        return date;
     }
 
-    private String text;
-    private Type type;
+    public enum Type {
+        SERIAL_MESSAGE, INTERNAL_MESSAGE, INTERNAL_ERROR
+    }
+
+    private final String text;
+    private final Type type;
+    private final Date date;
 
     public String getText() {
         return text;
@@ -18,13 +23,18 @@ public class Text {
         return type;
     }
 
-    public Text(String text, Type type) {
+    public Text(String text, Type type, Date date) {
         this.text = text;
         this.type = type;
+        this.date = date;
     }
 
-    public static Text message(String text) {
-        return new Text(text, Type.SERIAL_MESSAGE);
+    public Text(String text, Type type) {
+        this(text, type, new Date());
+    }
+
+    public static Text message(String text, Date date) {
+        return new Text(text, Type.SERIAL_MESSAGE, date);
     }
 
     public static Text appMessage(String text) {

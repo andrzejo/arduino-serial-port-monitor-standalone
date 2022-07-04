@@ -8,7 +8,7 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.gui.viewer.SerialViewer;
-import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
+import pl.andrzejo.aspm.gui.viewer.color.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.settings.appsettings.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.AutoscrollSetting;
@@ -49,7 +49,11 @@ public class SerialPortMonitorForm {
     }
 
     private void addText(String text) {
-        viewer.appendText(Text.message(text));
+        viewer.appendText(Text.appMessage(text));
+    }
+
+    private void addText(Text text) {
+        viewer.appendText(text);
     }
 
     @Subscribe
@@ -64,7 +68,7 @@ public class SerialPortMonitorForm {
 
     @Subscribe
     public void handleEvent(SerialMessageReceivedEvent event) {
-        addText(event.getValue());
+        addText(Text.message(event.getValue(), event.getDate()));
     }
 
     @Subscribe
