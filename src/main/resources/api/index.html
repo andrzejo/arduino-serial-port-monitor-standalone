@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>${APP}</title>
+    <style>
+        body {
+            font-family: Arial;
+        }
+        .header {
+            display: flex;
+            background-color: lightgray;
+        }
+
+        .header * {
+            border-left: 5px solid darkgray;
+            padding: 5px;
+            font-weight: bold;
+        }
+
+        .content {
+            font-family: monospace;
+        }
+
+        .method {
+            width: 60px;
+        }
+
+        .path {
+            width: 200px;
+        }
+
+        .desc {
+            width: 450px;
+        }
+
+        .item .curl span {
+            background-color: #484848;
+            color: lightgray;
+            border-radius: 5px;
+            padding: 2px 5px;
+        }
+
+        .item {
+            display: flex;
+            margin: 10px 0;
+            align-items: center;
+        }
+
+        .item > * {
+            border-left: 5px solid lightgray;
+            padding: 5px;
+            font-weight: bold;
+        }
+
+        .item .method {
+            text-align: center;
+        }
+
+        .method span {
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 6px;
+        }
+
+        .method.get span {
+            background-color: #6060f5;
+            color: white;
+        }
+
+        .method.post span {
+            background-color: green;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<h2>${APP}</h2>
+<h3> API endpoints:</h3>
+<div class="content">
+    <div class="header">
+        <div class="method">Method</div>
+        <div class="path">Path</div>
+        <div class="desc">Description</div>
+        <div class="curl">Curl command</div>
+    </div>
+    ${ENDPOINTS}
+</div>
+</body>
+</html>

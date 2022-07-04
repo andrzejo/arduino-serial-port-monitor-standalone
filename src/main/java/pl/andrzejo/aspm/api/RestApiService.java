@@ -7,6 +7,7 @@ import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
 import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -16,8 +17,11 @@ import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
 public class RestApiService {
     private static RestApiService inst;
     private final ApplicationEventBus eventBus;
+    private final List<Endpoint> endpoints = new ArrayList<>();
+    private final ApiIndex apiIndex;
 
     private RestApiService() {
+        apiIndex = new ApiIndex();
         eventBus = ApplicationEventBus.instance();
     }
 
@@ -34,17 +38,25 @@ public class RestApiService {
 
     public void start() {
         SimpleHttpServer server = new SimpleHttpServer();
-        setupEndpoint(server, Post, "open", this::handleOpen);
-        setupEndpoint(server, Post, "close", this::handleClose);
-        setupEndpoint(server, Get, "status", this::handleStatus);
-        setupEndpoint(server, Get, "devices", this::handleDevices);
+        setupEndpoint(server, Post, "/api/open", this::handleOpen, "Open device. Specify device in request body. If device is not specified opens first selected.");
+        setupEndpoint(server, Post, "/api/close", this::handleClose, "Close device.");
+        setupEndpoint(server, Get, "/api/status", this::handleStatus, "Display device status.");
+        setupEndpoint(server, Get, "/api/devices", this::handleDevices, "Get available devices.");
+        setupEndpoint(server, Get, null, this::handleRoot, "Get endpoints.");
     }
 
-    private void setupEndpoint(SimpleHttpServer server, SimpleHttpServer.Method method, String path, Function<String, String> handler) {
+    private void setupEndpoint(SimpleHttpServer server, SimpleHttpServer.Method method, String path, Function<String, String> handler, String desc) {
+        endpoints.add(new Endpoint(method, path, desc));
         server.addEndpoint(method, path, (body) -> {
-            eventBus.post(new ApiExecuteCommand(path, body));
+            if (path != null) {
+                eventBus.post(new ApiExecuteCommand(path, body));
+            }
             return handler.apply(body);
         });
+    }
+
+    private String handleRoot(String s) {
+        return apiIndex.getHtml(endpoints);
     }
 
     private String handleClose(String body) {
@@ -65,5 +77,29 @@ public class RestApiService {
     private String handleDevices(String body) {
         List<String> list = SerialPorts.getList();
         return String.join("\n", list);
+    }
+
+    public static class Endpoint {
+        private final String path;
+        private final String desc;
+        private final SimpleHttpServer.Method method;
+
+        public Endpoint(SimpleHttpServer.Method method, String path, String desc) {
+            this.method = method;
+            this.path = path;
+            this.desc = desc;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public SimpleHttpServer.Method getMethod() {
+            return method;
+        }
     }
 }

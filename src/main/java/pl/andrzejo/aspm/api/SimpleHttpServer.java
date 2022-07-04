@@ -42,7 +42,7 @@ public class SimpleHttpServer {
         if (server == null) {
             return;
         }
-        String path = "/api/" + name;
+        String path = name == null ? "/" : name;
         server.createContext(path, exchange -> {
             String body = IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8);
             logger.info("Rest api request: " + exchange.getRequestMethod() + " " + exchange.getRequestURI() + " [" + body + "]");

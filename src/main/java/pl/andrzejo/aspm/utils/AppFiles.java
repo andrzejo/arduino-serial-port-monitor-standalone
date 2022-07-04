@@ -1,6 +1,7 @@
 package pl.andrzejo.aspm.utils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import pl.andrzejo.aspm.App;
 
 import java.io.File;
@@ -32,5 +33,13 @@ public class AppFiles {
         File file = new File(root, App.ConfigDir);
         file.mkdirs();
         return file;
+    }
+
+    public static String readResources(String path) {
+        try {
+            return IOUtils.toString(resourceAsStream(path), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
