@@ -3,6 +3,7 @@ package pl.andrzejo.aspm.gui.viewer;
 import org.apache.commons.lang.StringUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
+import pl.andrzejo.aspm.gui.OutputLogger;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AutoscrollSetting;
@@ -18,13 +19,17 @@ import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
 
 public class SerialViewerColored {
     private final JScrollPane scroll;
+
     private final StyledDocument doc;
     private final Styles styles;
     private boolean isAutoScroll = get(AutoscrollSetting.class);
     private boolean isAddTimestamp = get(AddTimestampSetting.class);
+    private final OutputLogger logger;
 
-    public SerialViewerColored() {
+    public SerialViewerColored(OutputLogger logger) {
+        this.logger = logger;
         JTextPane editor = new JTextPane();
+        editor.setEditable(false);
         doc = editor.getStyledDocument();
         scroll = new JScrollPane(editor);
         Font font = editor.getFont();
@@ -56,7 +61,11 @@ public class SerialViewerColored {
     }
 
     public void clear() {
-
+        try {
+            doc.remove(0, doc.getLength());
+        } catch (BadLocationException e) {
+            //ignore
+        }
     }
 
     public void appendText(Text text) {
@@ -103,6 +112,7 @@ public class SerialViewerColored {
     private void insertText(String text, Style style) {
         try {
             doc.insertString(doc.getLength(), text, style);
+            logger.log(text);
         } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }

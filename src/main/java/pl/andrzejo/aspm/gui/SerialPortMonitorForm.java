@@ -3,6 +3,7 @@ package pl.andrzejo.aspm.gui;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.events.ApplicationStartedEvent;
+import pl.andrzejo.aspm.eventbus.events.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
@@ -23,8 +24,10 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleWindowClo
 public class SerialPortMonitorForm {
     private final JFrame mainFrame;
     private final SerialViewerColored viewer;
+    private final OutputLogger outputLogger;
 
     public SerialPortMonitorForm() {
+        outputLogger = new OutputLogger();
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
 
         mainFrame = new JFrame("Arduino Serial Port Monitor - Standalone");
@@ -32,12 +35,17 @@ public class SerialPortMonitorForm {
         DeviceSelectorPanel deviceSelector = new DeviceSelectorPanel();
         SendCommandPanel sendCommandPanel = new SendCommandPanel();
 
-        viewer = new SerialViewerColored();
+        viewer = new SerialViewerColored(outputLogger);
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         mainFrame.getContentPane().add(deviceSelector, BorderLayout.NORTH);
-        mainFrame.getContentPane().add(viewer.getComponent(), BorderLayout.CENTER);
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BorderLayout());
+        centerPanel.add(viewer.getComponent(), BorderLayout.CENTER);
+        centerPanel.add(new MonitorRightPanel(), BorderLayout.EAST);
+
+        mainFrame.getContentPane().add(centerPanel, BorderLayout.CENTER);
         mainFrame.getContentPane().add(sendCommandPanel, BorderLayout.SOUTH);
 
         mainFrame.pack();
@@ -45,6 +53,7 @@ public class SerialPortMonitorForm {
         mainFrame.setBounds(r);
         mainFrame.addComponentListener(handleMoved(e -> sizeSetting.set(mainFrame.getBounds())));
         mainFrame.addWindowListener(handleWindowClosed((e) -> ApplicationEventBus.instance().post(new ApplicationClosingEvent())));
+
 
         ApplicationEventBus eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
@@ -64,6 +73,13 @@ public class SerialPortMonitorForm {
     @SuppressWarnings("unused")
     public void handleEvent(SerialMessageReceivedEvent event) {
         addText(Text.message(event.getValue(), event.getDate()));
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(ClearMonitorOutputEvent event) {
+        viewer.clear();
+        addText("Output cleared");
     }
 
     @Subscribe

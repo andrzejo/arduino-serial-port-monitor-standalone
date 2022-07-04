@@ -4,7 +4,7 @@ import pl.andrzejo.aspm.eventbus.events.BusEvent;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 public class DeviceCloseEvent extends BusEvent {
-    private DeviceConfig config;
+    private final DeviceConfig config;
 
     public DeviceCloseEvent(DeviceConfig config) {
         super();

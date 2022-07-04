@@ -4,6 +4,6 @@ import pl.andrzejo.aspm.settings.types.StringSetting;
 
 public class LastDeviceSetting extends GroupDeviceSetting<String> {
     protected LastDeviceSetting() {
-        super(StringSetting.class, "last_device", null);
+        super(StringSetting.class, "lastDevice", null);
     }
 }
