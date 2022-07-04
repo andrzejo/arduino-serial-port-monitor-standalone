@@ -1,0 +1,3 @@
+POST http://localhost:4255/api/open/
+
+/dev/ttyUSBS0

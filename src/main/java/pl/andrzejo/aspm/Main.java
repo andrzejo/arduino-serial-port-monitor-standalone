@@ -1,8 +1,8 @@
 package pl.andrzejo.aspm;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import pl.andrzejo.aspm.api.RestApiService;
 import pl.andrzejo.aspm.error.DefaultErrorHandler;
-import pl.andrzejo.aspm.gui.MainWindowContainer;
 import pl.andrzejo.aspm.gui.SerialPortMonitorForm;
 import pl.andrzejo.aspm.service.DeviceWatcherService;
 import pl.andrzejo.aspm.service.SerialHandlerService;
@@ -15,6 +15,7 @@ public class Main {
     public static void main(String[] args) {
         new SerialHandlerService().start();
         new DeviceWatcherService().start();
+        new RestApiService().start();
 
         try {
             System.setProperty("awt.useSystemAAFontSettings", "on");
