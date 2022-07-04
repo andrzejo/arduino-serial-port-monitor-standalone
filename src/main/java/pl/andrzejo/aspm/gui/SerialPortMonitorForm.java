@@ -1,6 +1,5 @@
 package pl.andrzejo.aspm.gui;
 
-import com.google.common.eventbus.Subscribe;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.events.ApplicationStartedEvent;
@@ -8,6 +7,7 @@ import pl.andrzejo.aspm.eventbus.events.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
+import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;

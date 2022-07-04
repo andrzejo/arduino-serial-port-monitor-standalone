@@ -1,6 +1,5 @@
 package pl.andrzejo.aspm.service;
 
-import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
@@ -11,10 +10,11 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;
+import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.serial.Serial;
 import pl.andrzejo.aspm.serial.SerialException;
-import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.io.IOException;

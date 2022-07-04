@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.eventbus;
 
-import com.google.common.eventbus.EventBus;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
+import pl.andrzejo.aspm.eventbus.impl.EventBus;
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 
 public class ApplicationEventBus {
@@ -17,14 +17,14 @@ public class ApplicationEventBus {
     }
 
     public void register(Object listener) {
-        eventBus.register(listener);
+        eventBus.registerListener(listener);
     }
 
     public void post(BusEvent msg) {
-        eventBus.post(msg);
+        eventBus.trigger(msg);
     }
 
     public void post(AppSetting<?> msg) {
-        eventBus.post(msg);
+        eventBus.trigger(msg);
     }
 }

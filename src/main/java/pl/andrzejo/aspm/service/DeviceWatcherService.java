@@ -1,12 +1,12 @@
 package pl.andrzejo.aspm.service;
 
-import com.google.common.eventbus.Subscribe;
 import jssc.SerialPortList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.DeviceListChangedEvent;
+import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Arrays;

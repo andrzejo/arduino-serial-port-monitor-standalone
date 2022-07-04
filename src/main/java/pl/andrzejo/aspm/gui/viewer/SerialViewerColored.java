@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.gui.viewer;
 
-import com.google.common.eventbus.Subscribe;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AutoscrollSetting;
@@ -11,8 +11,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 
 import static pl.andrzejo.aspm.gui.viewer.Styles.MessageType.*;
 import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
