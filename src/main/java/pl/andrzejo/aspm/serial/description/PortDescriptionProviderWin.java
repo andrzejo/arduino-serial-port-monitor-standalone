@@ -1,7 +1,5 @@
 package pl.andrzejo.aspm.serial.description;
 
-import com.sun.istack.internal.NotNull;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -15,7 +13,6 @@ public class PortDescriptionProviderWin extends DescriptionProviderCommand {
     }
 
     @Override
-    @NotNull
     protected Map<String, String> getDescriptions(List<String> ports, List<String> descriptions) {
         return ports.stream().collect(Collectors.toMap(Function.identity(), p -> getDesc(p, descriptions)));
     }
