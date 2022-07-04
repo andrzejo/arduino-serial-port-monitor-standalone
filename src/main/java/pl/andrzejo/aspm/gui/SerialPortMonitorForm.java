@@ -35,7 +35,20 @@ public class SerialPortMonitorForm {
         RTextScrollPane sp = new RTextScrollPane(textArea);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+/*
+        JCheckBox autoOpenBox = new JCheckBox("Auto open");
 
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout(0, 0));
+
+        JPanel editorSettingsPanel = new JPanel();
+        editorSettingsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        editorSettingsPanel.add(autoOpenBox);
+        editorSettingsPanel.add(new JCheckBox("Auto open"));
+
+        bottomPanel.add(editorSettingsPanel, BorderLayout.NORTH);
+        bottomPanel.add(sendCommandPanel, BorderLayout.SOUTH);
+*/
         mainFrame.getContentPane().add(deviceSelector, BorderLayout.NORTH);
         mainFrame.getContentPane().add(sp, BorderLayout.CENTER);
         mainFrame.getContentPane().add(sendCommandPanel, BorderLayout.SOUTH);

@@ -1,6 +1,8 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.gui.setting.LineEndingSettingHandler;
+import pl.andrzejo.aspm.settings.appsettings.LineEndingSetting;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,7 +23,8 @@ public class SendCommandPanel extends ContentPanel {
         add(lePanel, BorderLayout.WEST);
         add(commandPanel, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.EAST);
-
+        LineEndingSettingHandler handler = new LineEndingSettingHandler(new LineEndingSetting());
+        handler.setupComponent(lineEndingComboBox);
         ApplicationEventBus.instance().register(this);
     }
 }

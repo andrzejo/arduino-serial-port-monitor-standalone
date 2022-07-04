@@ -68,7 +68,6 @@ public class DeviceSelectorPanel extends ContentPanel {
     }
 
     private void setupTtySettingsPanel() {
-
         String[] labels = new String[]{"close device settings ▲", "open device settings ▼"};
         JLabel openSettingsLbl = new JLabel(labels[1]);
         openSettingsLbl.setForeground(Color.BLUE);
@@ -84,6 +83,7 @@ public class DeviceSelectorPanel extends ContentPanel {
         p.setLayout(new BorderLayout());
         p.add(openSettingsLbl, BorderLayout.NORTH);
         p.add(settingPanel, BorderLayout.SOUTH);
+
         add(p, BorderLayout.SOUTH);
 
         JPanel devSettingsPanel = new JPanel();
@@ -125,7 +125,7 @@ public class DeviceSelectorPanel extends ContentPanel {
         handler.setupComponent(box);
     }
 
-    private void setupComboBoxSetting(String label, JPanel settingPanel, ListSettingHandler<?> handler) {
+    private void setupComboBoxSetting(String label, JPanel settingPanel, ListSettingHandler<?, ?> handler) {
         JComboBox<String> combo = new JComboBox<>();
         setPreferredWidthSize(combo);
         JPanel panel = createLabeled(label, combo);

@@ -10,7 +10,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class DeviceSettingHandler extends ListSettingHandler<String> {
+public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, String> {
 
     public DeviceSettingHandler(TtyDeviceSetting setting, DeviceConfig config, DeviceConfig defValue) {
         super(setting, config, config::setDevice, config::getDevice, defValue.getDevice(), false);

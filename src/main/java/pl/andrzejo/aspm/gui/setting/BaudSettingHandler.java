@@ -6,7 +6,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.util.LinkedHashMap;
 
-public class BaudSettingHandler extends ListSettingHandler<Integer> {
+public class BaudSettingHandler extends ListSettingHandler<DeviceConfig, Integer> {
     protected static Integer[] serialRates = {300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000};
 
     public BaudSettingHandler(TtyDeviceSetting setting, DeviceConfig config, DeviceConfig defValue) {
@@ -16,7 +16,14 @@ public class BaudSettingHandler extends ListSettingHandler<Integer> {
     @Override
     protected void fillItems(LinkedHashMap<Integer, String> items) {
         for (Integer rate : serialRates) {
-            items.put(rate, rate.toString());
+            items.put(rate, getLabel(rate));
         }
+    }
+
+    private String getLabel(Integer rate) {
+        if (rate.equals(defValue)) {
+            return rate + " (default)";
+        }
+        return rate.toString();
     }
 }

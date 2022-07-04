@@ -6,7 +6,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.util.LinkedHashMap;
 
-public class StopBitsSettingHandler extends ListSettingHandler<Float> {
+public class StopBitsSettingHandler extends ListSettingHandler<DeviceConfig, Float> {
 
     public StopBitsSettingHandler(TtyDeviceSetting setting, DeviceConfig config, DeviceConfig defConfig) {
         super(setting, config, config::setStopBits, config::getStopBits, defConfig.getStopBits(), true);

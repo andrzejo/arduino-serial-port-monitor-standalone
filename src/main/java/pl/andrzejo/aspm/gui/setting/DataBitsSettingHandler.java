@@ -6,7 +6,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.util.LinkedHashMap;
 
-public class DataBitsSettingHandler extends ListSettingHandler<Integer> {
+public class DataBitsSettingHandler extends ListSettingHandler<DeviceConfig, Integer> {
 
     public DataBitsSettingHandler(TtyDeviceSetting setting, DeviceConfig config, DeviceConfig defValue) {
         super(setting, config, config::setDataBits, config::getDataBits, defValue.getDataBits(), true);

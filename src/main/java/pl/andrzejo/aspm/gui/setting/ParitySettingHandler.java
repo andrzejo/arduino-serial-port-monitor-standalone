@@ -7,7 +7,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 import java.util.LinkedHashMap;
 
 
-public class ParitySettingHandler extends ListSettingHandler<Character> {
+public class ParitySettingHandler extends ListSettingHandler<DeviceConfig, Character> {
     public ParitySettingHandler(TtyDeviceSetting setting, DeviceConfig config, DeviceConfig defValue) {
         super(setting, config, config::setParity, config::getParity, defValue.getParity(), true);
     }

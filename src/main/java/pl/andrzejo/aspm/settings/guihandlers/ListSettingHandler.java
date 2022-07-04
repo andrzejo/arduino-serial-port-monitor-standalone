@@ -3,8 +3,7 @@ package pl.andrzejo.aspm.settings.guihandlers;
 import com.google.common.eventbus.Subscribe;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.SettingsResetToDefaultEvent;
-import pl.andrzejo.aspm.settings.appsettings.TtyDeviceSetting;
-import pl.andrzejo.aspm.settings.types.DeviceConfig;
+import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -15,25 +14,25 @@ import java.util.function.Supplier;
 
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 
-public abstract class ListSettingHandler<T> {
-    protected final LinkedHashMap<T, String> items = new LinkedHashMap<>();
-    protected final List<T> values = new ArrayList<>();
-    protected final TtyDeviceSetting setting;
-    protected final DeviceConfig config;
-    protected final Consumer<T> setter;
-    protected final Supplier<T> getter;
-    protected final T defValue;
+public abstract class ListSettingHandler<T, I> {
+    protected final LinkedHashMap<I, String> items = new LinkedHashMap<>();
+    protected final List<I> values = new ArrayList<>();
+    protected final AppSetting<T> setting;
+    protected final T configObject;
+    protected final Consumer<I> setter;
+    protected final Supplier<I> getter;
+    protected final I defValue;
     private final boolean handleRestToDefault;
     protected JComboBox<String> combo;
 
-    public ListSettingHandler(TtyDeviceSetting setting,
-                              DeviceConfig config,
-                              Consumer<T> setter,
-                              Supplier<T> getter,
-                              T defValue,
+    public ListSettingHandler(AppSetting<T> setting,
+                              T configObject,
+                              Consumer<I> setter,
+                              Supplier<I> getter,
+                              I defValue,
                               boolean handleRestToDefault) {
         this.setting = setting;
-        this.config = config;
+        this.configObject = configObject;
         this.setter = setter;
         this.getter = getter;
         this.defValue = defValue;
@@ -43,16 +42,25 @@ public abstract class ListSettingHandler<T> {
         ApplicationEventBus.instance().register(this);
     }
 
+    public ListSettingHandler(Consumer<I> setter,
+                              Supplier<I> getter,
+                              I defValue,
+                              boolean handleRestToDefault) {
+        this(null, null, setter, getter, defValue, handleRestToDefault);
+    }
+
     public void setupComponent(JComboBox<String> component) {
         combo = component;
         setComboValue();
         component.addActionListener(handleAction((e) -> {
             int idx = component.getSelectedIndex();
-            T val = (idx > -1) ? values.get(idx) : defValue;
-            T last = getter.get();
+            I val = (idx > -1) ? values.get(idx) : defValue;
+            I last = getter.get();
             if (last != null && !last.equals(val)) {
                 setter.accept(val);
-                setting.set(config);
+                if (configObject != null) {
+                    setting.set(configObject);
+                }
             }
         }));
     }
@@ -65,9 +73,9 @@ public abstract class ListSettingHandler<T> {
         }
     }
 
-    protected abstract void fillItems(LinkedHashMap<T, String> items);
+    protected abstract void fillItems(LinkedHashMap<I, String> items);
 
-    protected void setNewValues(LinkedHashMap<T, String> newItems) {
+    protected void setNewValues(LinkedHashMap<I, String> newItems) {
         items.clear();
         items.putAll(newItems);
         values.clear();
