@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.gui.setting.device;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.DeviceListChangedEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceListChangedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceDescriptionEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;

@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.SettingsResetToDefaultEvent;
+import pl.andrzejo.aspm.eventbus.events.setting.SettingsResetToDefaultEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;

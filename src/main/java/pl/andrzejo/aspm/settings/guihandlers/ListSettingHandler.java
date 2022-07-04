@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.settings.guihandlers;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.SettingsResetToDefaultEvent;
+import pl.andrzejo.aspm.eventbus.events.setting.SettingsResetToDefaultEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 

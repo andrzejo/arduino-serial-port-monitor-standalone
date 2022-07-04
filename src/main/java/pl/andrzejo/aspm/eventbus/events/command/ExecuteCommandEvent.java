@@ -1,4 +1,6 @@
-package pl.andrzejo.aspm.eventbus.events;
+package pl.andrzejo.aspm.eventbus.events.command;
+
+import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
 public class ExecuteCommandEvent extends BusEvent {
     private final String command;

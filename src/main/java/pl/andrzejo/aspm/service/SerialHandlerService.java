@@ -4,14 +4,16 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.*;
-import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
-import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
-import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
-import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;
+import pl.andrzejo.aspm.eventbus.events.app.ApplicationClosingEvent;
+import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
+import pl.andrzejo.aspm.eventbus.events.command.CommandExecutedEvent;
+import pl.andrzejo.aspm.eventbus.events.command.ExecuteCommandEvent;
+import pl.andrzejo.aspm.eventbus.events.device.*;
+import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.serial.Serial;
 import pl.andrzejo.aspm.serial.SerialException;
+import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.device.LastDeviceSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
@@ -19,6 +21,7 @@ import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.io.IOException;
+import java.util.List;
 
 public class SerialHandlerService {
     private static final Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);
@@ -36,6 +39,9 @@ public class SerialHandlerService {
 
     private void openSerial() {
         try {
+            if (isValidDevice()) {
+                return;
+            }
             logger.info("Open serial: {}", config);
             serial = new Serial(config.getDevice(), config.getBaud(), config.getParity(), config.getDataBits(), config.getStopBits(), config.isRTS(), config.isDTR()) {
                 @Override
@@ -50,6 +56,14 @@ public class SerialHandlerService {
         } catch (Exception e) {
             eventBus.post(new DeviceCloseEvent(config));
         }
+    }
+
+    private boolean isValidDevice() {
+        if (config != null) {
+            List<String> devices = SerialPorts.getList();
+            return devices.contains(config.getDevice());
+        }
+        return false;
     }
 
     @Subscribe
@@ -93,6 +107,7 @@ public class SerialHandlerService {
         if (serial != null) {
             String command = event.getCommand() + event.getLineEnding();
             serial.write(command);
+            eventBus.post(new CommandExecutedEvent(event.getCommand()));
         }
     }
 

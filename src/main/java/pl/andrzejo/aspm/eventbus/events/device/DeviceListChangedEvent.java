@@ -1,4 +1,6 @@
-package pl.andrzejo.aspm.eventbus.events;
+package pl.andrzejo.aspm.eventbus.events.device;
+
+import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
 import java.util.List;
 

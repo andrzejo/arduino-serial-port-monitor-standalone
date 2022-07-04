@@ -1,4 +1,6 @@
-package pl.andrzejo.aspm.eventbus.events;
+package pl.andrzejo.aspm.eventbus.events.serial;
+
+import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
 import java.util.Date;
 

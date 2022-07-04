@@ -1,10 +1,14 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.*;
+import pl.andrzejo.aspm.eventbus.events.app.ApplicationClosingEvent;
+import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
+import pl.andrzejo.aspm.eventbus.events.command.CommandExecutedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
+import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
@@ -68,7 +72,7 @@ public class SerialPortMonitorForm {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void handleEvent(ExecuteCommandEvent event) {
+    public void handleEvent(CommandExecutedEvent event) {
         addText("Execute command: [" + event.getCommand() + "]");
     }
 

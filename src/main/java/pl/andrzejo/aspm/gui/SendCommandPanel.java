@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.ExecuteCommandEvent;
+import pl.andrzejo.aspm.eventbus.events.command.ExecuteCommandEvent;
 import pl.andrzejo.aspm.gui.setting.LineEndingSettingHandler;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.LineEndingSetting;

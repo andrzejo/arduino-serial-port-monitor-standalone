@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.ClearMonitorOutputEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.SaveLogToFile;
 
