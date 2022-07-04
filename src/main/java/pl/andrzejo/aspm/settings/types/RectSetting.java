@@ -1,5 +1,6 @@
 package pl.andrzejo.aspm.settings.types;
 
+import pl.andrzejo.aspm.gui.util.ScreenUtil;
 import pl.andrzejo.aspm.settings.Setting;
 
 import java.awt.*;
@@ -29,9 +30,17 @@ public class RectSetting extends Setting<Rectangle> {
             int y = parseInt(parts[1]);
             int w = parseInt(parts[2]);
             int h = parseInt(parts[3]);
-            return new Rectangle(x, y, w, h);
+            return validated(new Rectangle(x, y, w, h));
         }
         return null;
+    }
+
+    private Rectangle validated(Rectangle rectangle) {
+        Rectangle desktop = ScreenUtil.getMaximumScreenBounds();
+        if (desktop.contains(rectangle)) {
+            return rectangle;
+        }
+        return defValue;
     }
 
 }

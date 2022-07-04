@@ -114,7 +114,7 @@ public class Serial implements SerialPortEventListener {
             }
             port.addEventListener(this);
         } catch (SerialPortException e) {
-            if (e.getPortName().startsWith("/dev") && SerialPortException.TYPE_PERMISSION_DENIED.equals(e.getExceptionType())) {
+            if (e.getPort().getPortName().startsWith("/dev") && SerialPortException.TYPE_PERMISSION_DENIED.equals(e.getExceptionType())) {
                 throw new SerialException(format("Error opening serial port ''{0}''. Try consulting the documentation at http://playground.arduino.cc/Linux/All#Permission", iname));
             }
             throw new SerialException(format("Error opening serial port ''{0}''.", iname), e);

@@ -20,7 +20,7 @@ public class ColorFormatter {
     }
 
     private String style(String cssClass, String text, boolean closeTag) {
-        return String.format("<span class='%s'>%s%s", cssClass, StringEscapeUtils.escapeHtml(text), closeTag ? "</span>" : "");
+        return String.format("<dfn class='%s'>%s%s", cssClass, StringEscapeUtils.escapeHtml(text), closeTag ? "</dfn>" : "");
     }
 
     public String format(Text text, boolean appendTimestamp) {
@@ -44,7 +44,7 @@ public class ColorFormatter {
     private String formatInternalMessage(String text, Date date, boolean appendTimestamp) {
         isLastTagClosed = true;
         String time = appendTimestamp ? time(date) + " - " : "";
-        return String.format("<div class='%s'>%s%s</div>", "int-msg", time, escape(text));
+        return String.format("<DIV class='%s'>%s%s</DIV>", "int-msg", time, escape(text));
     }
 
     private String escape(String text) {
@@ -52,24 +52,23 @@ public class ColorFormatter {
     }
 
     private String formatSerialMessage(String text, Date date, boolean appendTimestamp) {
-        String t = trimToEmpty(text);
-        char lastChar = t.charAt(t.length() - 1);
+        char lastChar = text.charAt(text.length() - 1);
         boolean isMessageCompleted = lastChar == '\n' || lastChar == '\r';
         String time = appendTimestamp ? time(date) + ": " : "";
 
         if (isLastTagClosed) {
             if (isMessageCompleted) {
-                return String.format("<span class='%s'>%s%s</span><br>", "serial-msg", time, nlToBr(escape(text)));
+                return String.format("<DFN class='%s'>%s%s</DFN><br>", "serial-msg", time, nlToBr(escape(text)));
             } else {
                 isLastTagClosed = false;
-                return String.format("<span class='%s'>%s%s</span>", "serial-msg", time, nlToBr(escape(text)));
+                return String.format("<DFN class='%s'>%s%s</DFN>", "serial-msg", time, nlToBr(escape(text)));
             }
         } else {
-            return String.format("<span class='%s %s'>%s</span>", "serial-msg", "serial-msg-continue", nlToBr(escape(text)));
+            return String.format("<DFN class='%s %s'>%s</DFN>", "serial-msg", "serial-msg-continue", nlToBr(escape(text)));
         }
     }
 
     private String nlToBr(String escape) {
-        return escape.replaceAll("[\n\r]", "<br>");
+        return escape.replace('\r', ' ').replace('\n', ' ');
     }
 }

@@ -6,11 +6,12 @@ import pl.andrzejo.aspm.utils.Files;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
@@ -20,7 +21,6 @@ public class SerialViewerColored implements SerialViewer {
     private final JEditorPane editor;
     private final HTMLEditorKit kit;
     private final HTMLDocument doc;
-    private final Element root;
     private final ColorFormatter formatter;
     private boolean isAutoScroll;
     private boolean isAddTimestamp;
@@ -42,14 +42,18 @@ public class SerialViewerColored implements SerialViewer {
         StyleSheet appStyles = loadCss();
         docStyles.addStyleSheet(appStyles);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        Element defaultRootElement = doc.getDefaultRootElement();
-        Element body = defaultRootElement.getElement(0);
-        try {
-            doc.setInnerHTML(body, "<div class='main-container'></div");
-            root = body.getElement(0);
-        } catch (BadLocationException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        scroll.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            private final BoundedRangeModel model = scroll.getVerticalScrollBar().getModel();
+
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                if (isAutoScroll) {
+                    model.setValue(model.getMaximum() - model.getExtent());
+                }
+            }
+        });
     }
 
     private StyleSheet loadCss() {
@@ -90,9 +94,18 @@ public class SerialViewerColored implements SerialViewer {
 
     public void appendText(String text) {
         try {
-            doc.insertBeforeEnd(root, text);
+            kit.insertHTML(doc, doc.getLength(), text, 0, 0, null);
+            scrollToEnd();
+            // Files.write("C:/tmp/ard.html", editor.getText());
         } catch (BadLocationException | IOException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    private void scrollToEnd() {
+        if (isAutoScroll) {
+            JScrollBar bar = scroll.getVerticalScrollBar();
+            bar.setValue(bar.getMaximum());
         }
     }
 }

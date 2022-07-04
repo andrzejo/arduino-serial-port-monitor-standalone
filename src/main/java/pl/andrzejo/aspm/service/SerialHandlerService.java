@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.events.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
@@ -102,6 +103,13 @@ public class SerialHandlerService {
             closeSerial();
         } else {
             openSerial();
+        }
+    }
+
+    @Subscribe
+    public void handleEvent(ApplicationClosingEvent event) {
+        if (isOpen()) {
+            closeSerial();
         }
     }
 
