@@ -42,12 +42,13 @@ public class AboutForm extends JDialog {
     private Component addUriLabel(String label, String url) {
         JPanel panel = new JPanel();
         panel.add(new JLabel(label + ": "));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         JLabel link = new JLabel(url);
         link.setForeground(Color.BLUE);
         link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         link.addMouseListener(mouseClicked((e) -> UriOpener.open(url)));
         panel.add(link);
-        panel.setBorder(new EmptyBorder(0, 0,0,0));
+        panel.setBorder(new EmptyBorder(0, 15, 0, 15));
         panel.setMaximumSize(new Dimension(1000, 20));
         return panel;
     }
