@@ -9,11 +9,15 @@ import java.util.Optional;
 
 public class AppSetting<T> {
     private final Setting<T> setting;
+    private final Debouncer<T> debouncer;
+    private final ApplicationEventBus eventBus;
 
     public AppSetting(Class<? extends Setting<T>> settingType, String component, String name, T def) {
         String key = createKey(component, name);
         setting = createSettingInstance(key, settingType, def);
-        sentEventBusEvent();
+        debouncer = new Debouncer<T>(this::sendEvent, 500);
+        eventBus = ApplicationEventBus.instance();
+        debouncer.debounce(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -46,13 +50,12 @@ public class AppSetting<T> {
         T last = setting.get();
         setting.set(value);
         if (last != null && !last.equals(value)) {
-            sentEventBusEvent();
+            debouncer.debounce(this);
         }
     }
 
-    private void sentEventBusEvent() {
-        ApplicationEventBus bus = ApplicationEventBus.instance();
-        bus.post(this);
+    private void sendEvent(AppSetting<T> o) {
+        eventBus.post(o);
     }
 
 }
