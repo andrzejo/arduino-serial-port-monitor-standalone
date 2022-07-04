@@ -8,12 +8,12 @@ import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.guihandlers.ListSettingHandler;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
-import javax.swing.*;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static javax.swing.SwingUtilities.invokeLater;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, String> {
@@ -30,18 +30,23 @@ public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, Strin
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(DeviceListChangedEvent event) {
-        SwingUtilities.invokeLater(() -> setNewValues(toMap(event.getDevices())));
+        invokeLater(() -> {
+            setNewValues(toMap(event.getDevices()));
+        });
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(DeviceDescriptionEvent event) {
-        SwingUtilities.invokeLater(() -> setNewValues(toMap(event.getDesc())));
+        invokeLater(() -> setNewValues(toMap(event.getDesc())));
     }
 
     private LinkedHashMap<String, String> toMap(List<String> devices) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        devices.forEach(s -> map.put(s, description(s)));
+        devices.forEach(s -> {
+            String oldLabel = items.get(s);
+            map.put(s, oldLabel == null ? s : oldLabel);
+        });
         return map;
     }
 
@@ -55,9 +60,5 @@ public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, Strin
             return v.getKey() + " - " + v.getValue();
         }
         return v.getKey();
-    }
-
-    private String description(String s) {
-        return s;
     }
 }
