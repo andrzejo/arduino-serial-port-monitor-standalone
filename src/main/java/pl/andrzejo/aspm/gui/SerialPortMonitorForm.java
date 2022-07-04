@@ -8,14 +8,10 @@ import pl.andrzejo.aspm.eventbus.events.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
-import pl.andrzejo.aspm.gui.viewer.SerialViewer;
 import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
-import pl.andrzejo.aspm.settings.appsettings.items.monitor.AddTimestampSetting;
-import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoscrollSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.WindowPositionSetting;
-import pl.andrzejo.aspm.settings.types.RectSetting;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +21,7 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleWindowClo
 
 public class SerialPortMonitorForm {
     private final JFrame mainFrame;
-    private final SerialViewer viewer;
+    private final SerialViewerColored viewer;
 
     public SerialPortMonitorForm() {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
@@ -61,16 +57,6 @@ public class SerialPortMonitorForm {
 
     private void addText(Text text) {
         viewer.appendText(text);
-    }
-
-    @Subscribe
-    public void handleEvent(AutoscrollSetting event) {
-        viewer.setAutoScroll(event.get());
-    }
-
-    @Subscribe
-    public void handleEvent(AddTimestampSetting event) {
-        viewer.setAddTimestamps(event.get());
     }
 
     @Subscribe

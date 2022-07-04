@@ -1,6 +1,10 @@
 package pl.andrzejo.aspm.gui.viewer;
 
+import com.google.common.eventbus.Subscribe;
+import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.AutoscrollSetting;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -11,20 +15,17 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
 import static pl.andrzejo.aspm.gui.viewer.Styles.MessageType.*;
+import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
 
-public class SerialViewerColored implements SerialViewer {
-    private final JTextPane editor;
+public class SerialViewerColored {
     private final JScrollPane scroll;
     private final StyledDocument doc;
     private final Styles styles;
-
-    private boolean autoScroll;
-    private boolean addTimestamps;
-    private boolean isAddTimestamp;
-    private boolean isAutoScroll;
+    private boolean isAutoScroll = get(AutoscrollSetting.class);
+    private boolean isAddTimestamp = get(AddTimestampSetting.class);
 
     public SerialViewerColored() {
-        editor = new JTextPane();
+        JTextPane editor = new JTextPane();
         doc = editor.getStyledDocument();
         scroll = new JScrollPane(editor);
         Font font = editor.getFont();
@@ -35,39 +36,28 @@ public class SerialViewerColored implements SerialViewer {
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-        scroll.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
-            private final BoundedRangeModel model = scroll.getVerticalScrollBar().getModel();
-
-            @Override
-            public void adjustmentValueChanged(AdjustmentEvent e) {
-                if (isAutoScroll) {
-                    model.setValue(model.getMaximum() - model.getExtent());
-                }
-            }
-        });
+        ApplicationEventBus.instance().register(this);
     }
 
-    @Override
-    public void setAutoScroll(boolean value) {
-        isAutoScroll = value;
+    @Subscribe
+    public void handleEvent(AutoscrollSetting event) {
+        isAutoScroll = event.get();
     }
 
-    @Override
-    public void setAddTimestamps(boolean value) {
-        isAddTimestamp = value;
+    @Subscribe
+    public void handleEvent(AddTimestampSetting event) {
+        isAddTimestamp = event.get();
     }
 
-    @Override
+
     public JComponent getComponent() {
         return scroll;
     }
 
-    @Override
     public void clear() {
 
     }
 
-    @Override
     public void appendText(Text text) {
         if (isAddTimestamp) {
             insertText(TimestampHelper.getTimestamp(text.getDate()) + ": ", styles.get(TIME));
@@ -87,6 +77,14 @@ public class SerialViewerColored implements SerialViewer {
                 break;
             default:
                 throw new ColorFormatterException("Unsupported text type: " + text.getType().name());
+        }
+        scrollDown();
+    }
+
+    private void scrollDown() {
+        if (isAutoScroll) {
+            BoundedRangeModel model = scroll.getVerticalScrollBar().getModel();
+            model.setValue(model.getMaximum() - model.getExtent());
         }
     }
 
