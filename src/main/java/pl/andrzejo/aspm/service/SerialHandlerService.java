@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.events.ApplicationStartedEvent;
+import pl.andrzejo.aspm.eventbus.events.DeviceListChangedEvent;
 import pl.andrzejo.aspm.eventbus.events.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
@@ -18,19 +19,15 @@ import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class SerialHandlerService {
     private static final Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);
-    private final ScheduledExecutorService executor;
     private final ApplicationEventBus eventBus;
     private Serial serial;
     private DeviceConfig config;
     private boolean autoOpen;
 
     public SerialHandlerService() {
-        executor = Executors.newSingleThreadScheduledExecutor();
         eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
     }
@@ -91,7 +88,7 @@ public class SerialHandlerService {
                 logger.info("Close serial");
                 serial.dispose();
             } catch (IOException e) {
-                logger.warn("Failed to close device: {0}", e);
+                logger.warn("Failed to close device");
             } finally {
                 serial = null;
                 eventBus.post(new DeviceCloseEvent(config));
@@ -106,6 +103,17 @@ public class SerialHandlerService {
             closeSerial();
         } else {
             openSerial();
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(DeviceListChangedEvent event) {
+        if (config != null) {
+            String device = config.getDevice();
+            if (!event.getDevices().contains(device)) {
+                closeSerial();
+            }
         }
     }
 

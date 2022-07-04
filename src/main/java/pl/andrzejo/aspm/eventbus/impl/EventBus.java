@@ -24,6 +24,9 @@ public class EventBus {
         }
         Class<?> type = event.getClass();
         List<HandlerMethod> handlerMethods = handlers.get(type);
+        if (handlerMethods == null) {
+            return;
+        }
         handlerMethods.forEach((m) -> {
             try {
                 m.invoke(event);

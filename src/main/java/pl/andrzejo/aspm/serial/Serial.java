@@ -1,4 +1,7 @@
 /*
+  Class from Arduino IDE (https://github.com/arduino/Arduino)
+
+
   PSerial - class for serial port goodness
   Part of the Processing project - http://processing.org
 

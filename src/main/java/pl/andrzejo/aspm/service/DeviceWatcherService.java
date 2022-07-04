@@ -35,16 +35,20 @@ public class DeviceWatcherService {
     }
 
     public void start() {
-        watcherExecutor.scheduleAtFixedRate(this::checkDevices, 0, 3, TimeUnit.SECONDS);
+        watcherExecutor.scheduleWithFixedDelay(this::checkDevices, 0, 1, TimeUnit.SECONDS);
     }
 
     public void checkDevices() {
-        List<String> newDevices = SerialPorts.getList();
-        if (!lastDevices.equals(newDevices)) {
-            setNewDevices(newDevices);
-            fetchDeviceDescriptions(newDevices);
-            logger.info("TTY devices list changed: {}", newDevices);
-            triggerEvent();
+        try {
+            List<String> newDevices = SerialPorts.getList();
+            if (!lastDevices.equals(newDevices)) {
+                setNewDevices(newDevices);
+                fetchDeviceDescriptions(newDevices);
+                logger.info("TTY devices list changed: {}", newDevices);
+                triggerEvent();
+            }
+        } catch (Exception e) {
+            logger.error("er e", e);
         }
     }
 

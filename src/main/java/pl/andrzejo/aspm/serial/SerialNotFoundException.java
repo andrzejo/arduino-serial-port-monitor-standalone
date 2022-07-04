@@ -1,4 +1,6 @@
 /*
+  Class from Arduino IDE (https://github.com/arduino/Arduino)
+
   Copyright (c) 2007 David A. Mellis
 
   This program is free software; you can redistribute it and/or modify
