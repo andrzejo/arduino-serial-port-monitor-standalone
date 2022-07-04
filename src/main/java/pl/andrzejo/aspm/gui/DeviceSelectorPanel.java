@@ -1,7 +1,11 @@
 package pl.andrzejo.aspm.gui;
 
+import com.google.common.eventbus.Subscribe;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.SettingsResetToDefaultEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
+import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;
 import pl.andrzejo.aspm.gui.setting.*;
 import pl.andrzejo.aspm.settings.appsettings.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.AutoOpenSetting;
@@ -10,12 +14,14 @@ import pl.andrzejo.aspm.settings.appsettings.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.guihandlers.CheckBoxSettingsHandler;
 import pl.andrzejo.aspm.settings.guihandlers.ListSettingHandler;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
+import pl.andrzejo.aspm.utils.Images;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.mouseClicked;
@@ -24,9 +30,16 @@ public class DeviceSelectorPanel extends ContentPanel {
     private final TtyDeviceSetting setting;
     private final DeviceConfig initialConfig;
     private final DeviceConfig defConfig;
+    private final JLabel statLabel;
+    private final ImageIcon imageIcon;
+    private final JButton openBtn;
     private boolean isSettingsOpen;
+    private final ApplicationEventBus eventBus;
 
     public DeviceSelectorPanel() {
+        eventBus = ApplicationEventBus.instance();
+        eventBus.register(this);
+
         setting = new TtyDeviceSetting();
         initialConfig = setting.get();
         defConfig = DeviceConfig.defaultConfig();
@@ -34,23 +47,38 @@ public class DeviceSelectorPanel extends ContentPanel {
         setLayout(new BorderLayout(5, 5));
         setBorder(new EmptyBorder(1, 5, 10, 5));
 
-        JButton openBtn = new JButton("Open");
+        openBtn = new JButton();
         JCheckBox autoOpenBox = new JCheckBox("Auto open");
 
         JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new GridLayout(2, 1, 15, 0));
+        btnPanel.setLayout(new GridLayout(2, 2, 15, 0));
         btnPanel.add(autoOpenBox);
         btnPanel.add(openBtn);
 
         JPanel dev = new JPanel();
         dev.setLayout(new GridLayout(1, 3, 15, 0));
 
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new BorderLayout());
+        statusPanel.setBorder(new EmptyBorder(1, 5, 1, 15));
+
+        imageIcon = new ImageIcon();
+        JLabel picLabel = new JLabel(imageIcon);
+        statLabel = new JLabel("");
+        statusPanel.add(picLabel, BorderLayout.NORTH);
+        statusPanel.add(statLabel, BorderLayout.EAST);
+
+        dev.add(statusPanel);
         dev.add(btnPanel);
 
         setupComboBoxSetting("Device:", dev, new DeviceSettingHandler(setting, initialConfig, defConfig));
         setupComboBoxSetting("Baud:", dev, new BaudSettingHandler(setting, initialConfig, defConfig));
 
-        add(dev, BorderLayout.WEST);
+        JPanel line = new JPanel();
+        line.add(statusPanel);
+        line.add(dev);
+
+        add(line, BorderLayout.WEST);
         JPanel boxes = new JPanel();
         boxes.setLayout(new GridLayout(2, 1));
         JCheckBox autoScroll = new JCheckBox("Auto scroll");
@@ -65,6 +93,19 @@ public class DeviceSelectorPanel extends ContentPanel {
         handleCheckboxSetting(autoOpenBox, new AutoOpenSetting());
         handleCheckboxSetting(autoScroll, new AutoscrollSetting());
         handleCheckboxSetting(addTimestamp, new AddTimestampSetting());
+
+        setDeviceStatus(false);
+        openBtn.addActionListener(handleAction((e) -> eventBus.post(new ToggleDeviceStatusEvent())));
+    }
+
+    private void setDeviceStatus(boolean isOpen) {
+        String path = isOpen ? "./images/controller-on.png" : "./images/controller-off.png";
+        String label = isOpen ? "OPEN" : "CLOSED";
+        String buttonAction = isOpen ? "Close" : "Open";
+        BufferedImage controllerImg = Images.fromResource(path);
+        imageIcon.setImage(controllerImg);
+        statLabel.setText(label);
+        openBtn.setText(buttonAction);
     }
 
     private void setupTtySettingsPanel() {
@@ -111,7 +152,7 @@ public class DeviceSelectorPanel extends ContentPanel {
     }
 
     private void resetTtySettings() {
-        ApplicationEventBus.instance().post(new SettingsResetToDefaultEvent());
+        eventBus.post(new SettingsResetToDefaultEvent());
     }
 
     private void setupCheckBoxSetting(String label, JPanel settingPanel, CheckBoxSettingsHandler handler) {
@@ -129,4 +170,13 @@ public class DeviceSelectorPanel extends ContentPanel {
         handler.setupComponent(combo);
     }
 
+    @Subscribe
+    public void handleEvent(DeviceOpenEvent event) {
+        setDeviceStatus(true);
+    }
+
+    @Subscribe
+    public void handleEvent(DeviceCloseEvent event) {
+        setDeviceStatus(false);
+    }
 }

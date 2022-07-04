@@ -4,11 +4,19 @@ import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.SerialMessageReceivedEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
+import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;
 import pl.andrzejo.aspm.serial.Serial;
 import pl.andrzejo.aspm.serial.SerialException;
+import pl.andrzejo.aspm.settings.appsettings.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.appsettings.TtyDeviceSetting;
+import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -18,6 +26,8 @@ public class SerialHandlerService {
     private final ScheduledExecutorService executor;
     private final ApplicationEventBus eventBus;
     private Serial serial;
+    private DeviceConfig config;
+    private boolean autoOpen;
 
     public SerialHandlerService() {
         executor = Executors.newSingleThreadScheduledExecutor();
@@ -26,24 +36,79 @@ public class SerialHandlerService {
     }
 
     private void openSerial() {
-        if (serial != null || true) return;
-
         try {
-            serial = new Serial("/dev/ttyUSB0", 9600) {
+            logger.info("Open serial: {}", config);
+            serial = new Serial(config.getDevice(), config.getBaud(), config.getParity(), config.getDataBits(),
+                    config.getStopBits(), config.isRTS(), config.isDTR()) {
                 @Override
                 protected void message(char buff[], int n) {
                     String msg = new String(buff);
                     eventBus.post(new SerialMessageReceivedEvent(msg));
                 }
             };
+            eventBus.post(new DeviceOpenEvent());
         } catch (SerialException e) {
-            throw new RuntimeException(e);
+            eventBus.post(new DeviceErrorEvent(e.getMessage()));
+        } catch (Exception e) {
+            eventBus.post(new DeviceCloseEvent());
         }
     }
 
     @Subscribe
+    public void handleEvent(AutoOpenSetting autoOpen) {
+        this.autoOpen = autoOpen.get();
+        if (this.autoOpen && config != null && !isOpen()) {
+            openSerial();
+        }
+    }
+
+    private boolean isOpen() {
+        return serial != null;
+    }
+
+    @Subscribe
     public void handleEvent(TtyDeviceSetting config) {
-        logger.info("Config: {}", config.get());
+        DeviceConfig deviceConfig = config.get();
+        if (!deviceConfig.equals(this.config)) {
+            this.config = deviceConfig;
+            logger.info("New TtyDeviceSetting: {}", deviceConfig);
+            if (autoOpen) {
+                reopenDevice();
+            }
+        }
+    }
+
+    private void reopenDevice() {
+        closeSerial();
+        openSerial();
+    }
+
+    private void closeSerial() {
+        if (isOpen()) {
+            try {
+                logger.info("Close serial");
+                serial.dispose();
+            } catch (IOException e) {
+                logger.warn("Failed to close device: {0}", e);
+            } finally {
+                serial = null;
+                eventBus.post(new DeviceCloseEvent());
+            }
+        }
+    }
+
+    @Subscribe
+    public void handleEvent(ToggleDeviceStatusEvent event) {
+        if (isOpen()) {
+            closeSerial();
+        } else {
+            openSerial();
+        }
+    }
+
+    @Subscribe
+    public void handleEvent(ApplicationStartedEvent event) {
+        logger.info("Config: {}", event);
     }
 
     public void start() {
