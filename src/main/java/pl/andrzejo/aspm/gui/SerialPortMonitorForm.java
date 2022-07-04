@@ -19,6 +19,7 @@ import pl.andrzejo.aspm.settings.appsettings.items.monitor.WindowPositionSetting
 import pl.andrzejo.aspm.utils.Images;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -27,6 +28,7 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
 public class SerialPortMonitorForm {
     private final JFrame mainFrame;
     private final SerialViewerColored viewer;
+    private JLabel statusLabel;
 
     public SerialPortMonitorForm() {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
@@ -71,12 +73,22 @@ public class SerialPortMonitorForm {
     }
 
     private void setupStatusPanel(JPanel statusPanel) {
+        JPanel contentPanel = new JPanel();
+        contentPanel.setBorder(new EmptyBorder(0, 4, 4, 4));
+        contentPanel.setLayout(new BorderLayout());
+
         JLabel about = new JLabel("about app");
+        statusLabel = new JLabel();
+
+        contentPanel.add(about, BorderLayout.EAST);
+        contentPanel.add(statusLabel, BorderLayout.WEST);
+
         about.setForeground(Color.BLUE);
         about.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         statusPanel.setLayout(new BorderLayout());
-        statusPanel.add(about, BorderLayout.EAST);
+        statusPanel.add(contentPanel, BorderLayout.CENTER);
         statusPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, SystemColor.activeCaptionBorder));
+
         about.addMouseListener(mouseClicked((e) -> new AboutForm(mainFrame).showModal()));
     }
 
@@ -111,18 +123,25 @@ public class SerialPortMonitorForm {
     @SuppressWarnings("unused")
     public void handleEvent(DeviceCloseEvent event) {
         addText("Close serial: " + event.getConfig().getDevice());
+        setStatus("Device is closed");
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(DeviceOpenEvent event) {
         addText("Open serial: " + event.getConfig().getDevice());
+        setStatus("Device is open: " + event.getConfig().getDevice());
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(DeviceErrorEvent event) {
         addText(Text.error("Serial error: " + event.getMessage()));
+        setStatus("Device error");
+    }
+
+    private void setStatus(String msg) {
+        statusLabel.setText(msg);
     }
 
     @Subscribe

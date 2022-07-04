@@ -37,7 +37,7 @@ public class SerialHandlerService {
 
     private DeviceConfig openDeviceConfig;
     private boolean autoOpen;
-
+    private boolean applicationStarted = false;
     private SerialHandlerService() {
         eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
@@ -102,6 +102,9 @@ public class SerialHandlerService {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(TtyDeviceSetting config) {
+        if (!applicationStarted) {
+            return;
+        }
         DeviceConfig deviceConfig = config.get();
         if (!deviceConfig.equals(this.config)) {
             this.config = deviceConfig;
@@ -172,7 +175,7 @@ public class SerialHandlerService {
                 logger.warn("Failed to close device");
             } finally {
                 serial = null;
-                eventBus.post(new DeviceCloseEvent(config));
+                eventBus.post(new DeviceCloseEvent(openDeviceConfig));
             }
         }
     }
@@ -210,7 +213,8 @@ public class SerialHandlerService {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(ApplicationStartedEvent event) {
-        logger.info("Config: {}", event);
+        logger.info("ApplicationStarted: {}", event);
+        applicationStarted = true;
     }
 
     public void start() {
