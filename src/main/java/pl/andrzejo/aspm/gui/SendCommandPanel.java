@@ -39,7 +39,7 @@ public class SendCommandPanel extends ContentPanel {
         commandEdit.setEditable(true);
         setPreferredWidthSize(lineEndingComboBox);
         setLayout(new BorderLayout(10, 10));
-        setBorder(new EmptyBorder(1, 5, 15, 5));
+        setBorder(new EmptyBorder(1, 5, 10, 5));
         JPanel lePanel = createLabeled("Line ending:", lineEndingComboBox);
         JPanel commandPanel = createLabeled("Command:", commandEdit);
         JPanel btnPanel = createLabeled("", sendBtn);

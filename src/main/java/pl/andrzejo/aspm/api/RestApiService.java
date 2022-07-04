@@ -4,8 +4,10 @@ import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
+import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 
+import java.util.List;
 import java.util.function.Function;
 
 import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
@@ -31,6 +33,7 @@ public class RestApiService {
         setupEndpoint(server, Post, "open", this::handleOpen);
         setupEndpoint(server, Post, "close", this::handleClose);
         setupEndpoint(server, Get, "status", this::handleStatus);
+        setupEndpoint(server, Get, "devices", this::handleDevices);
     }
 
     private void setupEndpoint(SimpleHttpServer server, SimpleHttpServer.Method method, String path, Function<String, String> handler) {
@@ -55,4 +58,8 @@ public class RestApiService {
         return status.toHumanReadableString();
     }
 
+    private String handleDevices(String body) {
+        List<String> list = SerialPorts.getList();
+        return String.join("\n", list);
+    }
 }

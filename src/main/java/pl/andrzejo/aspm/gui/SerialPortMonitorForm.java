@@ -22,12 +22,12 @@ import javax.swing.*;
 import java.awt.*;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleMoved;
-import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleWindowClosed;
+import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
 
 public class SerialPortMonitorForm {
     private final JFrame mainFrame;
     private final SerialViewerColored viewer;
+    private final AboutForm aboutForm;
 
     public SerialPortMonitorForm() {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
@@ -48,7 +48,16 @@ public class SerialPortMonitorForm {
         centerPanel.add(new MonitorRightPanel(), BorderLayout.EAST);
 
         mainFrame.getContentPane().add(centerPanel, BorderLayout.CENTER);
-        mainFrame.getContentPane().add(sendCommandPanel, BorderLayout.SOUTH);
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.add(sendCommandPanel, BorderLayout.NORTH);
+
+        JPanel statusPanel = new JPanel();
+        setupStatusPanel(statusPanel);
+        bottomPanel.add(statusPanel, BorderLayout.SOUTH);
+
+        mainFrame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
 
         mainFrame.pack();
         Rectangle r = sizeSetting.get();
@@ -56,11 +65,21 @@ public class SerialPortMonitorForm {
         mainFrame.addComponentListener(handleMoved(e -> sizeSetting.set(mainFrame.getBounds())));
         mainFrame.addWindowListener(handleWindowClosed((e) -> ApplicationEventBus.instance().post(new ApplicationClosingEvent())));
 
-
         ApplicationEventBus eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
         eventBus.post(new ApplicationStartedEvent());
         MainWindowContainer.setMainWindowComponent(mainFrame);
+        aboutForm = new AboutForm(mainFrame);
+    }
+
+    private void setupStatusPanel(JPanel statusPanel) {
+        JLabel about = new JLabel("about app");
+        about.setForeground(Color.BLUE);
+        about.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        statusPanel.setLayout(new BorderLayout());
+        statusPanel.add(about, BorderLayout.EAST);
+        statusPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, SystemColor.activeCaptionBorder));
+        about.addMouseListener(mouseClicked((e) -> aboutForm.showModal()));
     }
 
     private void addText(String text) {
