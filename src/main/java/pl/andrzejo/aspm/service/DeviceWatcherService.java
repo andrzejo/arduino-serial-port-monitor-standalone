@@ -46,6 +46,7 @@ public class DeviceWatcherService {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(ApplicationStartedEvent event) {
         triggerEvent();
     }

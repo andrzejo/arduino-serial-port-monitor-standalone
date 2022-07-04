@@ -45,6 +45,7 @@ public class CheckBoxSettingsHandler {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(SettingsResetToDefaultEvent event) {
         if (handleRestToDefault && checkBox != null) {
             checkBox.setSelected(defValue);

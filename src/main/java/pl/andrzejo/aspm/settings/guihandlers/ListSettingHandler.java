@@ -92,6 +92,7 @@ public abstract class ListSettingHandler<T, I> {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(SettingsResetToDefaultEvent event) {
         if (handleRestToDefault && combo != null) {
             combo.setSelectedIndex(values.indexOf(defValue));

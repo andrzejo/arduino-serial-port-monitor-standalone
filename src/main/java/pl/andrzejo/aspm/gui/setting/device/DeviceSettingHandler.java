@@ -22,6 +22,7 @@ public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, Strin
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(DeviceListChangedEvent event) {
         setNewValues(toMap(event.getDevices()));
     }

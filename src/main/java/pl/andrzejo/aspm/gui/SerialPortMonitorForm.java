@@ -12,6 +12,7 @@ import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.WindowPositionSetting;
+import pl.andrzejo.aspm.utils.Images;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +28,7 @@ public class SerialPortMonitorForm {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
 
         mainFrame = new JFrame("Arduino Serial Port Monitor - Standalone");
-
+        mainFrame.setIconImage(Images.fromResource("images/icon.png"));
         DeviceSelectorPanel deviceSelector = new DeviceSelectorPanel();
         SendCommandPanel sendCommandPanel = new SendCommandPanel();
 
@@ -60,21 +61,25 @@ public class SerialPortMonitorForm {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(SerialMessageReceivedEvent event) {
         addText(Text.message(event.getValue(), event.getDate()));
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(DeviceCloseEvent event) {
         addText("Close serial: " + event.getConfig().getDevice());
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(DeviceOpenEvent event) {
         addText("Open serial: " + event.getConfig().getDevice());
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(DeviceErrorEvent event) {
         addText("Serial error: " + event.getMessage());
     }

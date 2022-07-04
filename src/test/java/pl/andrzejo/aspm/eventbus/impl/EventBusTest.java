@@ -50,11 +50,13 @@ class EventBusTest {
         List<Object> invocations = new ArrayList<>();
 
         @Subscribe
+        @SuppressWarnings("unused")
         public void handle(String event) {
             invocations.add(event);
         }
 
         @Subscribe
+        @SuppressWarnings("unused")
         private int handle(Event event) {
             invocations.add(event);
             return 0;

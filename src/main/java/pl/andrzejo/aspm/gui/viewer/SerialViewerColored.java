@@ -38,11 +38,13 @@ public class SerialViewerColored {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(AutoscrollSetting event) {
         isAutoScroll = event.get();
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(AddTimestampSetting event) {
         isAddTimestamp = event.get();
     }

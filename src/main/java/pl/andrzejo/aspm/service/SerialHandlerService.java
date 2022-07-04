@@ -55,6 +55,7 @@ public class SerialHandlerService {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(AutoOpenSetting autoOpen) {
         this.autoOpen = autoOpen.get();
         if (this.autoOpen && config != null && !isOpen()) {
@@ -67,6 +68,7 @@ public class SerialHandlerService {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(TtyDeviceSetting config) {
         DeviceConfig deviceConfig = config.get();
         if (!deviceConfig.equals(this.config)) {
@@ -98,6 +100,7 @@ public class SerialHandlerService {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(ToggleDeviceStatusEvent event) {
         if (isOpen()) {
             closeSerial();
@@ -107,6 +110,7 @@ public class SerialHandlerService {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(ApplicationClosingEvent event) {
         if (isOpen()) {
             closeSerial();
@@ -114,6 +118,7 @@ public class SerialHandlerService {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(ApplicationStartedEvent event) {
         logger.info("Config: {}", event);
     }

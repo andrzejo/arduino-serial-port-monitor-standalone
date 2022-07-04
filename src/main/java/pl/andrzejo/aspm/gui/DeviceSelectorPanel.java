@@ -178,11 +178,13 @@ public class DeviceSelectorPanel extends ContentPanel {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(DeviceOpenEvent event) {
         setDeviceStatus(true);
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleEvent(DeviceCloseEvent event) {
         setDeviceStatus(false);
     }
