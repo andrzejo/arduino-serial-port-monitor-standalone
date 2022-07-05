@@ -24,6 +24,7 @@ public class ObjectFactory {
         try {
             for (Constructor<?> constructor : k.getConstructors()) {
                 if (constructor.getParameterCount() == 0) {
+                    constructor.setAccessible(true);
                     return constructor.newInstance();
                 }
             }
