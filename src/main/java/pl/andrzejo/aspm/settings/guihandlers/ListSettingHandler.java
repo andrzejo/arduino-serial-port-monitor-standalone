@@ -83,8 +83,18 @@ public abstract class ListSettingHandler<T, I> {
         setComboValue();
     }
 
+    protected void selectValue(I value) {
+        if (combo != null && value != null) {
+            combo.setSelectedIndex(itemIndexOrDefault(value));
+        }
+    }
+
     private int itemIndexOrDefault() {
-        int index = values.indexOf(getter.get());
+        return itemIndexOrDefault(getter.get());
+    }
+
+    private int itemIndexOrDefault(I value) {
+        int index = values.indexOf(value);
         if (index > -1) {
             return index;
         }

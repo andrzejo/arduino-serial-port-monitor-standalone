@@ -68,8 +68,8 @@ public class SerialPortMonitorForm {
 
         ApplicationEventBus eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
-        eventBus.post(new ApplicationStartedEvent());
         MainWindowContainer.setMainWindowComponent(mainFrame);
+        eventBus.post(new ApplicationStartedEvent());
     }
 
     private void setupStatusPanel(JPanel statusPanel) {

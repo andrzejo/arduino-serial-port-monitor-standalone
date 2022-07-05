@@ -50,13 +50,13 @@ public class DeviceWatcherService {
         try {
             List<String> newDevices = SerialPorts.getList();
             if (!lastDevices.equals(newDevices)) {
+                logger.info("TTY devices list changed: {} -> {} ", lastDevices, newDevices);
                 setNewDevices(newDevices);
                 fetchDeviceDescriptions(newDevices);
-                logger.info("TTY devices list changed: {}", newDevices);
                 triggerEvent();
             }
         } catch (Exception e) {
-            logger.error("er e", e);
+            logger.error("checkDevices error", e);
         }
     }
 
@@ -67,6 +67,7 @@ public class DeviceWatcherService {
         descFetcherFuture = descProviderExecutor.submit(() -> {
             Map<String, String> desc = descriptionFetcher.fetch(newDevices);
             if (!lastDesc.equals(desc)) {
+                logger.info("TTY device desc changed: {} -> {} ", lastDesc, desc);
                 lastDesc.clear();
                 lastDesc.putAll(desc);
                 eventBus.post(new DeviceDescriptionEvent(lastDesc));

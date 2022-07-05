@@ -38,6 +38,7 @@ public class SerialHandlerService {
     private DeviceConfig openDeviceConfig;
     private boolean autoOpen;
     private boolean applicationStarted = false;
+
     private SerialHandlerService() {
         eventBus = ApplicationEventBus.instance();
         eventBus.register(this);
@@ -153,7 +154,6 @@ public class SerialHandlerService {
         return devices.contains(device);
     }
 
-
     private boolean isValidDevice() {
         if (config != null) {
             return isValidDevice(config.getDevice());
@@ -215,6 +215,7 @@ public class SerialHandlerService {
     public void handleEvent(ApplicationStartedEvent event) {
         logger.info("ApplicationStarted: {}", event);
         applicationStarted = true;
+        eventBus.post(new SelectDeviceEvent(lastDeviceSetting.get()));
     }
 
     public void start() {

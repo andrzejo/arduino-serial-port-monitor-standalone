@@ -1,8 +1,9 @@
 package pl.andrzejo.aspm.gui.setting.device;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.device.DeviceListChangedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceDescriptionEvent;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceListChangedEvent;
+import pl.andrzejo.aspm.eventbus.events.device.SelectDeviceEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.guihandlers.ListSettingHandler;
@@ -30,9 +31,7 @@ public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, Strin
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(DeviceListChangedEvent event) {
-        invokeLater(() -> {
-            setNewValues(toMap(event.getDevices()));
-        });
+        invokeLater(() -> setNewValues(toMap(event.getDevices())));
     }
 
     @Subscribe
@@ -41,18 +40,30 @@ public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, Strin
         invokeLater(() -> setNewValues(toMap(event.getDesc())));
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(SelectDeviceEvent event) {
+        invokeLater(() -> selectValue(event.getDevice()));
+    }
+
     private LinkedHashMap<String, String> toMap(List<String> devices) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         devices.forEach(s -> {
             String oldLabel = items.get(s);
             map.put(s, oldLabel == null ? s : oldLabel);
         });
-        return map;
+        return sort(map);
+    }
+
+    private LinkedHashMap<String, String> sort(LinkedHashMap<String, String> map) {
+        LinkedHashMap<String, String> sorted = new LinkedHashMap<>();
+        map.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(e -> sorted.put(e.getKey(), e.getValue()));
+        return sorted;
     }
 
     private LinkedHashMap<String, String> toMap(Map<String, String> m) {
         Map<String, String> map = m.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, this::desc));
-        return new LinkedHashMap<>(map);
+        return sort(new LinkedHashMap<>(map));
     }
 
     private String desc(Map.Entry<String, String> v) {
