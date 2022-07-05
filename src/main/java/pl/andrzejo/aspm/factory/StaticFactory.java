@@ -16,6 +16,10 @@ public class StaticFactory {
         objects.put(type, instance);
     }
 
+    public static void clearInstance(Class<?> type) {
+        objects.remove(type);
+    }
+
     private static Object createInstance(Class<?> k) {
         try {
             for (Constructor<?> constructor : k.getConstructors()) {

@@ -4,6 +4,7 @@ import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
+import pl.andrzejo.aspm.factory.StaticFactory;
 import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 
@@ -20,16 +21,9 @@ public class RestApiService {
     private final List<Endpoint> endpoints = new ArrayList<>();
     private final ApiIndex apiIndex;
 
-    private RestApiService() {
+    public RestApiService() {
         apiIndex = new ApiIndex();
         eventBus = ApplicationEventBus.instance();
-    }
-
-    public static RestApiService instance() {
-        if (inst == null) {
-            inst = new RestApiService();
-        }
-        return inst;
     }
 
     public static String getRootEndpointAddress() {
@@ -37,7 +31,7 @@ public class RestApiService {
     }
 
     public void start() {
-        SimpleHttpServer server = new SimpleHttpServer();
+        SimpleHttpServer server = StaticFactory.instance(SimpleHttpServer.class);
         setupEndpoint(server, Post, "/api/open", this::handleOpen, "Open device. Specify device in request body. If device is not specified opens first selected.");
         setupEndpoint(server, Post, "/api/close", this::handleClose, "Close device.");
         setupEndpoint(server, Get, "/api/status", this::handleStatus, "Get device status.");
