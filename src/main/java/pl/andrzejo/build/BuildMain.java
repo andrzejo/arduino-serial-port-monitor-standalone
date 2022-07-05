@@ -2,6 +2,7 @@ package pl.andrzejo.build;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import pl.andrzejo.aspm.factory.StaticFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class BuildMain {
 
     private static String getCurrentDate() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return format.format(new Date());
+        return format.format(StaticFactory.instance(Date.class));
     }
 
     private static void replaceVersion(String projectDir, String currentVersion, String version) throws IOException {
