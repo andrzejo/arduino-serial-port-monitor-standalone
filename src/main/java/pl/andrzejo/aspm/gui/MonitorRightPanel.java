@@ -5,6 +5,7 @@ import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontNameSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontSizeSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.SaveLogToFile;
 
 import javax.swing.*;
@@ -21,9 +22,14 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 public class MonitorRightPanel extends ContentPanel {
 
     private final FontRenderContext fontRenderContext = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
+    private final ApplicationEventBus eventBus;
+    private Integer fontSize;
+    private String fontName;
 
 
     public MonitorRightPanel() {
+        eventBus = ApplicationEventBus.instance();
+
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(0, 10, 0, 10));
 
@@ -35,8 +41,16 @@ public class MonitorRightPanel extends ContentPanel {
         JComboBox<String> fontsCombo = new JComboBox<>();
         setPreferredWidthSize(fontsCombo);
         fillFonts(fontsCombo, true);
+
         panel.add(createLabeled("Font", fontsCombo));
-        add(panel, BorderLayout.CENTER);
+        SpinnerListModel fontSize = new SpinnerListModel(Arrays.asList(8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48));
+        JSpinner fontSizeSpinner = new JSpinner(fontSize);
+        setupFontSizeSpinner(fontSizeSpinner);
+        panel.add(createLabeled("Size", fontSizeSpinner));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel panel2 = new JPanel();
+        panel2.add(panel);
+        add(panel2, BorderLayout.CENTER);
 
         setupFontCombo(fontsCombo);
 
@@ -45,14 +59,24 @@ public class MonitorRightPanel extends ContentPanel {
         add(saveToFile, BorderLayout.SOUTH);
     }
 
+    private void setupFontSizeSpinner(JSpinner fontSizeSpinner) {
+        FontSizeSetting setting = AppSettingsFactory.create(FontSizeSetting.class);
+        fontSize = setting.get();
+        fontSizeSpinner.addChangeListener(e -> {
+            fontSize = (Integer) fontSizeSpinner.getValue();
+            setting.set(fontSize);
+            eventBus.post(new FontChangedEvent(fontName, fontSize));
+        });
+    }
+
     private void setupFontCombo(JComboBox<String> fontsCombo) {
         FontNameSetting setting = AppSettingsFactory.create(FontNameSetting.class);
-        ApplicationEventBus eventBus = ApplicationEventBus.instance();
         fontsCombo.setSelectedItem(setting.get());
+        fontName = setting.get();
         fontsCombo.addActionListener(handleAction((e) -> {
-            String name = (String) fontsCombo.getSelectedItem();
-            setting.set(name);
-            eventBus.post(new FontChangedEvent(name));
+            fontName = (String) fontsCombo.getSelectedItem();
+            setting.set(fontName);
+            eventBus.post(new FontChangedEvent(fontName, fontSize));
         }));
     }
 

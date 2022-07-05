@@ -32,15 +32,15 @@ public class RestApiService {
         return inst;
     }
 
-    public static String getStatusEndpointAddress() {
-        return SimpleHttpServer.getAddress() + "/api/status";
+    public static String getRootEndpointAddress() {
+        return SimpleHttpServer.getAddress();
     }
 
     public void start() {
         SimpleHttpServer server = new SimpleHttpServer();
         setupEndpoint(server, Post, "/api/open", this::handleOpen, "Open device. Specify device in request body. If device is not specified opens first selected.");
         setupEndpoint(server, Post, "/api/close", this::handleClose, "Close device.");
-        setupEndpoint(server, Get, "/api/status", this::handleStatus, "Display device status.");
+        setupEndpoint(server, Get, "/api/status", this::handleStatus, "Get device status.");
         setupEndpoint(server, Get, "/api/devices", this::handleDevices, "Get available devices.");
         setupEndpoint(server, Get, null, this::handleRoot, "Get endpoints.");
     }

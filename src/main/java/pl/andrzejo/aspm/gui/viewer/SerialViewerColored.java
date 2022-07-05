@@ -10,6 +10,7 @@ import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AutoscrollSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontNameSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontSizeSetting;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -36,7 +37,7 @@ public class SerialViewerColored {
         editor.setEditable(false);
         doc = editor.getStyledDocument();
         scroll = new JScrollPane(editor);
-        setFont(AppSettingsFactory.create(FontNameSetting.class).get());
+        setFont(AppSettingsFactory.create(FontNameSetting.class).get(), AppSettingsFactory.create(FontSizeSetting.class).get());
         styles = new Styles(doc);
         editor.setBackground(SystemColor.window);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -45,9 +46,9 @@ public class SerialViewerColored {
         ApplicationEventBus.instance().register(this);
     }
 
-    private void setFont(String name) {
+    private void setFont(String name, Integer size) {
         Font font = editor.getFont();
-        Font font1 = new Font(name, font.getStyle(), font.getSize());
+        Font font1 = new Font(name, font.getStyle(), size);
         editor.setFont(font1);
     }
 
@@ -66,7 +67,7 @@ public class SerialViewerColored {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(FontChangedEvent event) {
-        setFont(event.getName());
+        setFont(event.getName(), event.getSize());
     }
 
     public JComponent getComponent() {
