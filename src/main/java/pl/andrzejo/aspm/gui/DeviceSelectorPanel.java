@@ -1,16 +1,16 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.setting.SettingsResetToDefaultEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.eventbus.events.device.ToggleDeviceStatusEvent;
+import pl.andrzejo.aspm.eventbus.events.setting.SettingsResetToDefaultEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.setting.device.*;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AutoscrollSetting;
 import pl.andrzejo.aspm.settings.guihandlers.CheckBoxSettingsHandler;
 import pl.andrzejo.aspm.settings.guihandlers.ListSettingHandler;
@@ -24,6 +24,7 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.mouseClicked;
 
@@ -39,7 +40,7 @@ public class DeviceSelectorPanel extends ContentPanel {
     private boolean isSettingsOpen;
 
     public DeviceSelectorPanel() {
-        eventBus = ApplicationEventBus.instance();
+        eventBus = instance(ApplicationEventBus.class);
         eventBus.register(this);
 
         setting = AppSettingsFactory.create(TtyDeviceSetting.class);

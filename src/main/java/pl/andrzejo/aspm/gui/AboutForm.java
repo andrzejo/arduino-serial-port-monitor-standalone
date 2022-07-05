@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.App;
-import pl.andrzejo.aspm.api.RestApiService;
+import pl.andrzejo.aspm.api.AppApiService;
 import pl.andrzejo.aspm.utils.Images;
 import pl.andrzejo.aspm.utils.UriOpener;
 
@@ -26,7 +26,7 @@ public class AboutForm extends JDialog {
         panel.add(addLabel("Build date", App.Version.getDate()));
         panel.add(addSeparator());
         panel.add(addUriLabel("GitHub", App.GitHubUrl));
-        panel.add(addUriLabel("Internal API", RestApiService.getRootEndpointAddress()));
+        panel.add(addUriLabel("Internal API", AppApiService.getRootEndpointAddress()));
         panel.add(addSeparator());
         panel.add(addLabel("This software is free (GNU GPL)"));
         panel.add(addLabel("App is inspired by Port Monitor from Arduino IDE"));

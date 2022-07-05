@@ -9,6 +9,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 import javax.swing.*;
 import java.util.function.Consumer;
 
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 
 public class CheckBoxSettingsHandler {
@@ -28,7 +29,7 @@ public class CheckBoxSettingsHandler {
         this.defValue = defValue;
         this.handleRestToDefault = handleRestToDefault;
         if (handleRestToDefault) {
-            ApplicationEventBus.instance().register(this);
+            instance(ApplicationEventBus.class).register(this);
         }
     }
 

@@ -4,12 +4,12 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StaticFactory {
+public class ObjectFactory {
     private static final Map<Class<?>, Object> objects = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T> T instance(Class<T> type) {
-        return (T) objects.computeIfAbsent(type, StaticFactory::createInstance);
+        return (T) objects.computeIfAbsent(type, ObjectFactory::createInstance);
     }
 
     public static void overrideInstance(Class<?> type, Object instance) {

@@ -3,6 +3,7 @@ package pl.andrzejo.aspm.settings.guihandlers;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.setting.SettingsResetToDefaultEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
+import pl.andrzejo.aspm.factory.ObjectFactory;
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 
 import javax.swing.*;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 
 public abstract class ListSettingHandler<T, I> {
@@ -39,7 +41,7 @@ public abstract class ListSettingHandler<T, I> {
         this.handleRestToDefault = handleRestToDefault;
         fillItems(items);
         values.addAll(items.keySet());
-        ApplicationEventBus.instance().register(this);
+        instance(ApplicationEventBus.class).register(this);
     }
 
     public ListSettingHandler(Consumer<I> setter,

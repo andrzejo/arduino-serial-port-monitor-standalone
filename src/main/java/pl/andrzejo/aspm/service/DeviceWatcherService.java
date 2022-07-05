@@ -7,6 +7,7 @@ import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceDescriptionEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceListChangedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
+import pl.andrzejo.aspm.factory.ObjectFactory;
 import pl.andrzejo.aspm.serial.PortDescriptionFetcher;
 import pl.andrzejo.aspm.serial.SerialPorts;
 
@@ -16,9 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+
 public class DeviceWatcherService {
     private static final Logger logger = LoggerFactory.getLogger(DeviceWatcherService.class);
-    private static DeviceWatcherService inst;
     private final ScheduledExecutorService watcherExecutor;
     private final ExecutorService descProviderExecutor;
     private final ApplicationEventBus eventBus;
@@ -30,16 +32,9 @@ public class DeviceWatcherService {
     private DeviceWatcherService() {
         watcherExecutor = Executors.newSingleThreadScheduledExecutor();
         descProviderExecutor = Executors.newSingleThreadExecutor();
-        eventBus = ApplicationEventBus.instance();
+        eventBus = instance(ApplicationEventBus.class);
         eventBus.register(this);
         descriptionFetcher = new PortDescriptionFetcher();
-    }
-
-    public static DeviceWatcherService instance() {
-        if (inst == null) {
-            inst = new DeviceWatcherService();
-        }
-        return inst;
     }
 
     public void start() {

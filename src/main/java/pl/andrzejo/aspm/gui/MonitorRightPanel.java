@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 
 public class MonitorRightPanel extends ContentPanel {
@@ -28,14 +29,14 @@ public class MonitorRightPanel extends ContentPanel {
 
 
     public MonitorRightPanel() {
-        eventBus = ApplicationEventBus.instance();
+        eventBus = instance(ApplicationEventBus.class);
 
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(0, 10, 0, 10));
 
         JButton clear = new JButton("Clear output");
         add(clear, BorderLayout.NORTH);
-        clear.addActionListener(handleAction((e) -> ApplicationEventBus.instance().post(new ClearMonitorOutputEvent())));
+        clear.addActionListener(handleAction((e) -> instance(ApplicationEventBus.class).post(new ClearMonitorOutputEvent())));
 
         JPanel panel = new JPanel();
         JComboBox<String> fontsCombo = new JComboBox<>();

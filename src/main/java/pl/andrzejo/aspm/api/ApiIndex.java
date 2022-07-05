@@ -18,7 +18,7 @@ public class ApiIndex {
         templates.put(SimpleHttpServer.Method.Post, AppFiles.readResources("api/method.post.html"));
     }
 
-    public String getHtml(List<RestApiService.Endpoint> endpoints) {
+    public String getHtml(List<AppApiService.Endpoint> endpoints) {
         String html = AppFiles.readResources("api/index.html");
         String endpointsHtml = getEndpointsHtml(endpoints);
         Map<String, String> map = new HashMap<>();
@@ -27,17 +27,17 @@ public class ApiIndex {
         return replace(html, map);
     }
 
-    private String getEndpointsHtml(List<RestApiService.Endpoint> endpoints) {
+    private String getEndpointsHtml(List<AppApiService.Endpoint> endpoints) {
         return endpoints.stream().map(this::getEndpointHtml).collect(Collectors.joining());
     }
 
-    private String getEndpointHtml(RestApiService.Endpoint endpoint) {
+    private String getEndpointHtml(AppApiService.Endpoint endpoint) {
         String html = templates.get(endpoint.getMethod());
         Map<String, String> replacements = getReplacements(endpoint);
         return replace(html, replacements);
     }
 
-    private Map<String, String> getReplacements(RestApiService.Endpoint endpoint) {
+    private Map<String, String> getReplacements(AppApiService.Endpoint endpoint) {
         HashMap<String, String> map = new HashMap<>();
         String suffix = endpoint.getPath() == null ? "/" : endpoint.getPath();
         String href = SimpleHttpServer.getAddress() + suffix;

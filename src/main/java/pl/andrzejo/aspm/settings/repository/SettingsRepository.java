@@ -11,7 +11,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class SettingsRepository {
-    private static final SettingsRepository inst = new SettingsRepository();
     private final Properties props;
     private final File path;
     private boolean isDirty = false;
@@ -21,10 +20,6 @@ public class SettingsRepository {
         path = getSettingsPath();
         read();
         startDirtyWatcher();
-    }
-
-    public static SettingsRepository instance() {
-        return inst;
     }
 
     private void startDirtyWatcher() {

@@ -18,6 +18,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 import static pl.andrzejo.aspm.gui.viewer.Styles.MessageType.*;
 import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
 
@@ -43,7 +44,7 @@ public class SerialViewerColored {
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-        ApplicationEventBus.instance().register(this);
+        instance(ApplicationEventBus.class).register(this);
     }
 
     private void setFont(String name, Integer size) {

@@ -5,12 +5,7 @@ import pl.andrzejo.aspm.eventbus.impl.EventBus;
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 
 public class ApplicationEventBus {
-    private static final ApplicationEventBus instance = new ApplicationEventBus();
     private final EventBus eventBus;
-
-    public static ApplicationEventBus instance() {
-        return instance;
-    }
 
     public ApplicationEventBus() {
         eventBus = new EventBus();

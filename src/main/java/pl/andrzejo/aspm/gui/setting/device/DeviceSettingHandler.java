@@ -16,12 +16,13 @@ import java.util.stream.Collectors;
 
 import static javax.swing.SwingUtilities.invokeLater;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 
 public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, String> {
 
     public DeviceSettingHandler(TtyDeviceSetting setting, DeviceConfig config, DeviceConfig defValue) {
         super(setting, config, config::setDevice, config::getDevice, defValue.getDevice(), false);
-        ApplicationEventBus.instance().register(this);
+        instance(ApplicationEventBus.class).register(this);
     }
 
     @Override

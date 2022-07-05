@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.*;
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 
 public class SendCommandPanel extends ContentPanel {
@@ -51,7 +52,7 @@ public class SendCommandPanel extends ContentPanel {
         LineEndingSettingHandler handler = new LineEndingSettingHandler(AppSettingsFactory.create(LineEndingSetting.class));
         handler.setupComponent(lineEndingComboBox);
         toggleEnabled(false);
-        ApplicationEventBus.instance().register(this);
+        instance(ApplicationEventBus.class).register(this);
         loadHistory();
     }
 
@@ -60,7 +61,7 @@ public class SendCommandPanel extends ContentPanel {
         String command = current == null ? "" : current.toString();
         addToHistory(command);
         String lineEnding = getLineEnding();
-        ApplicationEventBus.instance().post(new ExecuteCommandEvent(command, lineEnding));
+        instance(ApplicationEventBus.class).post(new ExecuteCommandEvent(command, lineEnding));
     }
 
     private void addToHistory(String command) {

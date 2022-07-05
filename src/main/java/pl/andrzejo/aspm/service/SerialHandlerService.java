@@ -26,10 +26,10 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 
 public class SerialHandlerService {
     private static final Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);
-    private static SerialHandlerService inst;
     private final ApplicationEventBus eventBus;
     private final LastDeviceSetting lastDeviceSetting;
     private Serial serial;
@@ -40,16 +40,9 @@ public class SerialHandlerService {
     private boolean applicationStarted = false;
 
     private SerialHandlerService() {
-        eventBus = ApplicationEventBus.instance();
+        eventBus = instance(ApplicationEventBus.class);
         eventBus.register(this);
         lastDeviceSetting = AppSettingsFactory.create(LastDeviceSetting.class);
-    }
-
-    public static SerialHandlerService instance() {
-        if (inst == null) {
-            inst = new SerialHandlerService();
-        }
-        return inst;
     }
 
     private void openSerial() {

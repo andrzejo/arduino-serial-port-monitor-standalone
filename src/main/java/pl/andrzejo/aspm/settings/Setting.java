@@ -2,6 +2,8 @@ package pl.andrzejo.aspm.settings;
 
 import pl.andrzejo.aspm.settings.repository.SettingsRepository;
 
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+
 public abstract class Setting<T> {
     protected final SettingsRepository repository;
     protected final String key;
@@ -14,7 +16,7 @@ public abstract class Setting<T> {
     protected Setting(String key, T defValue) {
         this.key = key;
         this.defValue = defValue;
-        this.repository = SettingsRepository.instance();
+        this.repository = instance(SettingsRepository.class);
     }
 
     public T get() {

@@ -4,7 +4,6 @@ import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
-import pl.andrzejo.aspm.factory.StaticFactory;
 import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 
@@ -14,16 +13,16 @@ import java.util.function.Function;
 
 import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
 import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
+import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
 
-public class RestApiService {
-    private static RestApiService inst;
+public class AppApiService {
     private final ApplicationEventBus eventBus;
     private final List<Endpoint> endpoints = new ArrayList<>();
     private final ApiIndex apiIndex;
 
-    public RestApiService() {
+    public AppApiService() {
         apiIndex = new ApiIndex();
-        eventBus = ApplicationEventBus.instance();
+        eventBus = instance(ApplicationEventBus.class);
     }
 
     public static String getRootEndpointAddress() {
@@ -31,7 +30,7 @@ public class RestApiService {
     }
 
     public void start() {
-        SimpleHttpServer server = StaticFactory.instance(SimpleHttpServer.class);
+        SimpleHttpServer server = instance(SimpleHttpServer.class);
         setupEndpoint(server, Post, "/api/open", this::handleOpen, "Open device. Specify device in request body. If device is not specified opens first selected.");
         setupEndpoint(server, Post, "/api/close", this::handleClose, "Close device.");
         setupEndpoint(server, Get, "/api/status", this::handleStatus, "Get device status.");
@@ -64,7 +63,7 @@ public class RestApiService {
     }
 
     private String handleStatus(String body) {
-        SerialHandlerService.Status status = SerialHandlerService.instance().getStatus();
+        SerialHandlerService.Status status = instance(SerialHandlerService.class).getStatus();
         return status.toHumanReadableString();
     }
 
