@@ -2,7 +2,7 @@ package pl.andrzejo.aspm.settings;
 
 import pl.andrzejo.aspm.settings.repository.SettingsRepository;
 
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public abstract class Setting<T> {
     protected final SettingsRepository repository;

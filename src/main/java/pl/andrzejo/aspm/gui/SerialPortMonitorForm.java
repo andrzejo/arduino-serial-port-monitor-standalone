@@ -12,7 +12,6 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
-import pl.andrzejo.aspm.factory.ObjectFactory;
 import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
@@ -24,7 +23,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
 
 public class SerialPortMonitorForm {

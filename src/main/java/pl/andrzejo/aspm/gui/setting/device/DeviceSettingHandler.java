@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static javax.swing.SwingUtilities.invokeLater;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class DeviceSettingHandler extends ListSettingHandler<DeviceConfig, String> {
 

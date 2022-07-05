@@ -3,7 +3,6 @@ package pl.andrzejo.aspm;
 import com.formdev.flatlaf.FlatLightLaf;
 import pl.andrzejo.aspm.api.AppApiService;
 import pl.andrzejo.aspm.error.DefaultErrorHandler;
-import pl.andrzejo.aspm.factory.ObjectFactory;
 import pl.andrzejo.aspm.gui.SerialPortMonitorForm;
 import pl.andrzejo.aspm.service.DeviceWatcherService;
 import pl.andrzejo.aspm.service.SerialHandlerService;
@@ -11,7 +10,7 @@ import pl.andrzejo.aspm.service.SerialHandlerService;
 import javax.swing.*;
 import java.awt.*;
 
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class Main {
 

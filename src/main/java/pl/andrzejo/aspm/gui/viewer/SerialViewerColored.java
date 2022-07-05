@@ -18,7 +18,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.viewer.Styles.MessageType.*;
 import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
 

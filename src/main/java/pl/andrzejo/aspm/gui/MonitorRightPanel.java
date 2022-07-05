@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 
 public class MonitorRightPanel extends ContentPanel {

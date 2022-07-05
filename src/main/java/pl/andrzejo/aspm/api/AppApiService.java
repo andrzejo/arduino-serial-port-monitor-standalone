@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
 import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class AppApiService {
     private final ApplicationEventBus eventBus;

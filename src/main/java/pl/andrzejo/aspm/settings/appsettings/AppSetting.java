@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.settings.appsettings;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.factory.ObjectFactory;
+import pl.andrzejo.aspm.factory.BeanFactory;
 import pl.andrzejo.aspm.settings.Setting;
 
 import java.lang.reflect.Constructor;
@@ -17,7 +17,7 @@ public abstract class AppSetting<T> {
         String key = createKey(component, name);
         setting = createSettingInstance(key, settingType, def);
         debouncer = new Debouncer<>(this::sendEvent, 500);
-        eventBus = ObjectFactory.instance(ApplicationEventBus.class);
+        eventBus = BeanFactory.instance(ApplicationEventBus.class);
         debouncer.debounce(this);
     }
 

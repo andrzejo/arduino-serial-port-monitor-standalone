@@ -1,7 +1,7 @@
 package pl.andrzejo.aspm.api;
 
 import org.junit.jupiter.api.Test;
-import pl.andrzejo.aspm.factory.ObjectFactory;
+import pl.andrzejo.aspm.factory.BeanFactory;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -15,7 +15,7 @@ class AppApiServiceTest {
         //given
         AppApiService service = new AppApiService();
         SimpleHttpServer server = mock(SimpleHttpServer.class);
-        ObjectFactory.overrideInstance(SimpleHttpServer.class, server);
+        BeanFactory.overrideInstance(SimpleHttpServer.class, server);
 
         //when
         service.start();

@@ -3,7 +3,7 @@ package pl.andrzejo.build;
 import org.junit.jupiter.api.Test;
 import pl.andrzejo.TemporaryFileTestCase;
 import pl.andrzejo.TestUtils;
-import pl.andrzejo.aspm.factory.ObjectFactory;
+import pl.andrzejo.aspm.factory.BeanFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ class BuildMainTest extends TemporaryFileTestCase {
     @Test
     void shouldReplaceVersion() throws IOException, ParseException {
         //given
-        ObjectFactory.overrideInstance(Date.class, TestUtils.createDate("2022-01-01 11:11:11"));
+        BeanFactory.overrideInstance(Date.class, TestUtils.createDate("2022-01-01 11:11:11"));
 
         System.setProperty("build.increaseVersion", "true");
         File pom = copyFromResource("test-versioning-pom.xml", "pom.xml");

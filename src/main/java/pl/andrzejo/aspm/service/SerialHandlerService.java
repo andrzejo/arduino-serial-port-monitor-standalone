@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class SerialHandlerService {
     private static final Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);

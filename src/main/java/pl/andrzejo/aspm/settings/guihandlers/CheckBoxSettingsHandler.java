@@ -9,7 +9,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 import javax.swing.*;
 import java.util.function.Consumer;
 
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 
 public class CheckBoxSettingsHandler {

@@ -24,7 +24,7 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-import static pl.andrzejo.aspm.factory.ObjectFactory.instance;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.mouseClicked;
 
