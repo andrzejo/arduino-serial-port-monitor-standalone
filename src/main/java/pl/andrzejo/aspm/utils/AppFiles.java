@@ -28,8 +28,7 @@ public class AppFiles {
     }
 
     public static File getAppConfigDir() {
-        boolean isWindows = SystemExec.CurrentOs == SystemExec.OsName.Windows;
-        String root = isWindows ? System.getenv("APPDATA") : FileUtils.getUserDirectoryPath();
+        String root = FileUtils.getUserDirectoryPath();
         File file = new File(root, App.ConfigDir);
         file.mkdirs();
         return file;
