@@ -22,6 +22,10 @@ public class BeanFactory {
         objects.put(type, instance);
     }
 
+    public static void reset() {
+        objects.clear();
+    }
+
     public static void clearInstance(Class<?> type) {
         objects.remove(type);
     }
@@ -40,5 +44,4 @@ public class BeanFactory {
 
         throw new RuntimeException("Instantiation failed. Class has no default constructor " + k.getName() + "");
     }
-
 }

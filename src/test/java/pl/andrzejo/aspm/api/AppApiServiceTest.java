@@ -38,6 +38,7 @@ class AppApiServiceTest {
 
     @BeforeEach
     void setUp() {
+        BeanFactory.reset();
         apiIndex = mock(ApiIndex.class);
 
         bus = mock(ApplicationEventBus.class);
