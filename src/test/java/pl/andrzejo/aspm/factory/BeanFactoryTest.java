@@ -10,6 +10,7 @@ class BeanFactoryTest {
     @BeforeEach
     void setUp() {
         BeanFactory.reset();
+        SomeBean.instCounter = 0;
     }
 
     @Test
