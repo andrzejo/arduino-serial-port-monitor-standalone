@@ -201,6 +201,16 @@ class AppApiServiceTest {
         assertThat(list).hasSize(5);
     }
 
+    @Test
+    void shouldGetRootEndpointAddress() {
+        //given
+        //when
+        String address = AppApiService.getRootEndpointAddress();
+
+        //then
+        assertEquals("http://localhost:4255", address);
+    }
+
     @SuppressWarnings("unchecked")
     private <T extends BusEvent> T verifyEventIsInstanceOf(BusEvent busEvent, Class<T> eventClass) {
         assertThat(busEvent).isInstanceOf(eventClass);

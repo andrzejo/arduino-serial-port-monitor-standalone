@@ -1,15 +1,16 @@
 package pl.andrzejo.aspm.gui;
 
+import javax.swing.*;
 import java.awt.*;
 
 public class MainWindowContainer {
-    private static Component wnd = null;
+    private static JFrame wnd = null;
 
-    public static void setMainWindowComponent(Component window) {
+    public static void setMainWindowComponent(JFrame window) {
         wnd = window;
     }
 
-    public static Component getComponent() {
+    public static JFrame getComponent() {
         return wnd;
     }
 }
