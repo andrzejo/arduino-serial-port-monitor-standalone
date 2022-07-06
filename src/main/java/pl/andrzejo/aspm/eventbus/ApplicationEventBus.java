@@ -4,11 +4,13 @@ import pl.andrzejo.aspm.eventbus.events.BusEvent;
 import pl.andrzejo.aspm.eventbus.impl.EventBus;
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
+
 public class ApplicationEventBus {
     private final EventBus eventBus;
 
     public ApplicationEventBus() {
-        eventBus = new EventBus();
+        eventBus = instance(EventBus.class);
     }
 
     public void register(Object listener) {
