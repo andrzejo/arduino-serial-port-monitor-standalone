@@ -63,6 +63,7 @@ public class MonitorRightPanel extends ContentPanel {
     private void setupFontSizeSpinner(JSpinner fontSizeSpinner) {
         FontSizeSetting setting = AppSettingsFactory.create(FontSizeSetting.class);
         fontSize = setting.get();
+        fontSizeSpinner.setValue(fontSize);
         fontSizeSpinner.addChangeListener(e -> {
             fontSize = (Integer) fontSizeSpinner.getValue();
             setting.set(fontSize);
