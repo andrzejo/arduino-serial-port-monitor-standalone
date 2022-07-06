@@ -18,6 +18,11 @@ public class Styles {
         styles.put(MessageType.INTERNAL_INFO, intInfoStyle());
         styles.put(MessageType.INTERNAL_ERROR, intErrorStyle());
         styles.put(MessageType.SERIAL_MESSAGE, serialMsgStyle());
+
+        styles.put(MessageType.SERIAL_DEBUG, serialDebugStyle());
+        styles.put(MessageType.SERIAL_INFO, serialInfoStyle());
+        styles.put(MessageType.SERIAL_WARN, serialWarnStyle());
+        styles.put(MessageType.SERIAL_ERROR, serialErrorStyle());
     }
 
     public Style get(MessageType type) {
@@ -26,6 +31,22 @@ public class Styles {
 
     private Style serialMsgStyle() {
         return createStyle(MessageType.SERIAL_MESSAGE, "#000000");
+    }
+
+    private Style serialDebugStyle() {
+        return createStyle(MessageType.SERIAL_DEBUG, "#000000");
+    }
+
+    private Style serialInfoStyle() {
+        return createStyle(MessageType.SERIAL_INFO, "#000000");
+    }
+
+    private Style serialWarnStyle() {
+        return createStyle(MessageType.SERIAL_WARN, "#000000");
+    }
+
+    private Style serialErrorStyle() {
+        return createStyle(MessageType.SERIAL_ERROR, "#000000");
     }
 
     private Style intErrorStyle() {

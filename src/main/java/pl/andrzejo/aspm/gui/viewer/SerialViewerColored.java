@@ -28,11 +28,13 @@ public class SerialViewerColored {
     private final StyledDocument doc;
     private final Styles styles;
     private final JTextPane editor;
+    private final SerialMessageType serialMessageType;
     private boolean isAutoScroll = get(AutoscrollSetting.class);
     private boolean isAddTimestamp = get(AddTimestampSetting.class);
     private final OutputLogger logger;
 
     public SerialViewerColored(OutputLogger logger) {
+        serialMessageType = instance(SerialMessageType.class);
         this.logger = logger;
         editor = new JTextPane();
         editor.setEditable(false);
@@ -93,7 +95,7 @@ public class SerialViewerColored {
 
         switch (text.getType()) {
             case SERIAL_MESSAGE:
-                insertText(text.getText(), styles.get(SERIAL_MESSAGE));
+                formatSerialMessage(text.getText());
                 break;
 
             case INTERNAL_MESSAGE:
@@ -111,6 +113,11 @@ public class SerialViewerColored {
                 throw new ColorFormatterException("Unsupported text type: " + text.getType().name());
         }
         scrollDown();
+    }
+
+    private void formatSerialMessage(String text) {
+        Styles.MessageType type = serialMessageType.getType(text);
+        insertText(text, styles.get(type));
     }
 
     private String getCurrentText() {
