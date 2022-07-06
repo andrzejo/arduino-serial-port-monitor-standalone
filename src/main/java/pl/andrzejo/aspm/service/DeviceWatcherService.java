@@ -42,7 +42,7 @@ public class DeviceWatcherService {
 
     public void checkDevices() {
         try {
-            List<String> newDevices = SerialPorts.getList();
+            List<String> newDevices = instance(SerialPorts.class).getList();
             if (!lastDevices.equals(newDevices)) {
                 logger.info("TTY devices list changed: {} -> {} ", lastDevices, newDevices);
                 setNewDevices(newDevices);

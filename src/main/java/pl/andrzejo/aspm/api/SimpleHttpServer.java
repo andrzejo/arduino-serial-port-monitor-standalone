@@ -6,7 +6,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.andrzejo.aspm.factory.BeanFactory;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -26,11 +28,19 @@ public class SimpleHttpServer {
 
     public SimpleHttpServer() {
         try {
-            server = HttpServer.create(new InetSocketAddress(PORT), 0);
+            server = BeanFactory.instance(HttpServer.class, this::createHttpServer);
             server.setExecutor(null);
             server.start();
         } catch (Exception e) {
-            logger.warn("Failed to start REST API server. API not available!", e);
+            logger.warn("Failed to start application API server. API not available!", e);
+        }
+    }
+
+    private HttpServer createHttpServer() {
+        try {
+            return HttpServer.create(new InetSocketAddress(PORT), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

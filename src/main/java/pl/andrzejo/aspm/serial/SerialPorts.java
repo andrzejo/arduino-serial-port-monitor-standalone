@@ -7,7 +7,7 @@ import java.util.List;
 
 public class SerialPorts {
 
-    public static List<String> getList() {
+    public List<String> getList() {
         return Arrays.asList(SerialPortList.getPortNames());
     }
 

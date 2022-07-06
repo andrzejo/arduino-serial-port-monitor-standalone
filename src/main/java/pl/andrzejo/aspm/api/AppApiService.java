@@ -21,7 +21,7 @@ public class AppApiService {
     private final ApiIndex apiIndex;
 
     public AppApiService() {
-        apiIndex = new ApiIndex();
+        apiIndex = instance(ApiIndex.class);
         eventBus = instance(ApplicationEventBus.class);
     }
 
@@ -41,7 +41,7 @@ public class AppApiService {
     private void setupEndpoint(SimpleHttpServer server, SimpleHttpServer.Method method, String path, Function<String, String> handler, String desc) {
         endpoints.add(new Endpoint(method, path, desc));
         server.addEndpoint(method, path, (body) -> {
-            if (path != null) {
+            if (method == Post) {
                 eventBus.post(new ApiExecuteCommand(path, body));
             }
             return handler.apply(body);
@@ -68,7 +68,7 @@ public class AppApiService {
     }
 
     private String handleDevices(String body) {
-        List<String> list = SerialPorts.getList();
+        List<String> list = instance(SerialPorts.class).getList();
         return String.join("\n", list);
     }
 

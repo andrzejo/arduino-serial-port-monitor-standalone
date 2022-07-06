@@ -13,6 +13,7 @@ import pl.andrzejo.aspm.eventbus.events.command.ExecuteCommandEvent;
 import pl.andrzejo.aspm.eventbus.events.device.*;
 import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
+import pl.andrzejo.aspm.factory.BeanFactory;
 import pl.andrzejo.aspm.serial.Serial;
 import pl.andrzejo.aspm.serial.SerialException;
 import pl.andrzejo.aspm.serial.SerialPorts;
@@ -24,6 +25,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
@@ -34,7 +36,6 @@ public class SerialHandlerService {
     private final LastDeviceSetting lastDeviceSetting;
     private Serial serial;
     private DeviceConfig config;
-
     private DeviceConfig openDeviceConfig;
     private boolean autoOpen;
     private boolean applicationStarted = false;
@@ -56,19 +57,31 @@ public class SerialHandlerService {
         try {
             openDeviceConfig = config;
             logger.info("Open serial: {}", config);
-            serial = new Serial(config.getDevice(), config.getBaud(), config.getParity(), config.getDataBits(), config.getStopBits(), config.isRTS(), config.isDTR()) {
-                @Override
-                protected void message(char[] buff, int n) {
-                    String msg = new String(buff);
-                    eventBus.post(new SerialMessageReceivedEvent(msg));
-                }
-            };
+            serial = BeanFactory.instance(Serial.class, createSerial(config));
             eventBus.post(new DeviceOpenEvent(config));
-        } catch (SerialException e) {
-            eventBus.post(new DeviceErrorEvent(e.getMessage()));
         } catch (Exception e) {
-            eventBus.post(new DeviceCloseEvent(config));
+            if (e.getCause() instanceof SerialException) {
+                eventBus.post(new DeviceErrorEvent(e.getMessage()));
+            } else {
+                eventBus.post(new DeviceCloseEvent(config));
+            }
         }
+    }
+
+    private Supplier<Serial> createSerial(DeviceConfig config) {
+        return () -> {
+            try {
+                return new Serial(config.getDevice(), config.getBaud(), config.getParity(), config.getDataBits(), config.getStopBits(), config.isRTS(), config.isDTR()) {
+                    @Override
+                    protected void message(char[] buff, int n) {
+                        String msg = new String(buff);
+                        eventBus.post(new SerialMessageReceivedEvent(msg));
+                    }
+                };
+            } catch (SerialException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     @Subscribe
@@ -143,7 +156,7 @@ public class SerialHandlerService {
     }
 
     private boolean isValidDevice(String device) {
-        List<String> devices = SerialPorts.getList();
+        List<String> devices = instance(SerialPorts.class).getList();
         return devices.contains(device);
     }
 
