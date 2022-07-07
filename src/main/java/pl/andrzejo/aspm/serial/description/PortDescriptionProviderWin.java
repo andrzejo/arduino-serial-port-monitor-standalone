@@ -8,13 +8,14 @@ import java.util.stream.Collectors;
 public class PortDescriptionProviderWin extends DescriptionProviderCommand {
     private static final String Command = "Get-WMIObject -Query \\\"SELECT Caption FROM Win32_PnPEntity WHERE Caption LIKE '%(COM%' \\\" | findstr 'Caption ' ";
 
-    public PortDescriptionProviderWin() {
-        super(Command);
-    }
-
     @Override
     protected Map<String, String> getDescriptions(List<String> ports, List<String> descriptions) {
         return ports.stream().collect(Collectors.toMap(Function.identity(), p -> getDesc(p, descriptions)));
+    }
+
+    @Override
+    protected String getCommand(List<String> ports) {
+        return Command;
     }
 
     private String getDesc(String port, List<String> descriptions) {

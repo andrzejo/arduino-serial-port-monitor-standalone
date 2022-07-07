@@ -4,6 +4,7 @@ import jssc.SerialNativeInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.serial.description.DescriptionProvider;
+import pl.andrzejo.aspm.serial.description.PortDescriptionProviderUdev;
 import pl.andrzejo.aspm.serial.description.PortDescriptionProviderWin;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ public class PortDescriptionFetcher {
     public PortDescriptionFetcher() {
         switch (SerialNativeInterface.getOsType()) {
             case SerialNativeInterface.OS_LINUX: {
-                descriptionProvider = null;
+                descriptionProvider = new PortDescriptionProviderUdev();
                 break;
             }
 

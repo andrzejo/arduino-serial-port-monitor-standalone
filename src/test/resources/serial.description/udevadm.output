@@ -1,0 +1,66 @@
+P: /devices/pci0000:00/0000:00:01.2/0000:02:00.0/0000:03:08.0/0000:05:00.1/usb1/1-1/1-1:1.1/0003:413C:301D.0003/input/input15/mouse0
+N: input/mouse0
+L: 0
+S: input/by-id/usb-Dell_Dell_Universal_Receiver-if01-mouse
+S: input/by-path/pci-0000:05:00.1-usb-0:1:1.1-mouse
+E: DEVPATH=/devices/pci0000:00/0000:00:01.2/0000:02:00.0/0000:03:08.0/0000:05:00.1/usb1/1-1/1-1:1.1/0003:413C:301D.0003/input/input15/mouse0
+E: DEVNAME=/dev/input/mouse0
+E: MAJOR=13
+E: MINOR=32
+E: SUBSYSTEM=input
+E: USEC_INITIALIZED=5756011
+E: ID_INPUT=1
+E: ID_INPUT_MOUSE=1
+E: ID_VENDOR=Dell
+E: ID_VENDOR_ENC=Dell
+E: ID_VENDOR_ID=413c
+E: ID_MODEL=Dell_Universal_Receiver
+E: ID_MODEL_ENC=Dell\x20Universal\x20Receiver
+E: ID_MODEL_ID=301d
+E: ID_REVISION=0009
+E: ID_SERIAL=Dell_Dell_Universal_Receiver
+E: ID_TYPE=hid
+E: ID_BUS=usb
+E: ID_USB_INTERFACES=:030101:030102:030000:
+E: ID_USB_INTERFACE_NUM=01
+E: ID_USB_DRIVER=usbhid
+E: ID_PATH=pci-0000:05:00.1-usb-0:1:1.1
+E: ID_PATH_TAG=pci-0000_05_00_1-usb-0_1_1_1
+E: DEVLINKS=/dev/input/by-id/usb-Dell_Dell_Universal_Receiver-if01-mouse /dev/input/by-path/pci-0000:05:00.1-usb-0:1:1.1-mouse
+
+P: /devices/pci0000:00/0000:00:08.1/0000:0a:00.3/usb7/7-2/7-2.2/7-2.2:1.0/ttyUSB0/tty/ttyUSB0
+N: ttyUSB0
+L: 0
+S: serial/by-id/usb-1a86_USB_Serial-if00-port0
+S: serial/by-path/pci-0000:0a:00.3-usb-0:2.2:1.0-port0
+E: DEVPATH=/devices/pci0000:00/0000:00:08.1/0000:0a:00.3/usb7/7-2/7-2.2/7-2.2:1.0/ttyUSB0/tty/ttyUSB0
+E: DEVNAME=/dev/ttyUSB0
+E: MAJOR=188
+E: MINOR=0
+E: SUBSYSTEM=tty
+E: USEC_INITIALIZED=432553984156
+E: ID_BUS=usb
+E: ID_VENDOR_ID=1a86
+E: ID_MODEL_ID=7523
+E: ID_PCI_CLASS_FROM_DATABASE=Serial bus controller
+E: ID_PCI_SUBCLASS_FROM_DATABASE=USB controller
+E: ID_PCI_INTERFACE_FROM_DATABASE=XHCI
+E: ID_VENDOR_FROM_DATABASE=QinHeng Electronics
+E: ID_MODEL_FROM_DATABASE=CH340 serial converter
+E: ID_VENDOR=1a86
+E: ID_VENDOR_ENC=1a86
+E: ID_MODEL=USB_Serial
+E: ID_MODEL_ENC=USB\x20Serial
+E: ID_REVISION=0264
+E: ID_SERIAL=1a86_USB_Serial
+E: ID_TYPE=generic
+E: ID_USB_INTERFACES=:ff0102:
+E: ID_USB_INTERFACE_NUM=00
+E: ID_USB_DRIVER=ch341
+E: ID_USB_CLASS_FROM_DATABASE=Vendor Specific Class
+E: ID_PATH=pci-0000:0a:00.3-usb-0:2.2:1.0
+E: ID_PATH_TAG=pci-0000_0a_00_3-usb-0_2_2_1_0
+E: ID_MM_CANDIDATE=1
+E: DEVLINKS=/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0 /dev/serial/by-path/pci-0000:0a:00.3-usb-0:2.2:1.0-port0
+E: TAGS=:systemd:
+E: CURRENT_TAGS=:systemd:

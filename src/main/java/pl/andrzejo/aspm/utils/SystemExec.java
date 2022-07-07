@@ -25,7 +25,7 @@ public class SystemExec {
         }
     }
 
-    public static List<String> exec(String command) {
+    public List<String> exec(String command) {
         try {
             List<String> args = getCommandLine(command);
             ProcessBuilder builder = new ProcessBuilder(args);
@@ -44,7 +44,7 @@ public class SystemExec {
         }
     }
 
-    private static List<String> readOutput(InputStream stream) throws IOException {
+    private List<String> readOutput(InputStream stream) throws IOException {
         StringBuilder b = new StringBuilder();
         ArrayList<String> lines = new ArrayList<>();
         while (true) {
@@ -63,14 +63,14 @@ public class SystemExec {
         return lines;
     }
 
-    private static void addLine(StringBuilder b, ArrayList<String> lines) {
+    private void addLine(StringBuilder b, ArrayList<String> lines) {
         String line = b.toString().trim();
         if (line.length() > 0) {
             lines.add(line);
         }
     }
 
-    private static List<String> getCommandLine(String command) {
+    private List<String> getCommandLine(String command) {
         switch (CurrentOs) {
             case Linux:
                 return Arrays.asList("bash", "-c", command);
