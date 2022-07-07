@@ -8,14 +8,20 @@ import java.util.function.Supplier;
 public class BeanFactory {
     private static final Map<Class<?>, Object> objects = new HashMap<>();
 
-    @SuppressWarnings("unchecked")
     public static <T> T instance(Class<T> type) {
-        return (T) objects.computeIfAbsent(type, BeanFactory::createInstance);
+        return instance(type, () -> createInstance(type));
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T instance(Class<T> type, Supplier<T> factory) {
-        return (T) objects.computeIfAbsent(type, (k) -> factory.get());
+        synchronized (objects) {
+            Object inst = objects.get(type);
+            if (inst == null) {
+                inst = factory.get();
+                objects.put(type, inst);
+            }
+            return (T) inst;
+        }
     }
 
     public static <T> void overrideInstance(Class<T> type, T instance) {
@@ -30,12 +36,13 @@ public class BeanFactory {
         objects.remove(type);
     }
 
-    private static Object createInstance(Class<?> k) {
+    @SuppressWarnings("unchecked")
+    private static <T> T createInstance(Class<?> k) {
         try {
             for (Constructor<?> constructor : k.getDeclaredConstructors()) {
                 if (constructor.getParameterCount() == 0) {
                     constructor.setAccessible(true);
-                    return constructor.newInstance();
+                    return (T) constructor.newInstance();
                 }
             }
         } catch (Exception e) {

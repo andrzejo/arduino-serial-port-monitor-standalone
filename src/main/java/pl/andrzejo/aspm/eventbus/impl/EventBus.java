@@ -5,13 +5,14 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static pl.andrzejo.aspm.eventbus.impl.MethodDescription.getDescription;
 
 public class EventBus {
     private static final Logger logger = LoggerFactory.getLogger(EventBus.class);
 
-    private final Map<Class<?>, List<HandlerMethod>> handlers = new HashMap<>();
+    private final Map<Class<?>, List<HandlerMethod>> handlers = new ConcurrentHashMap<>();
 
     public void registerListener(Object listener) {
         Objects.requireNonNull(listener, "EventBus listener must not be null");
