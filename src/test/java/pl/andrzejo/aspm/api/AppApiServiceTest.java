@@ -30,7 +30,6 @@ import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
 import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
 
 class AppApiServiceTest {
-
     private ApplicationEventBus bus;
     private SimpleHttpServerTesting serverTesting;
     private AppApiService service;
@@ -39,13 +38,13 @@ class AppApiServiceTest {
     @BeforeEach
     void setUp() {
         BeanFactory.reset();
+        BeanFactory.overrideInstance(HttpServer.class, mock(HttpServer.class));
         apiIndex = mock(ApiIndex.class);
 
         bus = mock(ApplicationEventBus.class);
         serverTesting = new SimpleHttpServerTesting();
 
         BeanFactory.overrideInstance(ApiIndex.class, apiIndex);
-        BeanFactory.overrideInstance(HttpServer.class, mock(HttpServer.class));
         BeanFactory.overrideInstance(SimpleHttpServer.class, serverTesting);
         BeanFactory.overrideInstance(ApplicationEventBus.class, bus);
         service = new AppApiService();
