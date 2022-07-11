@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net45</TargetFramework>
+        <Title>Arduino Serial Port Monitor Standalone - Launcher</Title>
+        <Authors>Andrzej Oczkowicz</Authors>
+        <Copyright>Andrzej Oczkowicz</Copyright>
+        <PackageProjectUrl>https://github.com/andrzejo/arduino-serial-port-monitor-standalone</PackageProjectUrl>
+        <PackageIcon>big.png</PackageIcon>
+        <RepositoryUrl>https://github.com/andrzejo/arduino-serial-port-monitor-standalone</RepositoryUrl>
+        <Company>Copyright (c) Andrzej Oczkowicz 2022</Company>
+        <Product>Arduino Serial Port Monitor Standalone - Launcher</Product>
+        <ApplicationIcon>big.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Update="big.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+    </ItemGroup>
+
+</Project>
