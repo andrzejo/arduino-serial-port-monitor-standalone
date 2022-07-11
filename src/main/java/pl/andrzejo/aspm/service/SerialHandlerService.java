@@ -17,6 +17,7 @@ import pl.andrzejo.aspm.factory.BeanFactory;
 import pl.andrzejo.aspm.serial.Serial;
 import pl.andrzejo.aspm.serial.SerialException;
 import pl.andrzejo.aspm.serial.SerialPorts;
+import pl.andrzejo.aspm.settings.appsettings.AppSettingGetter;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.device.LastDeviceSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
@@ -41,9 +42,10 @@ public class SerialHandlerService {
     private boolean applicationStarted = false;
 
     private SerialHandlerService() {
+        lastDeviceSetting = AppSettingsFactory.create(LastDeviceSetting.class);
+        config = AppSettingGetter.get(TtyDeviceSetting.class);
         eventBus = instance(ApplicationEventBus.class);
         eventBus.register(this);
-        lastDeviceSetting = AppSettingsFactory.create(LastDeviceSetting.class);
     }
 
     private void openSerial() {

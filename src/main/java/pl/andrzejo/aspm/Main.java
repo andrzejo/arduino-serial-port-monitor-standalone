@@ -15,9 +15,6 @@ import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 public class Main {
 
     public static void main(String[] args) {
-        instance(SerialHandlerService.class).start();
-        instance(DeviceWatcherService.class).start();
-        instance(AppApiService.class).start();
 
         try {
             System.setProperty("awt.useSystemAAFontSettings", "on");
@@ -26,13 +23,16 @@ public class Main {
             System.err.println("Failed to initialize theme. Using fallback.");
         }
 
-        EventQueue.invokeLater(() -> {
-            DefaultErrorHandler handler = new DefaultErrorHandler();
-            Thread.setDefaultUncaughtExceptionHandler(handler);
+        SerialPortMonitorForm form = new SerialPortMonitorForm();
 
-            SerialPortMonitorForm form = new SerialPortMonitorForm();
-            form.show();
-        });
+        instance(SerialHandlerService.class).start();
+        instance(DeviceWatcherService.class).start();
+        instance(AppApiService.class).start();
+
+        DefaultErrorHandler handler = new DefaultErrorHandler();
+        Thread.setDefaultUncaughtExceptionHandler(handler);
+
+        form.show();
     }
 
 }
