@@ -33,6 +33,8 @@ public class SerialPortMonitorForm {
 
     public SerialPortMonitorForm() {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
+        ApplicationEventBus eventBus = instance(ApplicationEventBus.class);
+        eventBus.register(this);
 
         mainFrame = new JFrame(App.Name);
         mainFrame.setIconImage(Images.fromResource("images/icon.png"));
@@ -67,8 +69,6 @@ public class SerialPortMonitorForm {
         mainFrame.addComponentListener(handleMoved(e -> sizeSetting.set(mainFrame.getBounds())));
         mainFrame.addWindowListener(handleWindowClosed((e) -> instance(ApplicationEventBus.class).post(new ApplicationClosingEvent())));
 
-        ApplicationEventBus eventBus = instance(ApplicationEventBus.class);
-        eventBus.register(this);
         MainWindowContainer.setMainWindowComponent(mainFrame);
         eventBus.post(new ApplicationStartedEvent());
     }

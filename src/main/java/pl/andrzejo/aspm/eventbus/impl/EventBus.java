@@ -30,6 +30,7 @@ public class EventBus {
         }
         handlerMethods.forEach((m) -> {
             try {
+                logger.debug("Handle event {}({})", m.handlerMethodName(), event);
                 m.invoke(event);
             } catch (Exception e) {
                 String error = String.format("EventBus event handler (%s) thrown exception.", m.handlerDescription());

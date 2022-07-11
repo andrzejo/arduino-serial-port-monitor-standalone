@@ -24,4 +24,8 @@ public class HandlerMethod {
     public String handlerDescription() {
         return MethodDescription.getDescription(method);
     }
+
+    public String handlerMethodName() {
+        return String.format("%s::%s", method.getDeclaringClass().getName(), method.getName());
+    }
 }
