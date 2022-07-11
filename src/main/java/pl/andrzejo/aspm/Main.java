@@ -38,7 +38,7 @@ public class Main {
 
         DefaultErrorHandler handler = new DefaultErrorHandler();
         Thread.setDefaultUncaughtExceptionHandler(handler);
-
+        System.out.println("---- APPLICATION STARTED ----");
         form.show();
     }
 
