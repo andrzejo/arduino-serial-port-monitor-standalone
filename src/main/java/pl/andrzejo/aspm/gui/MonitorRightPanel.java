@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ public class MonitorRightPanel extends ContentPanel {
         JPanel panel = new JPanel();
         JComboBox<String> fontsCombo = new JComboBox<>();
         setPreferredWidthSize(fontsCombo);
-        fillFonts(fontsCombo, true);
+        fillFonts(fontsCombo);
 
         panel.add(createLabeled("Font", fontsCombo));
         SpinnerListModel fontSize = new SpinnerListModel(Arrays.asList(8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48));
@@ -82,10 +83,10 @@ public class MonitorRightPanel extends ContentPanel {
         }));
     }
 
-    private void fillFonts(JComboBox<String> fontsCombo, boolean mono) {
+    private void fillFonts(JComboBox<String> fontsCombo) {
         List<Font> fonts = Arrays
                 .stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts())
-                .filter(f -> mono && isMonospaced(f))
+                .sorted(Comparator.comparing((Font font) -> !isMonospaced(font)).thenComparing(Font::getName))
                 .collect(Collectors.toList());
         fontsCombo.removeAllItems();
         fonts.forEach(f -> fontsCombo.addItem(f.getName()));
