@@ -1,5 +1,6 @@
 package pl.andrzejo.aspm.gui;
 
+import org.apache.commons.lang.StringUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
@@ -14,7 +15,6 @@ import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,18 +78,35 @@ public class MonitorRightPanel extends ContentPanel {
         fontName = setting.get();
         fontsCombo.addActionListener(handleAction((e) -> {
             fontName = (String) fontsCombo.getSelectedItem();
-            setting.set(fontName);
-            eventBus.post(new FontChangedEvent(fontName, fontSize));
+            if (StringUtils.startsWith(fontName, "---")) {
+                setting.set(fontName);
+                eventBus.post(new FontChangedEvent(fontName, fontSize));
+            }
         }));
     }
 
     private void fillFonts(JComboBox<String> fontsCombo) {
-        List<Font> fonts = Arrays
-                .stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts())
-                .sorted(Comparator.comparing((Font font) -> !isMonospaced(font)).thenComparing(Font::getName))
-                .collect(Collectors.toList());
         fontsCombo.removeAllItems();
+        appendFonts("--- nonospaced ---", true, fontsCombo);
+        appendFonts("--- other ---", false, fontsCombo);
+    }
+
+    private void appendFonts(String label, boolean mono, JComboBox<String> fontsCombo) {
+        List<Font> fonts = getFonts(mono);
+        fontsCombo.addItem(label);
         fonts.forEach(f -> fontsCombo.addItem(f.getName()));
+    }
+
+    private List<Font> getFonts(boolean mono) {
+        return Arrays
+                .stream(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts())
+                .filter(font -> {
+                    if (mono && isMonospaced(font)) {
+                        return true;
+                    }
+                    return !mono && !isMonospaced(font);
+                })
+                .collect(Collectors.toList());
     }
 
     private boolean isMonospaced(Font font) {
