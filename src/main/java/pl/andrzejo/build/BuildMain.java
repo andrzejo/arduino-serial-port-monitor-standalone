@@ -21,24 +21,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 public class BuildMain {
 
     public static void main(String[] args) throws IOException {
-        String increase = System.getProperty("build.increaseVersion");
-        if (StringUtils.equalsIgnoreCase(increase, "true")) {
-            System.out.println("Increase build version");
+        String newVersion = System.getProperty("build.setVersion");
+        if (isNotBlank(newVersion)) {
+            validateNewVersion(newVersion);
+            System.out.println("Set project version to " + newVersion);
             String currentVersion = getArg(args, 0);
             String projectDir = getArg(args, 1);
 
             System.out.println("Current version: " + currentVersion);
             System.out.println("Project dir: " + projectDir);
-            String version = getNewVersion(currentVersion);
-            System.out.println("New version: " + version);
 
-            replacePomVersion(projectDir, currentVersion, version);
-            createVersionBuildFile(projectDir, version);
-            replaceLinuxLauncherVersion(projectDir, version);
-            replaceWindowsLauncherVersion(projectDir, version);
+            replacePomVersion(projectDir, currentVersion, newVersion);
+            createVersionBuildFile(projectDir, newVersion);
+            replaceLinuxLauncherVersion(projectDir, newVersion);
+            replaceWindowsLauncherVersion(projectDir, newVersion);
+        }
+    }
+
+    private static void validateNewVersion(String newVersion) {
+        if (!newVersion.matches("\\d+\\.\\d+\\.\\d+")) {
+            throw new RuntimeException("Invalid version specified: " + newVersion + ". Version should be like x.x.x");
         }
     }
 

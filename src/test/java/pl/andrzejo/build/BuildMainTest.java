@@ -46,9 +46,9 @@ class BuildMainTest extends TemporaryFileTestCase {
     }
 
     @Test
-    void shouldReplaceVersion() throws IOException, ParseException {
+    void shouldReplaceVersion() throws IOException {
         //given
-        System.setProperty("build.increaseVersion", "true");
+        System.setProperty("build.setVersion", "1.0.2");
 
         //when
         BuildMain.main(new String[]{"1.0.1", tmpPath.getAbsolutePath()});
@@ -64,24 +64,24 @@ class BuildMainTest extends TemporaryFileTestCase {
     @Test
     void shouldReplaceVersionInLauncherLinux() throws IOException {
         //given
-        System.setProperty("build.increaseVersion", "true");
+        System.setProperty("build.setVersion", "1.0.2");
 
         //when
         BuildMain.main(new String[]{"1.0.105", tmpPath.getAbsolutePath()});
 
         //then
-        assertThat(launcherLinux).content().contains("LAUNCHER_VERSION=1.0.106");
+        assertThat(launcherLinux).content().contains("LAUNCHER_VERSION=1.0.2");
     }
 
     @Test
     void shouldReplaceVersionInLauncherWin() throws IOException {
         //given
-        System.setProperty("build.increaseVersion", "true");
+        System.setProperty("build.setVersion", "1.2.3");
 
         //when
         BuildMain.main(new String[]{"1.0.105", tmpPath.getAbsolutePath()});
 
         //then
-        assertThat(launcherWin).content().contains("<AssemblyVersion>1.0.106</AssemblyVersion>");
+        assertThat(launcherWin).content().contains("<AssemblyVersion>1.2.3</AssemblyVersion>");
     }
 }
