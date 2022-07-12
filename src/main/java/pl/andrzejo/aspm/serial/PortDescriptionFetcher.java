@@ -43,6 +43,7 @@ public class PortDescriptionFetcher {
         try {
             if (descriptionProvider != null) {
                 Map<String, String> desc = descriptionProvider.get(p);
+                logger.debug("Device desc: {}", desc);
                 if (desc != null) {
                     return desc;
                 }

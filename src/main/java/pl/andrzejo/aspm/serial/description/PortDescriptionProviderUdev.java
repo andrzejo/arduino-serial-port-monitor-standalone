@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class PortDescriptionProviderUdev extends DescriptionProviderCommand {
-    private static final String Command = "udevadm info";
+    private static final String Command = "sleep 1; udevadm info";
 
     @Override
     protected Map<String, String> getDescriptions(List<String> devices, List<String> descriptions) {
