@@ -24,3 +24,20 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+      
+    - name: "[Launcher Win] Setup dotnet"
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.x'
+    - uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        # Look to see if there is a cache hit for the corresponding requirements file
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget
+    - name: "[Launcher Win] Install dependencies"
+      run: dotnet restore
+    - name: "[Launcher Win] Build"
+      run: dotnet build
+      
