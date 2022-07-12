@@ -22,6 +22,8 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         cache: maven
+    - name: Cleanup
+      run: rm -rf target/*jar
     - name: Propagate version
       run: mvn -Dbuild.setVersion=0.0.0 install
     - name: Build with Maven
