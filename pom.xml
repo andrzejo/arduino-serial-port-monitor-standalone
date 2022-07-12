@@ -88,7 +88,7 @@
                 <executions>
                     <execution>
                         <id>Run Versioning Script</id>
-                        <phase>clean</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>

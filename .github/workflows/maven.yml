@@ -25,7 +25,7 @@ jobs:
     - name: Cleanup
       run: rm -rf target/*.jar
     - name: Propagate version
-      run: mvn -Dbuild.setVersion=0.0.0 clean
+      run: mvn -Dbuild.setVersion=0.0.0 compile
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
