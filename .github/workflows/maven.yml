@@ -33,4 +33,15 @@ jobs:
       run: dotnet restore launcher/win/
     - name: "[Launcher Win] Build"
       run: dotnet build launcher/win/
+    
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            launcher/win/Launcher/bin/Debug/net45/Launcher.exe
+            launcher/linux/launcher.sh
+            target/*.jar
       
