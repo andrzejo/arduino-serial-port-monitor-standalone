@@ -16,21 +16,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class SystemExec {
-    public enum OsName {
-        Linux, Windows, Other
-    }
-
-    public final static OsName CurrentOs;
-
-    static {
-        String osName = System.getProperty("os.name");
-        if (osName.equals("Linux")) CurrentOs = OsName.Linux;
-        else if (osName.startsWith("Win")) {
-            CurrentOs = OsName.Windows;
-        } else {
-            CurrentOs = OsName.Other;
-        }
-    }
 
     public List<String> exec(String command) {
         try {
@@ -78,7 +63,7 @@ public class SystemExec {
     }
 
     private List<String> getCommandLine(String command) {
-        switch (CurrentOs) {
+        switch (OsInfo.CurrentOs) {
             case Linux:
                 return Arrays.asList("bash", "-c", command);
             case Windows:
