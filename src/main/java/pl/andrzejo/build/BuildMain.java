@@ -35,9 +35,25 @@ public class BuildMain {
             String version = getNewVersion(currentVersion);
             System.out.println("New version: " + version);
 
-            replaceVersion(projectDir, currentVersion, version);
+            replacePomVersion(projectDir, currentVersion, version);
             createVersionBuildFile(projectDir, version);
+            replaceLinuxLauncherVersion(projectDir, version);
+            replaceWindowsLauncherVersion(projectDir, version);
         }
+    }
+
+    private static void replaceWindowsLauncherVersion(String projectDir, String version) throws IOException {
+        File csproj = Paths.get(projectDir, "launcher", "win", "Launcher", "Launcher.csproj").toFile();
+        String xml = FileUtils.readFileToString(csproj, StandardCharsets.UTF_8);
+        String newXml = xml.replaceFirst("<AssemblyVersion>.*</AssemblyVersion>", "<AssemblyVersion>" + version + "</AssemblyVersion>");
+        FileUtils.writeStringToFile(csproj, newXml, StandardCharsets.UTF_8);
+    }
+
+    private static void replaceLinuxLauncherVersion(String projectDir, String version) throws IOException {
+        File launcherSh = Paths.get(projectDir, "launcher", "linux", "launcher.sh").toFile();
+        String sh = FileUtils.readFileToString(launcherSh, StandardCharsets.UTF_8);
+        String replaced = sh.replaceFirst("LAUNCHER_VERSION=.*", "LAUNCHER_VERSION=" + version);
+        FileUtils.writeStringToFile(launcherSh, replaced, StandardCharsets.UTF_8);
     }
 
     private static void createVersionBuildFile(String projectDir, String version) throws IOException {
@@ -52,14 +68,13 @@ public class BuildMain {
         return format.format(BeanFactory.instance(Date.class));
     }
 
-    private static void replaceVersion(String projectDir, String currentVersion, String version) throws IOException {
+    private static void replacePomVersion(String projectDir, String currentVersion, String version) throws IOException {
         File pom = Paths.get(projectDir, "pom.xml").toFile();
         String xml = FileUtils.readFileToString(pom, StandardCharsets.UTF_8);
         String search = versionPattern(currentVersion);
         String replace = versionPattern(version);
         String newXml = xml.replace(search, replace);
         FileUtils.writeStringToFile(pom, newXml, StandardCharsets.UTF_8);
-
     }
 
     private static String versionPattern(String version) {
