@@ -5,8 +5,11 @@
     <title>${APP}</title>
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, serif;
+            margin: 0;
+            padding: 0;
         }
+
         .header {
             display: flex;
             background-color: lightgray;
@@ -73,19 +76,50 @@
             background-color: green;
             color: white;
         }
+
+        .app-version {
+            font-size: small;
+        }
+
+        .footer {
+            font-family: Monospaced, monospace;
+            font-size: small;
+            position: absolute;
+            bottom: 0;
+            border-top: 1px solid darkgray;
+            background-color: lightgray;
+            width: 100%;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer > * {
+            padding: 5px;
+        }
+
+        .main {
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
-<h2>${APP}</h2>
-<h3> API endpoints:</h3>
-<div class="content">
-    <div class="header">
-        <div class="method">Method</div>
-        <div class="path">Path</div>
-        <div class="desc">Description</div>
-        <div class="curl">Curl command</div>
+<div class="main">
+    <h2>${APP} - ${VERSION} <span class="app-version">(build: ${VERSION_DATE})</span></h2>
+    <h3> API endpoints:</h3>
+    <div class="content">
+        <div class="header">
+            <div class="method">Method</div>
+            <div class="path">Path</div>
+            <div class="desc">Description</div>
+            <div class="curl">Curl command</div>
+        </div>
+        ${ENDPOINTS}
     </div>
-    ${ENDPOINTS}
+</div>
+<div class="footer">
+    <div>Copyright © Andrzej Oczkowicz 2022</div>
+    <div><a href="${URL}" target="_blank">${URL}</a></div>
 </div>
 </body>
 </html>

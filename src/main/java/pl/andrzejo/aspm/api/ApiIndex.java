@@ -30,6 +30,9 @@ public class ApiIndex {
         String endpointsHtml = getEndpointsHtml(endpoints);
         Map<String, String> map = new HashMap<>();
         map.put("APP", App.Name);
+        map.put("VERSION", App.Version.getVer());
+        map.put("VERSION_DATE", App.Version.getDate());
+        map.put("URL", App.GitHubUrl);
         map.put("ENDPOINTS", endpointsHtml);
         return replace(html, map);
     }

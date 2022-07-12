@@ -16,7 +16,7 @@ public class App {
     public static String Name = "Arduino Serial Port Monitor - Standalone";
     public static String ConfigDir = ".arduino-serial-port-monitor-st";
     public static Ver Version;
-    public static String GitHubUrl = "https://github.com/andrzejo/ArduinoSerialPortMonitorStandalone";
+    public static String GitHubUrl = "https://github.com/andrzejo/arduino-serial-port-monitor-standalone";
 
     static {
         Version = readVersion();
