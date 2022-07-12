@@ -40,7 +40,7 @@ jobs:
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: true
+        prerelease: false
         files: |
           launcher/win/Launcher/bin/Debug/net45/Launcher.exe
           launcher/linux/launcher.sh
