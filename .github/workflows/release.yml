@@ -1,21 +1,22 @@
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Java CI with Maven
+name: Release tag
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
+    - name: Set current tag
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
     - name: Set up JDK 1.8
       uses: actions/setup-java@v3
       with:
@@ -23,9 +24,9 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Propagate version
-      run: mvn -Dbuild.setVersion=0.0.0 install
+      run: mvn -Dbuild.setVersion=${{ steps.vars.outputs.tag }} clean install
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package
 
     - name: "[Launcher Win] Setup dotnet"
       uses: actions/setup-dotnet@v2
@@ -38,12 +39,9 @@ jobs:
 
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |
-            launcher/win/Launcher/bin/Debug/net45/Launcher.exe
-            launcher/linux/launcher.sh
-            target/*.jar
-      
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: true
+        files: |
+          launcher/win/Launcher/bin/Debug/net45/Launcher.exe
+          launcher/linux/launcher.sh
+          target/*.jar
