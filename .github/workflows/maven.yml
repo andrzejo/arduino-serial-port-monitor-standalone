@@ -30,7 +30,7 @@ jobs:
       with:
         dotnet-version: '6.x'
     - name: "[Launcher Win] Install dependencies"
-      run: dotnet restore
+      run: dotnet restore launcher/win/
     - name: "[Launcher Win] Build"
-      run: dotnet build
+      run: dotnet build launcher/win/
       
