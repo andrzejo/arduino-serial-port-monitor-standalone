@@ -26,7 +26,7 @@ jobs:
     - name: Propagate version
       run: mvn -Dbuild.setVersion=${{ steps.vars.outputs.tag }} compile
     - name: Build with Maven
-      run: mvn -B package
+      run: mvn -B install assembly:single
 
     - name: "[Launcher Win] Setup dotnet"
       uses: actions/setup-dotnet@v2
