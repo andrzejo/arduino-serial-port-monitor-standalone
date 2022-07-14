@@ -25,6 +25,7 @@ jobs:
         cache: maven
     - name: Propagate version
       run: mvn -Dbuild.setVersion=${{ steps.vars.outputs.tag }} compile
+
     - name: Build with Maven
       run: mvn -B assembly:single
 

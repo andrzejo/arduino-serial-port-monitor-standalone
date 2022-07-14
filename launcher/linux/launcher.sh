@@ -13,10 +13,28 @@ readonly red='\033[0;31m'
 readonly bld='\e[1m'
 readonly nc='\033[0m'
 
+readonly url="http://localhost:4255/api/"
 readonly dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 readonly path="$(find "${dir}" -iname "ArduinoSerialPortMonitorStandalone-*.jar" | head -n 1)"
 
 echo -e "${grn}Arduino Serial Port Monitor - Standalone${nc}, Linux Launcher ver. ${red}${LAUNCHER_VERSION}${nc}\n"
+
+if [[ -n "${1}" ]]; then
+  readonly method=${1}
+  readonly res=${2}
+  readonly body=${3}
+  if [[ -z "${res}" ]]; then
+    echo -e "Api usage:\n${0} ${grn}method${nc}(get|post) ${grn}resource${nc}(open|close|status|devices) [${grn}body${nc}]\n"
+    exit 1
+  fi
+  echo -e "Execute API request ${bld}${method}${nc} ${bld}${res}${nc} to ${grn}${url}${nc}\n"
+  if [[ -n "${body}" ]]; then
+    readonly bodyParam="-d ${body}"
+  fi
+  # shellcheck disable=SC2086
+  curl -X "${method}" "${url}${res}" ${bodyParam}
+  exit $?
+fi
 
 if command -v java >/dev/null 2>&1; then
   javaVersion=$(java -version 2>&1 | head -n 1 | tr -d "\n")
