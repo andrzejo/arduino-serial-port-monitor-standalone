@@ -58,4 +58,13 @@ public class BeanFactory {
 
         throw new RuntimeException("Instantiation failed. Class has no default constructor " + k.getName() + "");
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T newInstance(Class<T> type, Supplier<T> supplier) {
+        Object o = objects.get(type);
+        if (o == null) {
+            return supplier.get();
+        }
+        return (T) o;
+    }
 }
