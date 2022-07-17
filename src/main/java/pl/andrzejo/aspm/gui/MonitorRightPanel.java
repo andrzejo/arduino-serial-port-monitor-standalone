@@ -85,7 +85,7 @@ public class MonitorRightPanel extends ContentPanel {
         fontName = setting.get();
         fontsCombo.addActionListener(handleAction((e) -> {
             fontName = (String) fontsCombo.getSelectedItem();
-            if (StringUtils.startsWith(fontName, "---")) {
+            if (!StringUtils.startsWith(fontName, "---")) {
                 setting.set(fontName);
                 eventBus.post(new FontChangedEvent(fontName, fontSize));
             }
