@@ -7,10 +7,12 @@
 
 package pl.andrzejo.aspm.api;
 
+import org.apache.commons.lang.BooleanUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.BringWindowToTopEvent;
 import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 
@@ -38,10 +40,12 @@ public class AppApiService {
 
     public void start() {
         SimpleHttpServer server = instance(SimpleHttpServer.class);
-        setupEndpoint(server, Post, "/api/open", this::handleOpen, "Open device. Specify device in request body. If device is not specified opens first selected.");
-        setupEndpoint(server, Post, "/api/close", this::handleClose, "Close device.");
-        setupEndpoint(server, Get, "/api/status", this::handleStatus, "Get device status.");
-        setupEndpoint(server, Get, "/api/devices", this::handleDevices, "Get available devices.");
+        setupEndpoint(server, Post, "/api/device/open", this::handleOpen, "Open device. Specify device in request body. If device is not specified opens first selected.");
+        setupEndpoint(server, Post, "/api/device/close", this::handleClose, "Close device.");
+        setupEndpoint(server, Get, "/api/device/status", this::handleStatus, "Get device status.");
+        setupEndpoint(server, Get, "/api/device/list", this::handleDevices, "Get available devices.");
+
+        setupEndpoint(server, Post, "/api/window/focus", this::handleWindowFocus, "Bring app window to top.");
         setupEndpoint(server, Get, null, this::handleRoot, "Get endpoints.");
     }
 
@@ -57,6 +61,11 @@ public class AppApiService {
 
     private String handleRoot(String s) {
         return apiIndex.getHtml(endpoints);
+    }
+
+    private String handleWindowFocus(String body) {
+        eventBus.post(new BringWindowToTopEvent(BooleanUtils.toBoolean(body)));
+        return null;
     }
 
     private String handleClose(String body) {

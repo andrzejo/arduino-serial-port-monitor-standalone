@@ -16,6 +16,7 @@ import pl.andrzejo.aspm.eventbus.events.command.CommandExecutedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.BringWindowToTopEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
@@ -157,6 +158,24 @@ public class SerialPortMonitorForm {
     public void handleEvent(ApiExecuteCommand event) {
         String body = isBlank(event.getBody()) ? "" : " - " + event.getBody();
         addText(Text.info("Remote command: " + event.getCommand() + body));
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(BringWindowToTopEvent event) {
+        java.awt.EventQueue.invokeLater(() -> {
+            if (event.isBlur()) {
+                mainFrame.toBack();
+            } else {
+                mainFrame.setState(java.awt.Frame.ICONIFIED);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    //
+                }
+                mainFrame.setState(java.awt.Frame.NORMAL);
+            }
+        });
     }
 
     public void show() {
