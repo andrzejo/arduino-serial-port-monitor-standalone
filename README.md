@@ -10,7 +10,7 @@ serial port communication.
 ### Features
 
 - Read Arduino serial output
-- Send command to arduino serial
+- Send command to Arduino serial
 - Output highlighting
 - HTTP API for controlling application from scripts (e.g. CLion build steps)
 
@@ -20,7 +20,6 @@ serial port communication.
 
 Api allows to control application from external tools like scripts. To use API start application and open
 http://localhost:4255/ in web browser. 
-
 
 Icons: 
 <a href="https://www.flaticon.com/free-icons/microcontroller" title="microcontroller icons">Microcontroller icons created by Eucalyp - Flaticon</a>
