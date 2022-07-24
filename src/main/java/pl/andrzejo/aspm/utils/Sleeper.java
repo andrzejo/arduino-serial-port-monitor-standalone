@@ -11,7 +11,7 @@ public class Sleeper {
 
     public static void sleep(long millis) {
         try {
-            Thread.sleep(500);
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
             //
         }
