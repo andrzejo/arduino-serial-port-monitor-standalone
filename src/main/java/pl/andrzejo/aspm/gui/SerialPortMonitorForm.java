@@ -25,11 +25,13 @@ import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.WindowPositionSetting;
 import pl.andrzejo.aspm.utils.Images;
+import pl.andrzejo.aspm.utils.Sleeper;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+import static java.awt.EventQueue.invokeLater;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
@@ -163,16 +165,19 @@ public class SerialPortMonitorForm {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(BringWindowToTopEvent event) {
-        java.awt.EventQueue.invokeLater(() -> {
+        invokeLater(() -> {
             if (event.isBlur()) {
                 mainFrame.toBack();
             } else {
                 mainFrame.setState(java.awt.Frame.ICONIFIED);
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    //
-                }
+            }
+
+        });
+
+        Sleeper.sleep(500);
+
+        invokeLater(() -> {
+            if (!event.isBlur()) {
                 mainFrame.setState(java.awt.Frame.NORMAL);
             }
         });
