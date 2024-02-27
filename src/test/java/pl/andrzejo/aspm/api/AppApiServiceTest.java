@@ -68,10 +68,10 @@ class AppApiServiceTest {
         service.start();
 
         //then
-        verify(server).addEndpoint(eq(Post), eq("/api/open"), anyObject());
-        verify(server).addEndpoint(eq(Post), eq("/api/close"), anyObject());
-        verify(server).addEndpoint(eq(Get), eq("/api/status"), anyObject());
-        verify(server).addEndpoint(eq(Get), eq("/api/devices"), anyObject());
+        verify(server).addEndpoint(eq(Post), eq("/api/device/open"), anyObject());
+        verify(server).addEndpoint(eq(Post), eq("/api/device/close"), anyObject());
+        verify(server).addEndpoint(eq(Get), eq("/api/device/status"), anyObject());
+        verify(server).addEndpoint(eq(Get), eq("/api/device/list"), anyObject());
     }
 
     @Test
@@ -81,7 +81,7 @@ class AppApiServiceTest {
         service.start();
 
         //then
-        MethodDefinition definition = getMethodDefinition(Post, "/api/open");
+        MethodDefinition definition = getMethodDefinition(Post, "/api/device/open");
 
         String response = invokeHandler(definition, "COM1");
         assertThat(response).isNull();
@@ -90,7 +90,7 @@ class AppApiServiceTest {
 
         ApiExecuteCommand event1 = verifyEventIsInstanceOf(events.get(0), ApiExecuteCommand.class);
         assertThat(event1.getBody()).isEqualTo("COM1");
-        assertThat(event1.getCommand()).isEqualTo("/api/open");
+        assertThat(event1.getCommand()).isEqualTo("/api/device/open");
 
         ApiOpenDeviceEvent event2 = verifyEventIsInstanceOf(events.get(1), ApiOpenDeviceEvent.class);
         assertThat(event2.getDevice()).isEqualTo("COM1");
@@ -111,7 +111,7 @@ class AppApiServiceTest {
         service.start();
 
         //then
-        MethodDefinition definition = getMethodDefinition(Post, "/api/close");
+        MethodDefinition definition = getMethodDefinition(Post, "/api/device/close");
 
         String response = invokeHandler(definition, null);
         assertThat(response).isNull();
@@ -120,7 +120,7 @@ class AppApiServiceTest {
 
         ApiExecuteCommand event1 = verifyEventIsInstanceOf(events.get(0), ApiExecuteCommand.class);
         assertThat(event1.getBody()).isNull();
-        assertThat(event1.getCommand()).isEqualTo("/api/close");
+        assertThat(event1.getCommand()).isEqualTo("/api/device/close");
 
         verifyEventIsInstanceOf(events.get(1), ApiCloseDeviceEvent.class);
     }
@@ -136,7 +136,7 @@ class AppApiServiceTest {
         service.start();
 
         //then
-        MethodDefinition definition = getMethodDefinition(Get, "/api/status");
+        MethodDefinition definition = getMethodDefinition(Get, "/api/device/status");
 
         String response = invokeHandler(definition, null);
         assertThat(response).isEqualTo("DeviceOpen: false\n");
@@ -155,7 +155,7 @@ class AppApiServiceTest {
         service.start();
 
         //then
-        MethodDefinition definition = getMethodDefinition(Get, "/api/status");
+        MethodDefinition definition = getMethodDefinition(Get, "/api/device/status");
 
         String response = invokeHandler(definition, null);
         assertThat(response).isEqualTo("DeviceOpen: true\n" +
@@ -179,7 +179,7 @@ class AppApiServiceTest {
         service.start();
 
         //then
-        MethodDefinition definition = getMethodDefinition(Get, "/api/devices");
+        MethodDefinition definition = getMethodDefinition(Get, "/api/device/list");
 
         String response = invokeHandler(definition, null);
         assertThat(response).isEqualTo("COM1\nCOM3\nCOM4");
@@ -204,7 +204,7 @@ class AppApiServiceTest {
         ArgumentCaptor<List<AppApiService.Endpoint>> captor = ArgumentCaptor.forClass(listClass);
         verify(apiIndex).getHtml(captor.capture());
         List<AppApiService.Endpoint> list = captor.getValue();
-        assertThat(list).hasSize(5);
+        assertThat(list).hasSize(6);
     }
 
     @Test
