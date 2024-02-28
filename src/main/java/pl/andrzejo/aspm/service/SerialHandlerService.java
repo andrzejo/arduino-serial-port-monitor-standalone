@@ -64,9 +64,9 @@ public class SerialHandlerService {
 
     private void openSerial(DeviceConfig config) {
         try {
-            openDeviceConfig = config;
             logger.info("Open serial: {}", config);
             serial = BeanFactory.newInstance(Serial.class, createSerial(config));
+            openDeviceConfig = config;
             eventBus.post(new DeviceOpenEvent(config));
         } catch (Exception e) {
             if (e.getCause() instanceof SerialException) {
