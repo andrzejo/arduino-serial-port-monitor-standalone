@@ -23,13 +23,13 @@ if [[ -n "${1}" ]]; then
   readonly method=${1}
   readonly res=${2}
   readonly body=${3}
-  readonly ignoreError=
+
   if [[ -z "${res}" ]]; then
     echo -e "Api usage:\n${0} ${grn}method${nc}(get|post) ${grn}resource${nc} [${grn}body${nc}] [--ignore-error]\n"
     exit 1
   fi
   echo -e "Execute API request ${bld}${method}${nc} ${bld}${res}${nc} to ${grn}${url}${nc}\n"
-  if [[ -n "${body}" ]]; then
+  if [[ -n "${body}" && "${body}" != "--ignore-error" ]]; then
     readonly bodyParam="-d ${body}"
   fi
   # shellcheck disable=SC2086
