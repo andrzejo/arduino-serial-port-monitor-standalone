@@ -11,10 +11,12 @@ import org.apache.commons.lang.StringUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.WindowAlwaysOnTopEvent;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontNameSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontSizeSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.SaveLogToFile;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.WindowAlwaysOnTopSetting;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,6 +25,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
@@ -31,14 +34,10 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 public class MonitorRightPanel extends ContentPanel {
 
     private final FontRenderContext fontRenderContext = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
-    private final ApplicationEventBus eventBus;
     private Integer fontSize;
     private String fontName;
 
-
     public MonitorRightPanel() {
-        eventBus = instance(ApplicationEventBus.class);
-
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(0, 10, 0, 10));
 
@@ -63,9 +62,19 @@ public class MonitorRightPanel extends ContentPanel {
 
         setupFontCombo(fontsCombo);
 
+        JCheckBox alwaysOnTop = new JCheckBox("Always on top");
+        Consumer<Boolean> onTopHandler = (s) -> eventBus.post(new WindowAlwaysOnTopEvent(s));
+        handleCheckboxSetting(alwaysOnTop, AppSettingsFactory.create(WindowAlwaysOnTopSetting.class), onTopHandler);
+
         JCheckBox saveToFile = new JCheckBox("Save log to file");
         handleCheckboxSetting(saveToFile, AppSettingsFactory.create(SaveLogToFile.class));
-        add(saveToFile, BorderLayout.SOUTH);
+
+        JPanel bottom = new JPanel();
+        bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
+        bottom.add(alwaysOnTop);
+        bottom.add(saveToFile);
+
+        add(bottom, BorderLayout.SOUTH);
     }
 
     private void setupFontSizeSpinner(JSpinner fontSizeSpinner) {

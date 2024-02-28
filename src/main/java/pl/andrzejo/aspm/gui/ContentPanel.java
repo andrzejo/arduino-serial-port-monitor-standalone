@@ -7,15 +7,26 @@
 
 package pl.andrzejo.aspm.gui;
 
+import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.BusEvent;
+import pl.andrzejo.aspm.eventbus.impl.EventBus;
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 import pl.andrzejo.aspm.settings.types.StringSetting;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.function.Consumer;
+
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class ContentPanel extends JPanel {
     public static int PREFERRED_COMBO_WIDTH = 120;
+    protected final ApplicationEventBus eventBus;
+
+    public ContentPanel() {
+        eventBus = instance(ApplicationEventBus.class);
+    }
 
     protected void handleComboSetting(JComboBox<String> box, AppSetting<String> setting) {
         box.setSelectedItem(setting.get());
@@ -27,14 +38,22 @@ public class ContentPanel extends JPanel {
         });
     }
 
-    protected void handleCheckboxSetting(JCheckBox box, AppSetting<Boolean> setting) {
+    protected void handleCheckboxSetting(JCheckBox box, AppSetting<Boolean> setting, Consumer<Boolean> handler) {
         box.setSelected(setting.get());
         box.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setting.set(box.isSelected());
+                boolean selected = box.isSelected();
+                setting.set(selected);
+                if (handler != null) {
+                    handler.accept(selected);
+                }
             }
         });
+    }
+
+    protected void handleCheckboxSetting(JCheckBox box, AppSetting<Boolean> setting) {
+        handleCheckboxSetting(box, setting, null);
     }
 
     protected JPanel createLabeled(String label, JComponent component) {

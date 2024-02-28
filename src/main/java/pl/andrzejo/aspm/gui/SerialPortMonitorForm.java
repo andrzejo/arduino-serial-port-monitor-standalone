@@ -18,12 +18,14 @@ import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.BringWindowToTopEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.WindowAlwaysOnTopEvent;
 import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.WindowPositionSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.WindowAlwaysOnTopSetting;
 import pl.andrzejo.aspm.utils.Images;
 import pl.andrzejo.aspm.utils.Sleeper;
 
@@ -43,6 +45,7 @@ public class SerialPortMonitorForm {
 
     public SerialPortMonitorForm() {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
+        WindowAlwaysOnTopSetting alwaysOnTop = AppSettingsFactory.create(WindowAlwaysOnTopSetting.class);
         ApplicationEventBus eventBus = instance(ApplicationEventBus.class);
         eventBus.register(this);
 
@@ -78,6 +81,8 @@ public class SerialPortMonitorForm {
         mainFrame.setBounds(r);
         mainFrame.addComponentListener(handleMoved(e -> sizeSetting.set(mainFrame.getBounds())));
         mainFrame.addWindowListener(handleWindowClosed((e) -> instance(ApplicationEventBus.class).post(new ApplicationClosingEvent())));
+
+        mainFrame.setAlwaysOnTop(alwaysOnTop.get());
 
         MainWindowContainer.setMainWindowComponent(mainFrame);
         eventBus.post(new ApplicationStartedEvent());
@@ -182,6 +187,13 @@ public class SerialPortMonitorForm {
             }
         });
     }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(WindowAlwaysOnTopEvent event) {
+        invokeLater(() -> mainFrame.setAlwaysOnTop(event.isAlwaysOnTop()));
+    }
+
 
     public void show() {
         mainFrame.setVisible(true);
