@@ -19,10 +19,10 @@ public class HandlerMethod {
         this.method = method;
     }
 
-    public void invoke(Object event) {
+    public Object invoke(Object event) {
         try {
             method.setAccessible(true);
-            method.invoke(listener, event);
+            return method.invoke(listener, event);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }

@@ -55,8 +55,8 @@ public class ApiIndex {
         map.put("PATH", suffix);
         map.put("DESC", endpoint.getDesc());
         String curl = "curl -X " + endpoint.getMethod().name().toUpperCase() + " " + href;
-        if (endpoint.getMethod() != SimpleHttpServer.Method.Get) {
-            curl += " -d 'BODY' ";
+        if (endpoint.getMethod() != SimpleHttpServer.Method.Get && endpoint.getBodyExample() != null) {
+            curl += String.format(" -d '%s' ", endpoint.getBodyExample());
         }
         map.put("CMD", curl);
         return map;

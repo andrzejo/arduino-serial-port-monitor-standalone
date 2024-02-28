@@ -13,12 +13,17 @@ import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.BringWindowToTopEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.GetMonitorOutputEvent;
 import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.service.SerialHandlerService;
+import pl.andrzejo.aspm.utils.OsInfo;
+import pl.andrzejo.aspm.utils.StrUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
 import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
@@ -40,50 +45,85 @@ public class AppApiService {
 
     public void start() {
         SimpleHttpServer server = instance(SimpleHttpServer.class);
-        setupEndpoint(server, Post, "/api/device/open", this::handleOpen, "Open device. Specify device in request body. If device is not specified opens first selected.");
+        setupEndpoint(server, Post, "/api/device/open", this::handleOpen,
+                "Open device. Specify device in request body. If device is not specified opens first selected.",
+                getBodyExample());
         setupEndpoint(server, Post, "/api/device/close", this::handleClose, "Close device.");
         setupEndpoint(server, Get, "/api/device/status", this::handleStatus, "Get device status.");
         setupEndpoint(server, Get, "/api/device/list", this::handleDevices, "Get available devices.");
 
         setupEndpoint(server, Post, "/api/window/focus", this::handleWindowFocus, "Bring app window to top.");
+        setupEndpoint(server, Post, "/api/monitor/clear", this::handleMonitorOutputClear, "Clear monitor output.");
+        setupEndpoint(server, Get, "/api/monitor/output", this::handleGetMonitorOutput, "Get monitor output. Optional add ?with_messages parameters for full output.");
         setupEndpoint(server, Get, null, this::handleRoot, "Get endpoints.");
     }
 
-    private void setupEndpoint(SimpleHttpServer server, SimpleHttpServer.Method method, String path, Function<String, String> handler, String desc) {
-        endpoints.add(new Endpoint(method, path, desc));
-        server.addEndpoint(method, path, (body) -> {
+    private static String getBodyExample() {
+        if (OsInfo.CurrentOs == OsInfo.OsName.Windows) {
+            return "COM1";
+        }
+        return "/dev/ttyUSB0";
+    }
+
+    private void setupEndpoint(SimpleHttpServer server,
+                               SimpleHttpServer.Method method,
+                               String path,
+                               Function<Request, String> handler,
+                               String desc,
+                               String bodyExample) {
+        endpoints.add(new Endpoint(method, path, desc, bodyExample));
+        server.addEndpoint(method, path, (request) -> {
             if (method == Post) {
-                eventBus.post(new ApiExecuteCommand(path, body));
+                eventBus.post(new ApiExecuteCommand(path, request.getBody()));
             }
-            return handler.apply(body);
+            return handler.apply(request);
         });
     }
 
-    private String handleRoot(String s) {
+    private void setupEndpoint(SimpleHttpServer server,
+                               SimpleHttpServer.Method method,
+                               String path,
+                               Function<Request, String> handler,
+                               String desc) {
+        setupEndpoint(server, method, path, handler, desc, null);
+    }
+
+    private String handleRoot(Request request) {
         return apiIndex.getHtml(endpoints);
     }
 
-    private String handleWindowFocus(String body) {
-        eventBus.post(new BringWindowToTopEvent(BooleanUtils.toBoolean(body)));
+    private String handleMonitorOutputClear(Request request) {
+        eventBus.post(new ClearMonitorOutputEvent());
         return null;
     }
 
-    private String handleClose(String body) {
+    private String handleGetMonitorOutput(Request request) {
+        boolean withMessages = StrUtil.contains(request.getRequestURI().getQuery(), "with_messages");
+        List<Object> objects = eventBus.postForResult(new GetMonitorOutputEvent(withMessages));
+        return objects.stream().map(Object::toString).collect(Collectors.joining());
+    }
+
+    private String handleWindowFocus(Request request) {
+        eventBus.post(new BringWindowToTopEvent(BooleanUtils.toBoolean(request.getBody())));
+        return null;
+    }
+
+    private String handleClose(Request request) {
         eventBus.post(new ApiCloseDeviceEvent());
         return null;
     }
 
-    private String handleOpen(String body) {
-        eventBus.post(new ApiOpenDeviceEvent(body));
+    private String handleOpen(Request request) {
+        eventBus.post(new ApiOpenDeviceEvent(request.getBody()));
         return null;
     }
 
-    private String handleStatus(String body) {
+    private String handleStatus(Request request) {
         SerialHandlerService.Status status = instance(SerialHandlerService.class).getStatus();
         return status.toHumanReadableString();
     }
 
-    private String handleDevices(String body) {
+    private String handleDevices(Request request) {
         List<String> list = instance(SerialPorts.class).getList();
         return String.join("\n", list);
     }
@@ -91,12 +131,14 @@ public class AppApiService {
     public static class Endpoint {
         private final String path;
         private final String desc;
+        private final String bodyExample;
         private final SimpleHttpServer.Method method;
 
-        public Endpoint(SimpleHttpServer.Method method, String path, String desc) {
+        public Endpoint(SimpleHttpServer.Method method, String path, String desc, String bodyExample) {
             this.method = method;
             this.path = path;
             this.desc = desc;
+            this.bodyExample = bodyExample;
         }
 
         public String getPath() {
@@ -109,6 +151,10 @@ public class AppApiService {
 
         public SimpleHttpServer.Method getMethod() {
             return method;
+        }
+
+        public String getBodyExample() {
+            return bodyExample;
         }
     }
 }

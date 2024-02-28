@@ -26,24 +26,33 @@ public class EventBus {
         extractListenersFromObject(listener);
     }
 
-    public void trigger(Object event) {
+    public List<Object> triggerAndWaitForResults(Object event) {
         if (event == null) {
-            return;
+            return Collections.emptyList();
         }
         Class<?> type = event.getClass();
         List<HandlerMethod> handlerMethods = handlers.get(type);
         if (handlerMethods == null) {
-            return;
+            return Collections.emptyList();
         }
+        LinkedList<Object> results = new LinkedList<>();
         handlerMethods.forEach((m) -> {
             try {
                 logger.debug("Handle event {}({})", m.handlerMethodName(), event);
-                m.invoke(event);
+                Object value = m.invoke(event);
+                if (value != null) {
+                    results.add(value);
+                }
             } catch (Exception e) {
                 String error = String.format("EventBus event handler (%s) thrown exception.", m.handlerDescription());
                 logger.error(error, e);
             }
         });
+        return results;
+    }
+
+    public void trigger(Object event) {
+        triggerAndWaitForResults(event);
     }
 
     private void extractListenersFromObject(Object listener) {

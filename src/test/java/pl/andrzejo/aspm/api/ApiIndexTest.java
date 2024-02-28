@@ -21,7 +21,9 @@ class ApiIndexTest {
     void shouldGetApiIndex() {
         //given
         ApiIndex index = new ApiIndex();
-        List<AppApiService.Endpoint> endpoints = Collections.singletonList(new AppApiService.Endpoint(Post, "/api/endpoint", "Some endpoint."));
+        List<AppApiService.Endpoint> endpoints = Collections.singletonList(
+                new AppApiService.Endpoint(Post, "/api/endpoint", "Some endpoint.", "BODY")
+        );
 
         //when
         String html = index.getHtml(endpoints);

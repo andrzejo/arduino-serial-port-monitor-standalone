@@ -55,7 +55,7 @@ public class SimpleHttpServer {
         return String.format("http://localhost:%s", PORT);
     }
 
-    public void addEndpoint(Method method, String name, Function<String, String> handler) {
+    public void addEndpoint(Method method, String name, Function<Request, String> handler) {
         if (server == null) {
             return;
         }
@@ -69,7 +69,8 @@ public class SimpleHttpServer {
                 return;
             }
             try {
-                String response = handler.apply(body);
+                Request r = new Request(body, method, exchange.getRequestURI());
+                String response = handler.apply(r);
                 sendResponse(exchange, 200, response);
             } catch (Exception e) {
                 logger.error("Request handler failed: " + exchange.getRequestURI(), e);

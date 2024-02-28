@@ -10,6 +10,7 @@ package pl.andrzejo.aspm.gui.viewer;
 import org.apache.commons.lang.StringUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
+import pl.andrzejo.aspm.eventbus.events.gui.GetMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.OutputLogger;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
@@ -39,6 +40,7 @@ public class SerialViewerColored {
     private boolean isAutoScroll = get(AutoscrollSetting.class);
     private boolean isAddTimestamp = get(AddTimestampSetting.class);
     private final OutputLogger logger;
+    private String serialOutput = "";
 
     public SerialViewerColored(OutputLogger logger) {
         serialMessageType = instance(SerialMessageType.class);
@@ -80,12 +82,22 @@ public class SerialViewerColored {
         setFont(event.getName(), event.getSize());
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public String handleEvent(GetMonitorOutputEvent event) {
+        if (event.isWithMessages()) {
+            return getCurrentText();
+        }
+        return serialOutput;
+    }
+
     public JComponent getComponent() {
         return scroll;
     }
 
     public void clear() {
         try {
+            serialOutput = "";
             doc.remove(0, doc.getLength());
         } catch (BadLocationException e) {
             //ignore
@@ -102,6 +114,7 @@ public class SerialViewerColored {
 
         switch (text.getType()) {
             case SERIAL_MESSAGE:
+                serialOutput += text.getText();
                 formatSerialMessage(text.getText());
                 break;
 

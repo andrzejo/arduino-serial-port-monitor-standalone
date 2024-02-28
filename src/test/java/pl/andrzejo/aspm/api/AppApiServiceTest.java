@@ -21,6 +21,8 @@ import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +77,7 @@ class AppApiServiceTest {
     }
 
     @Test
-    void shouldTestOpenEndpoint() {
+    void shouldTestOpenEndpoint() throws URISyntaxException {
         //given
         //when
         service.start();
@@ -83,7 +85,7 @@ class AppApiServiceTest {
         //then
         MethodDefinition definition = getMethodDefinition(Post, "/api/device/open");
 
-        String response = invokeHandler(definition, "COM1");
+        String response = invokeHandler(definition, new Request("COM1", Post, new URI("")));
         assertThat(response).isNull();
 
         List<BusEvent> events = verifyMethodPostEventBusEvents(bus);
@@ -113,7 +115,7 @@ class AppApiServiceTest {
         //then
         MethodDefinition definition = getMethodDefinition(Post, "/api/device/close");
 
-        String response = invokeHandler(definition, null);
+        String response = invokeHandler(definition, new Request(null, Post, null));
         assertThat(response).isNull();
 
         List<BusEvent> events = verifyMethodPostEventBusEvents(bus);
@@ -204,7 +206,7 @@ class AppApiServiceTest {
         ArgumentCaptor<List<AppApiService.Endpoint>> captor = ArgumentCaptor.forClass(listClass);
         verify(apiIndex).getHtml(captor.capture());
         List<AppApiService.Endpoint> list = captor.getValue();
-        assertThat(list).hasSize(6);
+        assertThat(list).hasSize(8);
     }
 
     @Test
@@ -229,15 +231,15 @@ class AppApiServiceTest {
         return captor.getAllValues();
     }
 
-    private String invokeHandler(MethodDefinition definition, String body) {
-        return definition.getHandler().apply(body);
+    private String invokeHandler(MethodDefinition definition, Request request) {
+        return definition.getHandler().apply(request);
     }
 
     static class SimpleHttpServerTesting extends SimpleHttpServer {
         private final Map<String, MethodDefinition> methods = new HashMap<>();
 
         @Override
-        public void addEndpoint(Method method, String name, Function<String, String> handler) {
+        public void addEndpoint(Method method, String name, Function<Request, String> handler) {
             methods.put(name, new MethodDefinition(method, name, handler));
         }
 
@@ -249,9 +251,9 @@ class AppApiServiceTest {
     static class MethodDefinition {
         private final SimpleHttpServer.Method method;
         private final String name;
-        private final Function<String, String> handler;
+        private final Function<Request, String> handler;
 
-        MethodDefinition(SimpleHttpServer.Method method, String name, Function<String, String> handler) {
+        MethodDefinition(SimpleHttpServer.Method method, String name, Function<Request, String> handler) {
             this.method = method;
             this.name = name;
             this.handler = handler;
@@ -265,7 +267,7 @@ class AppApiServiceTest {
             return name;
         }
 
-        public Function<String, String> getHandler() {
+        public Function<Request, String> getHandler() {
             return handler;
         }
     }

@@ -11,6 +11,8 @@ import pl.andrzejo.aspm.eventbus.events.BusEvent;
 import pl.andrzejo.aspm.eventbus.impl.EventBus;
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
 
+import java.util.List;
+
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class ApplicationEventBus {
@@ -26,6 +28,10 @@ public class ApplicationEventBus {
 
     public void post(BusEvent msg) {
         eventBus.trigger(msg);
+    }
+
+    public List<Object> postForResult(BusEvent msg) {
+        return eventBus.triggerAndWaitForResults(msg);
     }
 
     public void post(AppSetting<?> msg) {
