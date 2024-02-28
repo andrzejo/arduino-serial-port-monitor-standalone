@@ -10,11 +10,14 @@ package pl.andrzejo.aspm.api;
 import pl.andrzejo.aspm.App;
 import pl.andrzejo.aspm.utils.AppFiles;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang.StringUtils.trimToEmpty;
 import static org.apache.commons.lang.text.StrSubstitutor.replace;
 
 public class ApiIndex {
@@ -32,9 +35,16 @@ public class ApiIndex {
         map.put("APP", App.Name);
         map.put("VERSION", App.Version.getVer());
         map.put("VERSION_DATE", App.Version.getDate());
+        map.put("BUILD_YEAR", getYear(App.Version.getDate()));
         map.put("URL", App.GitHubUrl);
         map.put("ENDPOINTS", endpointsHtml);
         return replace(html, map);
+    }
+
+    private String getYear(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
+        return String.valueOf(dateTime.getYear());
     }
 
     private String getEndpointsHtml(List<AppApiService.Endpoint> endpoints) {
@@ -53,10 +63,12 @@ public class ApiIndex {
         String href = SimpleHttpServer.getAddress() + suffix;
         map.put("HREF", href);
         map.put("PATH", suffix);
-        map.put("DESC", endpoint.getDesc());
+        AppApiService.EndpointDescription description = endpoint.getDescription();
+        map.put("DESC", trimToEmpty(description.getDesc()));
+        map.put("QUERY", trimToEmpty(description.getQueryParams()));
         String curl = "curl -X " + endpoint.getMethod().name().toUpperCase() + " " + href;
-        if (endpoint.getMethod() != SimpleHttpServer.Method.Get && endpoint.getBodyExample() != null) {
-            curl += String.format(" -d '%s' ", endpoint.getBodyExample());
+        if (endpoint.getMethod() != SimpleHttpServer.Method.Get && description.getBodyExample() != null) {
+            curl += String.format(" -d '%s' ", description.getBodyExample());
         }
         map.put("CMD", curl);
         return map;
