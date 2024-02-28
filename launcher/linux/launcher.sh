@@ -23,8 +23,9 @@ if [[ -n "${1}" ]]; then
   readonly method=${1}
   readonly res=${2}
   readonly body=${3}
+  readonly ignoreError=
   if [[ -z "${res}" ]]; then
-    echo -e "Api usage:\n${0} ${grn}method${nc}(get|post) ${grn}resource${nc} [${grn}body${nc}]\n"
+    echo -e "Api usage:\n${0} ${grn}method${nc}(get|post) ${grn}resource${nc} [${grn}body${nc}] [--ignore-error]\n"
     exit 1
   fi
   echo -e "Execute API request ${bld}${method}${nc} ${bld}${res}${nc} to ${grn}${url}${nc}\n"
@@ -33,7 +34,12 @@ if [[ -n "${1}" ]]; then
   fi
   # shellcheck disable=SC2086
   curl -X "${method}" "${url}${res}" ${bodyParam}
-  exit $?
+  readonly exitCode=$?
+  if [[ $* == *"--ignore-error"* ]]; then
+    exit 0
+  else
+    exit $exitCode
+  fi
 fi
 
 if command -v java >/dev/null 2>&1; then
