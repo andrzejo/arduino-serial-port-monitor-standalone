@@ -8,6 +8,8 @@
 package pl.andrzejo.aspm.gui.viewer;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.GetMonitorOutputEvent;
@@ -26,11 +28,13 @@ import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 
+import static javax.swing.SwingUtilities.invokeLater;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.viewer.Styles.MessageType.*;
 import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
 
 public class SerialViewerColored {
+    private static final Logger log = LoggerFactory.getLogger(SerialViewerColored.class);
     private final JScrollPane scroll;
 
     private final StyledDocument doc;
@@ -96,12 +100,14 @@ public class SerialViewerColored {
     }
 
     public void clear() {
-        try {
-            serialOutput = "";
-            doc.remove(0, doc.getLength());
-        } catch (BadLocationException e) {
-            //ignore
-        }
+        invokeLater(() -> {
+            try {
+                serialOutput = "";
+                doc.remove(0, doc.getLength());
+            } catch (BadLocationException e) {
+                //ignore
+            }
+        });
     }
 
     public void appendText(Text text) {
@@ -150,18 +156,24 @@ public class SerialViewerColored {
 
     private void scrollDown() {
         if (isAutoScroll) {
-            BoundedRangeModel model = scroll.getVerticalScrollBar().getModel();
-            model.setValue(model.getMaximum() - model.getExtent());
+            invokeLater(() -> {
+                BoundedRangeModel model = scroll.getVerticalScrollBar().getModel();
+                int maximum = model.getMaximum();
+                int extent = model.getExtent();
+                model.setValue(maximum - extent);
+            });
         }
     }
 
     private void insertText(String text, Style style) {
-        try {
-            doc.insertString(doc.getLength(), text, style);
-            logger.log(text);
-        } catch (BadLocationException e) {
-            throw new RuntimeException(e);
-        }
+        invokeLater(() -> {
+            try {
+                doc.insertString(doc.getLength(), text, style);
+            } catch (BadLocationException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        logger.log(text);
     }
 }
 

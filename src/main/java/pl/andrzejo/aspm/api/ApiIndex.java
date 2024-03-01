@@ -35,16 +35,10 @@ public class ApiIndex {
         map.put("APP", App.Name);
         map.put("VERSION", App.Version.getVer());
         map.put("VERSION_DATE", App.Version.getDate());
-        map.put("BUILD_YEAR", getYear(App.Version.getDate()));
+        map.put("BUILD_YEAR", App.Version.getYear());
         map.put("URL", App.GitHubUrl);
         map.put("ENDPOINTS", endpointsHtml);
         return replace(html, map);
-    }
-
-    private String getYear(String date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
-        return String.valueOf(dateTime.getYear());
     }
 
     private String getEndpointsHtml(List<AppApiService.Endpoint> endpoints) {

@@ -41,7 +41,7 @@ public class AboutForm extends JDialog {
 
         add(panel, BorderLayout.CENTER);
 
-        JLabel cp = new JLabel("Copyright (c) Andrzej Oczkowicz 2022");
+        JLabel cp = new JLabel("Copyright © Andrzej Oczkowicz " + App.Version.getYear());
         cp.setHorizontalAlignment(JLabel.CENTER);
         add(cp, BorderLayout.SOUTH);
     }

@@ -10,6 +10,8 @@ package pl.andrzejo.aspm;
 import pl.andrzejo.aspm.utils.AppFiles;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class App {
@@ -54,7 +56,13 @@ public class App {
         public String getDate() {
             return date;
         }
-    }
 
+        public String getYear() {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
+            return String.valueOf(dateTime.getYear());
+        }
+
+    }
 
 }
