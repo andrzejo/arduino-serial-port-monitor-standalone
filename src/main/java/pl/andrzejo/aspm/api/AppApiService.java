@@ -8,7 +8,6 @@
 package pl.andrzejo.aspm.api;
 
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
@@ -62,7 +61,7 @@ public class AppApiService {
                 .build(server);
 
         builder()
-                .method(Post)
+                .method(Get)
                 .path("/api/device/status")
                 .handler(this::handleStatus)
                 .description("Get device status.")
