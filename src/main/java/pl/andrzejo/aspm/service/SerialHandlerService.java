@@ -57,6 +57,8 @@ public class SerialHandlerService {
 
     private void openSerial() {
         if (!isValidDevice()) {
+            String device = config == null ? "null" : config.getDevice();
+            eventBus.post(new DeviceErrorEvent("Invalid device selected: " + device));
             return;
         }
         openSerial(config);
@@ -198,6 +200,7 @@ public class SerialHandlerService {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(ToggleDeviceStatusEvent event) {
+        logger.info("Toggle device state: {}, isOpen(): {}", event, isOpen());
         if (isOpen()) {
             closeSerial();
         } else {

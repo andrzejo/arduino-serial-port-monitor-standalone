@@ -24,6 +24,7 @@ import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontSizeSetting;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
@@ -72,6 +73,8 @@ public class SerialViewerColored {
     @SuppressWarnings("unused")
     public void handleEvent(AutoscrollSetting event) {
         isAutoScroll = event.get();
+        DefaultCaret caret = (DefaultCaret) editor.getCaret();
+        caret.setUpdatePolicy(isAutoScroll ? DefaultCaret.ALWAYS_UPDATE : DefaultCaret.NEVER_UPDATE);
     }
 
     @Subscribe
@@ -163,6 +166,7 @@ public class SerialViewerColored {
                 model.setValue(maximum - extent);
             });
         }
+
     }
 
     private void insertText(String text, Style style) {
