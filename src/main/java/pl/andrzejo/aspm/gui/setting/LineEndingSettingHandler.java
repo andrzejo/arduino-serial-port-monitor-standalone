@@ -22,6 +22,7 @@ public class LineEndingSettingHandler extends ListSettingHandler<String, String>
     protected void fillItems(LinkedHashMap<String, String> items) {
         items.put("\n", "\\n");
         items.put("\r", "\\r");
+        items.put("\r\n", "\\r\\n");
         items.put("\n\r", "\\n\\r");
         items.put("", "none");
     }

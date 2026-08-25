@@ -24,6 +24,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -61,6 +63,14 @@ public class SendCommandPanel extends ContentPanel {
         toggleEnabled(false);
         instance(ApplicationEventBus.class).register(this);
         loadHistory();
+
+        commandEdit.getActionMap()
+                .put("enterPressed", new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        sendBtn.doClick();
+                    }
+                });
     }
 
     private void executeCommand(ActionEvent actionEvent) {
