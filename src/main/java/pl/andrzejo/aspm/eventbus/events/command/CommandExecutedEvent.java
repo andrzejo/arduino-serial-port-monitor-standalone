@@ -11,12 +11,18 @@ import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
 public class CommandExecutedEvent extends BusEvent {
     private final String command;
+    private final String lineEnding;
 
-    public CommandExecutedEvent(String command) {
+    public CommandExecutedEvent(String command, String lineEnding) {
         this.command = command;
+        this.lineEnding = lineEnding;
     }
 
     public String getCommand() {
         return command;
+    }
+
+    public String getLineEnding() {
+        return lineEnding;
     }
 }

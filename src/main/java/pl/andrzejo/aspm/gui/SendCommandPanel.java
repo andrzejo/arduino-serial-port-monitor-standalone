@@ -24,8 +24,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 public class SendCommandPanel extends ContentPanel {
     private static final Logger logger = LoggerFactory.getLogger(SendCommandPanel.class);
 
-    private static final int MAX_HIST_ITEMS = 15;
+    private static final int MAX_HIST_ITEMS = 30;
     private final File histFile;
     JComboBox<String> lineEndingComboBox = new JComboBox<>();
     JComboBox<String> commandEdit = new JComboBox<>();
@@ -100,7 +98,8 @@ public class SendCommandPanel extends ContentPanel {
     }
 
     private String getLineEnding() {
-        return "\n";
+        Object item = lineEndingComboBox.getSelectedItem();
+        return item == null ? "" : item.toString();
     }
 
     @Subscribe

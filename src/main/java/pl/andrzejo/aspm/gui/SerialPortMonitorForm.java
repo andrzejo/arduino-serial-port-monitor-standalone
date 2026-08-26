@@ -119,7 +119,17 @@ public class SerialPortMonitorForm {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(CommandExecutedEvent event) {
-        addText(Text.info("Execute command: [" + event.getCommand() + "]"));
+        String ending = decodedEnding(event.getLineEnding());
+        addText(Text.info("Execute command: [" + event.getCommand() + ending + "]"));
+    }
+
+    private String decodedEnding(String lineEnding) {
+        if (lineEnding == null || lineEnding.isEmpty()) {
+            return "";
+        }
+        return lineEnding
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
     }
 
     @Subscribe

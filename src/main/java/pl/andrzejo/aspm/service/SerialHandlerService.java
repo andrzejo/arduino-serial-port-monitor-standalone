@@ -139,7 +139,7 @@ public class SerialHandlerService {
         if (serial != null) {
             String command = event.getCommand() + event.getLineEnding();
             serial.write(command);
-            eventBus.post(new CommandExecutedEvent(event.getCommand()));
+            eventBus.post(new CommandExecutedEvent(event.getCommand(), event.getLineEnding()));
         }
     }
 
