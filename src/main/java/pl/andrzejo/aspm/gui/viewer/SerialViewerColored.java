@@ -10,6 +10,7 @@ package pl.andrzejo.aspm.gui.viewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.GetMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
@@ -99,6 +100,12 @@ public class SerialViewerColored {
 
     @Subscribe
     @SuppressWarnings("unused")
+    public void handleEvent(DeviceCloseEvent event) {
+        pendingTexts.clear();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
     public String handleEvent(GetMonitorOutputEvent event) {
         if (event.isWithMessages()) {
             return getCurrentText();
@@ -165,6 +172,7 @@ public class SerialViewerColored {
             StringBuilder currentText = new StringBuilder();
             for (PendingText text : grouped) {
                 currentText.append(text.text);
+                String escaped = escapeText(text.text);
                 doc.insertString(doc.getLength(), text.text, text.style);
             }
             trimDocument();
@@ -173,6 +181,22 @@ public class SerialViewerColored {
         } catch (BadLocationException e) {
             throw new RuntimeException("Cannot append serial output", e);
         }
+    }
+
+    private String escapeText(String text) {
+        /*
+        StringBuilder sb = new StringBuilder();
+        for (byte b : text.getBytes()) {
+            int c = b & 0xFF;
+            if (c >= 32 && c < 127) {
+                sb.append((char) c);
+            } else {
+                sb.append(String.format("<%02X>", c));
+            }
+        }
+        return sb.toString();
+         */
+        return text;
     }
 
     private List<PendingText> pollPendingTexts() {

@@ -109,6 +109,7 @@ public class Serial implements SerialPortEventListener {
         try {
             port = new SerialPort(iname);
             port.openPort();
+            port.purgePort(SerialPort.PURGE_RXCLEAR | SerialPort.PURGE_TXCLEAR);
             boolean res = port.setParams(irate, idatabits, stopbits, parity, setRTS, setDTR);
             if (!res) {
                 System.err.println(format("Error while setting serial port parameters: {0} {1} {2} {3}", irate, iparity, idatabits, istopbits));

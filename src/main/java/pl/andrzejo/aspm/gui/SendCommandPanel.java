@@ -38,6 +38,7 @@ public class SendCommandPanel extends ContentPanel {
 
     private static final int MAX_HIST_ITEMS = 30;
     private final File histFile;
+    private final LineEndingSetting lineEndingSetting;
     JComboBox<String> lineEndingComboBox = new JComboBox<>();
     JComboBox<String> commandEdit = new JComboBox<>();
     JButton sendBtn = new JButton("Send");
@@ -56,7 +57,8 @@ public class SendCommandPanel extends ContentPanel {
         add(lePanel, BorderLayout.WEST);
         add(commandPanel, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.EAST);
-        LineEndingSettingHandler handler = new LineEndingSettingHandler(AppSettingsFactory.create(LineEndingSetting.class));
+        lineEndingSetting = AppSettingsFactory.create(LineEndingSetting.class);
+        LineEndingSettingHandler handler = new LineEndingSettingHandler(lineEndingSetting);
         handler.setupComponent(lineEndingComboBox);
         toggleEnabled(false);
         instance(ApplicationEventBus.class).register(this);
@@ -98,8 +100,7 @@ public class SendCommandPanel extends ContentPanel {
     }
 
     private String getLineEnding() {
-        Object item = lineEndingComboBox.getSelectedItem();
-        return item == null ? "" : item.toString();
+        return lineEndingSetting.get();
     }
 
     @Subscribe
