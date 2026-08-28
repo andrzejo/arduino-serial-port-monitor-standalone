@@ -44,7 +44,7 @@ public class EventBus {
                     results.add(value);
                 }
             } catch (Exception e) {
-                String error = String.format("EventBus event handler (%s) thrown exception.", m.handlerDescription());
+                String error = String.format("EventBus event handler (%s) threw an exception.", m.handlerDescription());
                 logger.error(error, e);
             }
         });
@@ -56,7 +56,7 @@ public class EventBus {
     }
 
     private void extractListenersFromObject(Object listener) {
-        for (Method m : listener.getClass().getDeclaredMethods()) {
+        for (Method m : listener.getClass().getMethods()) {
             if (m.getDeclaredAnnotation(Subscribe.class) != null) {
                 if (m.getParameterCount() != 1) {
                     throw new EventBusException(String.format("EventBus handler method (%s) must have only one parameter", getDescription(m)));
