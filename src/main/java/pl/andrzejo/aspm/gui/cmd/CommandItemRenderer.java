@@ -15,13 +15,19 @@ final class CommandItemRenderer extends JPanel implements ListCellRenderer<Comma
     private final JLabel executeLabel = new JLabel("▶");
     private final JLabel commandLabel = new JLabel();
     private final JLabel descriptionLabel = new JLabel();
+    private int editIndex = -1;
+
+    private static final Color EDIT_COLOR = Color.BLUE;
+    private static final Color EXEC_COLOR = new Color(139, 0, 0);
+    private boolean isEnabled;
 
     public CommandItemRenderer() {
         setLayout(new BorderLayout(8, 2));
-        setBorder(new EmptyBorder(5, 6, 5, 6));
+        setBorder(new EmptyBorder(2, 4, 2, 6));
+
+        executeLabel.setFont(executeLabel.getFont().deriveFont(Font.BOLD, 22f));
 
         commandLabel.setFont(commandLabel.getFont().deriveFont(Font.BOLD));
-        descriptionLabel.setForeground(Color.GRAY);
 
         JPanel textPanel = new JPanel();
         textPanel.setOpaque(false);
@@ -37,6 +43,7 @@ final class CommandItemRenderer extends JPanel implements ListCellRenderer<Comma
     }
 
     public void setSendEnabled(boolean enabled) {
+        isEnabled = enabled;
         executeLabel.setEnabled(enabled);
         commandLabel.setEnabled(enabled);
         descriptionLabel.setEnabled(enabled);
@@ -49,19 +56,34 @@ final class CommandItemRenderer extends JPanel implements ListCellRenderer<Comma
                                                   boolean isSelected,
                                                   boolean cellHasFocus
     ) {
-        commandLabel.setText(value.getCommand());
+        boolean edit = editIndex >= 0 && editIndex == index;
+
+        commandLabel.setText((edit ? "Editing " : "") + value.getCommand());
         descriptionLabel.setText(value.getDescription());
+        executeLabel.setText(edit ? "✎" : "▶");
+
+        commandLabel.setEnabled(isEnabled || edit);
+        executeLabel.setEnabled(isEnabled || edit);
+        descriptionLabel.setEnabled(isEnabled || edit);
 
         if (isSelected) {
             setBackground(list.getSelectionBackground());
-            commandLabel.setForeground(list.getSelectionForeground());
-            executeLabel.setForeground(list.getSelectionForeground());
+            Color color = edit ? EDIT_COLOR : list.getSelectionForeground();
+            commandLabel.setForeground(color);
+            descriptionLabel.setForeground(edit ? Color.GRAY : list.getSelectionForeground());
+            executeLabel.setForeground(edit ? EDIT_COLOR : EXEC_COLOR);
         } else {
             setBackground(list.getBackground());
-            commandLabel.setForeground(list.getForeground());
-            executeLabel.setForeground(list.getForeground());
+            Color color = edit ? EDIT_COLOR : list.getForeground();
+            commandLabel.setForeground(color);
+            executeLabel.setForeground(edit ? EDIT_COLOR : EXEC_COLOR);
+            descriptionLabel.setForeground(Color.GRAY);
         }
 
         return this;
+    }
+
+    public void setEditIndex(int selectedIndex) {
+        this.editIndex = selectedIndex;
     }
 }

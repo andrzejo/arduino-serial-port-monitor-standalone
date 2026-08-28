@@ -55,12 +55,13 @@ public class SendCommandPanel extends ContentPanel {
     private final CommandItemRenderer cellRenderer = new CommandItemRenderer();
     private final JComboBox<String> lineEndingComboBox = new JComboBox<>();
     private final JComboBox<String> commandEdit = new JComboBox<>();
-    //    private final JTextField commandField = new JTextField();
     private final JTextField descriptionField = new JTextField();
     private final JButton sendBtn = new JButton("Send");
     private final JButton addButton = new JButton("+");
     private final JButton saveButton = new JButton("✔");
-    private final JButton delButton = new JButton("X");
+    private final JButton delButton = new JButton("\uD83D\uDDD1");
+    private final JButton upButton = new JButton("⇧");
+    private final JButton downButton = new JButton("⇩");
     private final Serialization serialization;
     private CommandItem editedItem;
 
@@ -78,26 +79,48 @@ public class SendCommandPanel extends ContentPanel {
 
         addButton.setToolTipText("Add command");
         saveButton.setToolTipText("Save changes");
+        delButton.setToolTipText("Delete selected");
+        upButton.setToolTipText("Move command up");
+        downButton.setToolTipText("Move command down");
+
         addButton.addActionListener(handleAction(this::addCommand));
         saveButton.addActionListener(handleAction(this::updateCommand));
         delButton.addActionListener(handleAction(this::deleteCommand));
+        upButton.addActionListener(handleAction(this::moveCommandUp));
+        downButton.addActionListener(handleAction(this::moveCommandDown));
+
         addButton.setEnabled(false);
         saveButton.setEnabled(false);
         delButton.setEnabled(false);
 
-        JPanel editorPanel = createEditorPanel(commandEdit, sendBtn, addButton, saveButton, delButton, descriptionField);
+        JPanel editorPanel = createEditorPanel(commandEdit, sendBtn, addButton, saveButton, descriptionField);
         commandList.setCellRenderer(cellRenderer);
         commandList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         commandList.setFixedCellHeight(48);
+
+        JPanel movePanel = new JPanel(new BorderLayout());
+        upButton.setEnabled(false);
+        downButton.setEnabled(false);
+
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        leftPanel.add(delButton);
+
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        rightPanel.add(upButton);
+        rightPanel.add(downButton);
+
+        movePanel.add(leftPanel, BorderLayout.WEST);
+        movePanel.add(rightPanel, BorderLayout.EAST);
 
         JScrollPane commandListScrollPane = new JScrollPane(commandList);
         commandListScrollPane.setPreferredSize(new Dimension(280, 300));
 
         JScrollPane scroll = new JScrollPane(commandList);
-
         JPanel commandsPanel = new JPanel(new BorderLayout(5, 5));
+
         commandsPanel.add(editorPanel, BorderLayout.NORTH);
         commandsPanel.add(scroll, BorderLayout.CENTER);
+        commandsPanel.add(movePanel, BorderLayout.SOUTH);
         commandsPanel.setPreferredSize(new Dimension(280, 300));
 
         JLabel titleLabel = new JLabel("Send command");
@@ -140,9 +163,11 @@ public class SendCommandPanel extends ContentPanel {
                         executeCommand(cmd);
                     } else {
                         editedItem = commandList.getSelectedValue();
+                        cellRenderer.setEditIndex(commandList.getSelectedIndex());
                         commandEdit.getEditor().setItem(editedItem.getCommand());
                         descriptionField.setText(editedItem.getDescription());
                         commandEdit.requestFocusInWindow();
+                        updateButtonsState();
                     }
                 }
             }
@@ -150,6 +175,7 @@ public class SendCommandPanel extends ContentPanel {
 
         commandList.addListSelectionListener(e -> {
             editedItem = null;
+            cellRenderer.setEditIndex(-1);
             updateButtonsState();
         });
 
@@ -172,6 +198,35 @@ public class SendCommandPanel extends ContentPanel {
         });
     }
 
+    private void moveCommandDown(ActionEvent actionEvent) {
+        moveCommand(1);
+    }
+
+    private void moveCommandUp(ActionEvent actionEvent) {
+        moveCommand(-1);
+    }
+
+    private void moveCommand(int dir) {
+        int currentIndex = commandList.getSelectedIndex();
+        if (currentIndex < 0) {
+            return;
+        }
+        int targetIndex = currentIndex + dir;
+        int size = commandListModel.getSize();
+
+        if (targetIndex < 0 || targetIndex >= size) {
+            return;
+        }
+
+        CommandItem item = commandListModel.getElementAt(currentIndex);
+        commandListModel.removeElementAt(currentIndex);
+        commandListModel.insertElementAt(item, targetIndex);
+        commandList.setSelectedIndex(targetIndex);
+        commandList.ensureIndexIsVisible(targetIndex);
+        updateButtonsState();
+        saveCommands();
+    }
+
     private boolean isOnActivePlayIcon(MouseEvent e) {
         int index = commandList.locationToIndex(e.getPoint());
 
@@ -189,12 +244,16 @@ public class SendCommandPanel extends ContentPanel {
         boolean notBlank = isNotBlank(command.getCommand());
         addButton.setEnabled(notBlank);
         saveButton.setEnabled(notBlank && editedItem != null);
-        delButton.setEnabled(editedItem != null);
-        String deleteSelected = "Delete selected command";
-        if (editedItem != null) {
-            deleteSelected += ": " + editedItem.getCommand() + " (" + editedItem.getDescription() + ")";
+        int index = commandList.getSelectedIndex();
+        if (index >= 0) {
+            upButton.setEnabled(index > 0);
+            downButton.setEnabled(index < commandListModel.size() - 1);
+            delButton.setEnabled(true);
+        } else {
+            upButton.setEnabled(false);
+            downButton.setEnabled(false);
+            delButton.setEnabled(false);
         }
-        delButton.setToolTipText(deleteSelected);
     }
 
     private void updateCommand(ActionEvent actionEvent) {
@@ -212,14 +271,12 @@ public class SendCommandPanel extends ContentPanel {
             commandList.ensureIndexIsVisible(index);
             saveCommands();
         }
+        editedItem = null;
+        cellRenderer.setEditIndex(-1);
     }
 
     private void deleteCommand(ActionEvent actionEvent) {
-        if (editedItem == null) {
-            return;
-        }
-
-        int index = commandListModel.indexOf(editedItem);
+        int index = commandList.getSelectedIndex();
         if (index >= 0) {
             commandListModel.remove(index);
             editedItem = null;
@@ -246,8 +303,7 @@ public class SendCommandPanel extends ContentPanel {
     }
 
     private static JPanel createEditorPanel(JComboBox<String> commandField, JButton sendBtn,
-                                            JButton addBtn, JButton saveBtn, JButton delButton,
-                                            JTextField commentField) {
+                                            JButton addBtn, JButton saveBtn,                                             JTextField commentField) {
         JPanel editorPanel = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -260,7 +316,7 @@ public class SendCommandPanel extends ContentPanel {
         editorPanel.add(new JLabel("Cmd:"), gbc);
 
         gbc.gridx = 1;
-        gbc.gridwidth = 4;
+        gbc.gridwidth = 3;
         gbc.weightx = 1;
         editorPanel.add(commandField, gbc);
 
@@ -271,7 +327,7 @@ public class SendCommandPanel extends ContentPanel {
         editorPanel.add(new JLabel("Desc:"), gbc);
 
         gbc.gridx = 1;
-        gbc.gridwidth = 4;
+        gbc.gridwidth = 3;
         gbc.weightx = 1;
         editorPanel.add(commentField, gbc);
 
@@ -290,9 +346,6 @@ public class SendCommandPanel extends ContentPanel {
         gbc.weightx = 0;
         editorPanel.add(saveBtn, gbc);
 
-        gbc.gridx = 4;
-        gbc.weightx = 0;
-        editorPanel.add(delButton, gbc);
         return editorPanel;
     }
 
