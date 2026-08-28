@@ -47,6 +47,7 @@ public class SendCommandPanel extends ContentPanel {
     private static final Logger logger = LoggerFactory.getLogger(SendCommandPanel.class);
 
     private static final int MAX_HIST_ITEMS = 30;
+    public static final Color DARK_GREEN = new Color(0, 100, 0);
     private final File histFile;
     private final File cmdFile;
     private final LineEndingSetting lineEndingSetting;
@@ -76,6 +77,20 @@ public class SendCommandPanel extends ContentPanel {
         JPanel lePanel = createLabeled("Line ending:", lineEndingComboBox);
         lePanel.setBorder(new EmptyBorder(-5, 0, 5, 0));
         sendBtn.addActionListener(handleAction(this::executeCommand));
+
+        Font font = saveButton.getFont().deriveFont(Font.BOLD, 16f);
+
+        addButton.setForeground(DARK_GREEN);
+        upButton.setForeground(DARK_GREEN);
+        downButton.setForeground(DARK_GREEN);
+        saveButton.setForeground(Color.BLUE);
+        delButton.setForeground(new Color(139, 0, 0));
+
+        saveButton.setFont(font);
+        addButton.setFont(font);
+        downButton.setFont(font);
+        upButton.setFont(font);
+        delButton.setFont(font);
 
         addButton.setToolTipText("Add command");
         saveButton.setToolTipText("Save changes");
@@ -303,7 +318,7 @@ public class SendCommandPanel extends ContentPanel {
     }
 
     private static JPanel createEditorPanel(JComboBox<String> commandField, JButton sendBtn,
-                                            JButton addBtn, JButton saveBtn,                                             JTextField commentField) {
+                                            JButton addBtn, JButton saveBtn, JTextField commentField) {
         JPanel editorPanel = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
