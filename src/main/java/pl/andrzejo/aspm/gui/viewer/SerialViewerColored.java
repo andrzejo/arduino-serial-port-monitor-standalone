@@ -17,10 +17,7 @@ import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.OutputLogger;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.AutoscrollSetting;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontNameSetting;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontSizeSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.*;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -53,6 +50,7 @@ public class SerialViewerColored {
     private final SerialMessageType serialMessageType;
     private boolean isAutoScroll = get(AutoscrollSetting.class);
     private boolean isAddTimestamp = get(AddTimestampSetting.class);
+    private boolean isEscapeChars = get(EscapeCharsSetting.class);
     private final OutputLogger logger;
     private final StringBuilder serialOutput = new StringBuilder();
     private final Queue<PendingText> pendingTexts = new ConcurrentLinkedQueue<>();
@@ -90,6 +88,12 @@ public class SerialViewerColored {
     @SuppressWarnings("unused")
     public void handleEvent(AddTimestampSetting event) {
         isAddTimestamp = event.get();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(EscapeCharsSetting event) {
+        isEscapeChars = event.get();
     }
 
     @Subscribe
@@ -172,7 +176,6 @@ public class SerialViewerColored {
             StringBuilder currentText = new StringBuilder();
             for (PendingText text : grouped) {
                 currentText.append(text.text);
-                String escaped = escapeText(text.text);
                 doc.insertString(doc.getLength(), text.text, text.style);
             }
             trimDocument();
@@ -184,19 +187,16 @@ public class SerialViewerColored {
     }
 
     private String escapeText(String text) {
-        /*
         StringBuilder sb = new StringBuilder();
         for (byte b : text.getBytes()) {
             int c = b & 0xFF;
-            if (c >= 32 && c < 127) {
+            if ((c >= 32 && c < 127) || c == 10 || c == 13) {
                 sb.append((char) c);
             } else {
                 sb.append(String.format("<%02X>", c));
             }
         }
         return sb.toString();
-         */
-        return text;
     }
 
     private List<PendingText> pollPendingTexts() {
@@ -256,12 +256,8 @@ public class SerialViewerColored {
         if (expectedLength <= MAX_DOCUMENT_LENGTH) {
             return;
         }
-
-        int charsToRemove =
-                expectedLength - TARGET_DOCUMENT_LENGTH;
-
+        int charsToRemove = expectedLength - TARGET_DOCUMENT_LENGTH;
         charsToRemove = Math.min(charsToRemove, doc.getLength());
-
         try {
             doc.remove(0, charsToRemove);
         } catch (BadLocationException e) {
@@ -277,7 +273,8 @@ public class SerialViewerColored {
 
     private void formatSerialMessage(String text) {
         Styles.MessageType type = serialMessageType.getType(text);
-        insertText(text, styles.get(type));
+        String escaped = isEscapeChars ? escapeText(text) : text;
+        insertText(escaped, styles.get(type));
     }
 
     private String getCurrentText() {
@@ -300,6 +297,7 @@ public class SerialViewerColored {
 
     private void insertText(String text, Style style) {
         synchronized (pendingTextsLock) {
+            lastChar = text.charAt(text.length() - 1);
             pendingTexts.add(new PendingText(text, style));
         }
     }

@@ -19,6 +19,7 @@ import pl.andrzejo.aspm.settings.appsettings.items.device.TtyDeviceSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AddTimestampSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.AutoscrollSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.EscapeCharsSetting;
 import pl.andrzejo.aspm.settings.guihandlers.CheckBoxSettingsHandler;
 import pl.andrzejo.aspm.settings.guihandlers.ListSettingHandler;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
@@ -92,12 +93,14 @@ public class DeviceSelectorPanel extends ContentPanel {
 
         add(line, BorderLayout.WEST);
         JPanel boxes = new JPanel();
-        boxes.setLayout(new GridLayout(2, 1));
+        boxes.setLayout(new GridLayout(3, 1));
+        JCheckBox escapeText = new JCheckBox("Escape special chars");
         JCheckBox autoScroll = new JCheckBox("Auto scroll");
         JCheckBox addTimestamp = new JCheckBox("Add timestamp");
 
         boxes.add(autoScroll);
         boxes.add(addTimestamp);
+        boxes.add(escapeText);
         add(boxes);
 
         setupTtySettingsPanel();
@@ -105,6 +108,7 @@ public class DeviceSelectorPanel extends ContentPanel {
         handleCheckboxSetting(autoOpenBox, AppSettingsFactory.create(AutoOpenSetting.class));
         handleCheckboxSetting(autoScroll, AppSettingsFactory.create(AutoscrollSetting.class));
         handleCheckboxSetting(addTimestamp, AppSettingsFactory.create(AddTimestampSetting.class));
+        handleCheckboxSetting(escapeText, AppSettingsFactory.create(EscapeCharsSetting.class));
 
         setDeviceStatus(false);
         openBtn.addActionListener(handleAction((e) -> eventBus.post(new ToggleDeviceStatusEvent())));

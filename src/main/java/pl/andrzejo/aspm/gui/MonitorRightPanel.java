@@ -13,10 +13,7 @@ import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.WindowAlwaysOnTopEvent;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontNameSetting;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.FontSizeSetting;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.SaveLogToFile;
-import pl.andrzejo.aspm.settings.appsettings.items.viewer.WindowAlwaysOnTopSetting;
+import pl.andrzejo.aspm.settings.appsettings.items.viewer.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -71,6 +68,7 @@ public class MonitorRightPanel extends ContentPanel {
 
         JPanel bottom = new JPanel();
         bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
+
         bottom.add(alwaysOnTop);
         bottom.add(saveToFile);
 
