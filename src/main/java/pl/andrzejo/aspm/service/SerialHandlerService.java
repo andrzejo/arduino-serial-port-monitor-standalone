@@ -137,7 +137,7 @@ public class SerialHandlerService {
     @SuppressWarnings("unused")
     public void handleEvent(ExecuteCommandEvent event) {
         if (serial != null) {
-            String command = event.getCommand() + event.getLineEnding();
+            String command = event.getCommand().getCommand() + event.getLineEnding();
             serial.write(command);
             eventBus.post(new CommandExecutedEvent(event.getCommand(), event.getLineEnding()));
         }

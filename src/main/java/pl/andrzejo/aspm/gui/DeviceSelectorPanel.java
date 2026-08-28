@@ -93,7 +93,7 @@ public class DeviceSelectorPanel extends ContentPanel {
 
         add(line, BorderLayout.WEST);
         JPanel boxes = new JPanel();
-        boxes.setLayout(new GridLayout(3, 1));
+        boxes.setLayout(new GridLayout(2, 2));
         JCheckBox escapeText = new JCheckBox("Escape special chars");
         JCheckBox autoScroll = new JCheckBox("Auto scroll");
         JCheckBox addTimestamp = new JCheckBox("Add timestamp");

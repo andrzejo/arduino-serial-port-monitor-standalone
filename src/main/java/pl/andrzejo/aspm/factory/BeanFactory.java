@@ -53,7 +53,7 @@ public class BeanFactory {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create instance of " + k.getName(), e);
+            throw new RuntimeException("Failed to create an instance of " + k.getName(), e);
         }
 
         throw new RuntimeException("Instantiation failed. Class has no default constructor " + k.getName() + "");

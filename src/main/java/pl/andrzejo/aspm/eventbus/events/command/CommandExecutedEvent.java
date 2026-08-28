@@ -8,17 +8,18 @@
 package pl.andrzejo.aspm.eventbus.events.command;
 
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
+import pl.andrzejo.aspm.gui.cmd.CommandItem;
 
 public class CommandExecutedEvent extends BusEvent {
-    private final String command;
+    private final CommandItem command;
     private final String lineEnding;
 
-    public CommandExecutedEvent(String command, String lineEnding) {
+    public CommandExecutedEvent(CommandItem command, String lineEnding) {
         this.command = command;
         this.lineEnding = lineEnding;
     }
 
-    public String getCommand() {
+    public CommandItem getCommand() {
         return command;
     }
 

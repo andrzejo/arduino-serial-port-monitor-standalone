@@ -21,6 +21,7 @@ import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.WindowAlwaysOnTopEvent;
 import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
+import pl.andrzejo.aspm.gui.cmd.SendCommandPanel;
 import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
 import pl.andrzejo.aspm.gui.viewer.Text;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
@@ -35,6 +36,7 @@ import java.awt.*;
 
 import static java.awt.EventQueue.invokeLater;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
 
@@ -62,20 +64,15 @@ public class SerialPortMonitorForm {
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BorderLayout());
         centerPanel.add(viewer.getComponent(), BorderLayout.CENTER);
-        centerPanel.add(new MonitorRightPanel(), BorderLayout.EAST);
+        centerPanel.add(new MonitorSettingsPanel(), BorderLayout.SOUTH);
 
         mainFrame.getContentPane().add(centerPanel, BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BorderLayout());
-        bottomPanel.add(sendCommandPanel, BorderLayout.NORTH);
+        mainFrame.getContentPane().add(sendCommandPanel, BorderLayout.EAST);
 
         JPanel statusPanel = new JPanel();
         setupStatusPanel(statusPanel);
-        bottomPanel.add(statusPanel, BorderLayout.SOUTH);
 
-        mainFrame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
-
+        mainFrame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
         mainFrame.pack();
         Rectangle r = sizeSetting.get();
         mainFrame.setBounds(r);
@@ -120,7 +117,11 @@ public class SerialPortMonitorForm {
     @SuppressWarnings("unused")
     public void handleEvent(CommandExecutedEvent event) {
         String ending = decodedEnding(event.getLineEnding());
-        addText(Text.info("Execute command: [" + event.getCommand() + ending + "]"));
+        String desc = event.getCommand().getDescription();
+        if (isNotBlank(desc)) {
+            desc = "(" + desc + ") ";
+        }
+        addText(Text.info("Execute command: " + desc + "[" + event.getCommand().getCommand() + ending + "]"));
     }
 
     private String decodedEnding(String lineEnding) {

@@ -28,34 +28,34 @@ import java.util.stream.Collectors;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 
-public class MonitorRightPanel extends ContentPanel {
+public class MonitorSettingsPanel extends ContentPanel {
 
     private final FontRenderContext fontRenderContext = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
     private Integer fontSize;
     private String fontName;
 
-    public MonitorRightPanel() {
+    public MonitorSettingsPanel() {
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(0, 10, 0, 10));
 
+        JPanel btnPanel = new JPanel();
         JButton clear = new JButton("Clear output");
-        add(clear, BorderLayout.NORTH);
+        btnPanel.add(clear);
+        add(btnPanel, BorderLayout.WEST);
         clear.addActionListener(handleAction((e) -> instance(ApplicationEventBus.class).post(new ClearMonitorOutputEvent())));
 
-        JPanel panel = new JPanel();
+        JPanel fontPanel = new JPanel();
         JComboBox<String> fontsCombo = new JComboBox<>();
         setPreferredWidthSize(fontsCombo);
         fillFonts(fontsCombo);
 
-        panel.add(createLabeled("Font", fontsCombo));
+        fontPanel.add(createLabeled("Font", fontsCombo));
         SpinnerListModel fontSize = new SpinnerListModel(Arrays.asList(8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48));
         JSpinner fontSizeSpinner = new JSpinner(fontSize);
         setupFontSizeSpinner(fontSizeSpinner);
-        panel.add(createLabeled("Size", fontSizeSpinner));
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        JPanel panel2 = new JPanel();
-        panel2.add(panel);
-        add(panel2, BorderLayout.CENTER);
+        fontPanel.add(Box.createHorizontalStrut(10));
+        fontPanel.add(createLabeled("Size", fontSizeSpinner));
+        fontPanel.setLayout(new BoxLayout(fontPanel, BoxLayout.X_AXIS));
 
         setupFontCombo(fontsCombo);
 
@@ -66,13 +66,18 @@ public class MonitorRightPanel extends ContentPanel {
         JCheckBox saveToFile = new JCheckBox("Save log to file");
         handleCheckboxSetting(saveToFile, AppSettingsFactory.create(SaveLogToFile.class));
 
-        JPanel bottom = new JPanel();
-        bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
+        JPanel checkboxesPanel = new JPanel();
+        checkboxesPanel.setLayout(new BoxLayout(checkboxesPanel, BoxLayout.Y_AXIS));
 
-        bottom.add(alwaysOnTop);
-        bottom.add(saveToFile);
+        checkboxesPanel.add(alwaysOnTop);
+        checkboxesPanel.add(saveToFile);
 
-        add(bottom, BorderLayout.SOUTH);
+        JPanel settingsPanel = new JPanel();
+        settingsPanel.add(fontPanel);
+        settingsPanel.add(Box.createHorizontalStrut(10));
+        settingsPanel.add(checkboxesPanel);
+
+       add(settingsPanel, BorderLayout.EAST);
     }
 
     private void setupFontSizeSpinner(JSpinner fontSizeSpinner) {
