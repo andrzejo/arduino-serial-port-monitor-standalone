@@ -7,22 +7,13 @@
 
 package pl.andrzejo.aspm.eventbus.events.api.commands;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
+@Getter
+@RequiredArgsConstructor
 public class ApiExecuteCommand extends BusEvent {
     private final String command;
     private final String body;
-
-    public ApiExecuteCommand(String command, String body) {
-        this.command = command;
-        this.body = body;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public String getBody() {
-        return body;
-    }
 }

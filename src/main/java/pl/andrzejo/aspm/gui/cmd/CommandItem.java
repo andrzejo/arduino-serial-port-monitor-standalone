@@ -7,20 +7,12 @@
 
 package pl.andrzejo.aspm.gui.cmd;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public class CommandItem {
     private final String command;
     private final String description;
-
-    CommandItem(String command, String comment) {
-        this.command = command;
-        this.description = comment;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }

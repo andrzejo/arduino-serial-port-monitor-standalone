@@ -39,7 +39,7 @@ public class SimpleHttpServer {
             server.setExecutor(null);
             server.start();
         } catch (Exception e) {
-            logger.warn("Failed to start application API server. API not available!", e);
+            logger.warn("Failed to start the application API server. API is not available!", e);
         }
     }
 

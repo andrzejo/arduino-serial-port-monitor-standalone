@@ -7,6 +7,7 @@
 
 package pl.andrzejo.aspm.gui;
 
+import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.SaveLogToFile;
@@ -18,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 
 public class OutputLogger {
     private final SaveLogToFile saveLogToFile;
+    @Getter
     private static final File logFile = new File(AppFiles.getAppConfigDir(), "aspm.log.txt");
 
     public OutputLogger() {
@@ -32,9 +34,5 @@ public class OutputLogger {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    public static File getLogFile() {
-        return logFile;
     }
 }

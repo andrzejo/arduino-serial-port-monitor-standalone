@@ -7,22 +7,13 @@
 
 package pl.andrzejo.aspm.eventbus.events.gui;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
+@Getter
+@RequiredArgsConstructor
 public class FontChangedEvent extends BusEvent {
     private final String name;
     private final Integer size;
-
-    public FontChangedEvent(String name, Integer size) {
-        this.name = name;
-        this.size = size;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Integer getSize() {
-        return size;
-    }
 }

@@ -7,6 +7,7 @@
 
 package pl.andrzejo.aspm.eventbus.impl;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static pl.andrzejo.aspm.eventbus.impl.MethodDescription.getDescription;
 
+@Getter
 public class EventBus {
     private static final Logger logger = LoggerFactory.getLogger(EventBus.class);
 
@@ -83,10 +85,6 @@ public class EventBus {
     private void addHandler(Class<?> type, HandlerMethod handlerMethod) {
         List<HandlerMethod> typeHandlers = handlers.computeIfAbsent(type, k -> new ArrayList<>());
         typeHandlers.add(handlerMethod);
-    }
-
-    public Map<Class<?>, List<HandlerMethod>> getHandlers() {
-        return handlers;
     }
 
 }

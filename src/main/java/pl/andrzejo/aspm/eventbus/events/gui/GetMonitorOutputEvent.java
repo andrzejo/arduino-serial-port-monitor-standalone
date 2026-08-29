@@ -7,16 +7,12 @@
 
 package pl.andrzejo.aspm.eventbus.events.gui;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
+@Getter
+@RequiredArgsConstructor
 public class GetMonitorOutputEvent extends BusEvent {
     private final boolean withMessages;
-
-    public GetMonitorOutputEvent(boolean withMessages) {
-        this.withMessages = withMessages;
-    }
-
-    public boolean isWithMessages() {
-        return withMessages;
-    }
 }

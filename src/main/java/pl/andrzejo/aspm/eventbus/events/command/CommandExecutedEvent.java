@@ -7,23 +7,14 @@
 
 package pl.andrzejo.aspm.eventbus.events.command;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 import pl.andrzejo.aspm.gui.cmd.CommandItem;
 
+@Getter
+@RequiredArgsConstructor
 public class CommandExecutedEvent extends BusEvent {
     private final CommandItem command;
     private final String lineEnding;
-
-    public CommandExecutedEvent(CommandItem command, String lineEnding) {
-        this.command = command;
-        this.lineEnding = lineEnding;
-    }
-
-    public CommandItem getCommand() {
-        return command;
-    }
-
-    public String getLineEnding() {
-        return lineEnding;
-    }
 }

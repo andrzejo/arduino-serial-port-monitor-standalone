@@ -46,7 +46,7 @@ public abstract class AppSetting<T> {
                 throw new RuntimeException(e);
             }
         } else {
-            throw new RuntimeException("Failed to create setting item " + settingType.getCanonicalName());
+            throw new RuntimeException("Failed to create a setting item " + settingType.getCanonicalName());
         }
     }
 

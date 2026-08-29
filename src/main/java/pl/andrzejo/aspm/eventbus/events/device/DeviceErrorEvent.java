@@ -7,16 +7,12 @@
 
 package pl.andrzejo.aspm.eventbus.events.device;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
+@Getter
+@RequiredArgsConstructor
 public class DeviceErrorEvent extends BusEvent {
-    private String message;
-
-    public DeviceErrorEvent(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
+    private final String message;
 }

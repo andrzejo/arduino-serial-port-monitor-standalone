@@ -7,18 +7,13 @@
 
 package pl.andrzejo.aspm.eventbus.events.device;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
+@Getter
+@RequiredArgsConstructor
 public class DeviceCloseEvent extends BusEvent {
     private final DeviceConfig config;
-
-    public DeviceCloseEvent(DeviceConfig config) {
-        super();
-        this.config = config;
-    }
-
-    public DeviceConfig getConfig() {
-        return config;
-    }
 }

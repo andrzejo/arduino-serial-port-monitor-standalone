@@ -7,6 +7,8 @@
 
 package pl.andrzejo.aspm.api;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.BooleanUtils;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
@@ -154,53 +156,20 @@ public class AppApiService {
         return String.join("\n", list);
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public static class EndpointDescription {
         private final String desc;
         private final String bodyExample;
-
-        public String getQueryParams() {
-            return queryParams;
-        }
-
-        public String getBodyExample() {
-            return bodyExample;
-        }
-
-        public String getDesc() {
-            return desc;
-        }
-
         private final String queryParams;
-
-        public EndpointDescription(String desc, String bodyExample, String queryParams) {
-            this.desc = desc;
-            this.bodyExample = bodyExample;
-            this.queryParams = queryParams;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public static class Endpoint {
+        private final SimpleHttpServer.Method method;
         private final String path;
         private final EndpointDescription description;
-        private final SimpleHttpServer.Method method;
-
-        public Endpoint(SimpleHttpServer.Method method, String path, EndpointDescription description) {
-            this.method = method;
-            this.path = path;
-            this.description = description;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public SimpleHttpServer.Method getMethod() {
-            return method;
-        }
-
-        public EndpointDescription getDescription() {
-            return description;
-        }
     }
 
     private class Builder {

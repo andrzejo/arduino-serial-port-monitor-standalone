@@ -7,16 +7,12 @@
 
 package pl.andrzejo.aspm.eventbus.events.api.commands;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
+@Getter
+@RequiredArgsConstructor
 public class ApiOpenDeviceEvent extends BusEvent {
     private final String device;
-
-    public ApiOpenDeviceEvent(String device) {
-        this.device = device;
-    }
-
-    public String getDevice() {
-        return device;
-    }
 }

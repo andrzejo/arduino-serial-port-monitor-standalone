@@ -7,6 +7,9 @@
 
 package pl.andrzejo.aspm.settings.types;
 
+import lombok.Getter;
+
+@Getter
 public class DeviceConfig implements Cloneable {
     private String device;
     private int baud;
@@ -25,17 +28,9 @@ public class DeviceConfig implements Cloneable {
                 .setStopBits(1);
     }
 
-    public String getDevice() {
-        return device;
-    }
-
     public DeviceConfig setDevice(String device) {
         this.device = device;
         return this;
-    }
-
-    public int getBaud() {
-        return baud;
     }
 
     public DeviceConfig setBaud(int baud) {
@@ -43,17 +38,9 @@ public class DeviceConfig implements Cloneable {
         return this;
     }
 
-    public char getParity() {
-        return parity;
-    }
-
     public DeviceConfig setParity(char parity) {
         this.parity = parity;
         return this;
-    }
-
-    public int getDataBits() {
-        return dataBits;
     }
 
     public DeviceConfig setDataBits(int dataBits) {
@@ -61,26 +48,14 @@ public class DeviceConfig implements Cloneable {
         return this;
     }
 
-    public float getStopBits() {
-        return stopBits;
-    }
-
     public DeviceConfig setStopBits(float stopBits) {
         this.stopBits = stopBits;
         return this;
     }
 
-    public boolean isRTS() {
-        return RTS;
-    }
-
     public DeviceConfig setRTS(boolean RTS) {
         this.RTS = RTS;
         return this;
-    }
-
-    public boolean isDTR() {
-        return DTR;
     }
 
     public DeviceConfig setDTR(boolean DTR) {

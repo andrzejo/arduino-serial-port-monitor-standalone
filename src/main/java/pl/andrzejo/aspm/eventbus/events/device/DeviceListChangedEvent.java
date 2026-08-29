@@ -7,18 +7,14 @@
 
 package pl.andrzejo.aspm.eventbus.events.device;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
 import java.util.List;
 
+@Getter
+@RequiredArgsConstructor
 public class DeviceListChangedEvent extends BusEvent {
     private final List<String> devices;
-
-    public DeviceListChangedEvent(List<String> devices) {
-        this.devices = devices;
-    }
-
-    public List<String> getDevices() {
-        return devices;
-    }
 }

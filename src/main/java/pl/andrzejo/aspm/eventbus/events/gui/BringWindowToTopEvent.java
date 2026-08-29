@@ -7,16 +7,12 @@
 
 package pl.andrzejo.aspm.eventbus.events.gui;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
+@Getter
+@RequiredArgsConstructor
 public class BringWindowToTopEvent extends BusEvent {
     private final boolean blur;
-
-    public BringWindowToTopEvent(boolean blur) {
-        this.blur = blur;
-    }
-
-    public boolean isBlur() {
-        return blur;
-    }
 }

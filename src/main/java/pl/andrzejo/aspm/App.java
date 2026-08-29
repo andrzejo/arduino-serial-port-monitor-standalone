@@ -7,6 +7,8 @@
 
 package pl.andrzejo.aspm;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.utils.AppFiles;
 
 import java.io.InputStream;
@@ -40,22 +42,11 @@ public class App {
         return new Ver(notAvailable, notAvailable);
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public static class Ver {
         private final String ver;
         private final String date;
-
-        public Ver(String ver, String date) {
-            this.ver = ver;
-            this.date = date;
-        }
-
-        public String getVer() {
-            return ver;
-        }
-
-        public String getDate() {
-            return date;
-        }
 
         public String getYear() {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

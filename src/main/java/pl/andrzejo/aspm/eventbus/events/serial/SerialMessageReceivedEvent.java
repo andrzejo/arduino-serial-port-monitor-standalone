@@ -7,24 +7,15 @@
 
 package pl.andrzejo.aspm.eventbus.events.serial;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
 import java.util.Date;
 
+@Getter
+@RequiredArgsConstructor
 public class SerialMessageReceivedEvent extends BusEvent {
     private final String value;
-    private final Date date;
-
-    public SerialMessageReceivedEvent(String value) {
-        this.value = value;
-        date = new Date();
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public Date getDate() {
-        return date;
-    }
+    private final Date date = new Date();
 }

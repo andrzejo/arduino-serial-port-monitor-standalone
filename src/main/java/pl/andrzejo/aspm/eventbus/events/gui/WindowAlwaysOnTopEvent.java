@@ -7,16 +7,12 @@
 
 package pl.andrzejo.aspm.eventbus.events.gui;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
+@Getter
+@RequiredArgsConstructor
 public class WindowAlwaysOnTopEvent extends BusEvent {
     private final boolean alwaysOnTop;
-
-    public WindowAlwaysOnTopEvent(boolean alwaysOnTop) {
-        this.alwaysOnTop = alwaysOnTop;
-    }
-
-    public boolean isAlwaysOnTop() {
-        return alwaysOnTop;
-    }
 }

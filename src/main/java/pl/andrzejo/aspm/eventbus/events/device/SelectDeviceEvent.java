@@ -7,16 +7,12 @@
 
 package pl.andrzejo.aspm.eventbus.events.device;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
+@Getter
+@RequiredArgsConstructor
 public class SelectDeviceEvent extends BusEvent {
     private final String device;
-
-    public SelectDeviceEvent(String device) {
-        this.device = device;
-    }
-
-    public String getDevice() {
-        return device;
-    }
 }
