@@ -27,10 +27,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -211,6 +208,21 @@ public class SendCommandPanel extends ContentPanel {
                 commandList.setCursor(Cursor.getDefaultCursor());
             }
         });
+
+        commandList
+                .getInputMap(JComponent.WHEN_FOCUSED)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "executeCommand");
+
+        commandList
+                .getActionMap().put("executeCommand", new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (sendBtn.isEnabled()) {
+                            CommandItem cmd = commandList.getSelectedValue();
+                            executeCommand(cmd);
+                        }
+                    }
+                });
     }
 
     private void moveCommandDown(ActionEvent actionEvent) {
