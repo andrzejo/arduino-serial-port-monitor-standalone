@@ -10,6 +10,7 @@ package pl.andrzejo.aspm.eventbus.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,15 +57,27 @@ public class EventBus {
     }
 
     private void extractListenersFromObject(Object listener) {
-        for (Method m : listener.getClass().getMethods()) {
-            if (m.getDeclaredAnnotation(Subscribe.class) != null) {
-                if (m.getParameterCount() != 1) {
-                    throw new EventBusException(String.format("EventBus handler method (%s) must have only one parameter", getDescription(m)));
-                }
-                Class<?> type = m.getParameterTypes()[0];
-                addHandler(type, new HandlerMethod(listener, m));
+        Objects.requireNonNull(listener, "Listener cannot be null");
+        for (Method m : getAnnotatedMethods(listener.getClass(), Subscribe.class)) {
+            if (m.getParameterCount() != 1) {
+                throw new EventBusException(String.format("EventBus handler method (%s) must have only one parameter", getDescription(m)));
             }
+            Class<?> type = m.getParameterTypes()[0];
+            addHandler(type, new HandlerMethod(listener, m));
         }
+    }
+
+    public static List<Method> getAnnotatedMethods(Class<?> type, Class<? extends Annotation> annotation) {
+        List<Method> methods = new ArrayList<>();
+        while (type != null && type != Object.class) {
+            for (Method method : type.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(annotation)) {
+                    methods.add(method);
+                }
+            }
+            type = type.getSuperclass();
+        }
+        return methods;
     }
 
     private void addHandler(Class<?> type, HandlerMethod handlerMethod) {
