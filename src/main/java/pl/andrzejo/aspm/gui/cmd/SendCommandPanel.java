@@ -109,7 +109,7 @@ public class SendCommandPanel extends ContentPanel {
         JPanel editorPanel = createEditorPanel(commandEdit, sendBtn, addButton, saveButton, descriptionField);
         commandList.setCellRenderer(cellRenderer);
         commandList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        commandList.setFixedCellHeight(48);
+        commandList.setFixedCellHeight(-1);
 
         JPanel movePanel = new JPanel(new BorderLayout());
         upButton.setEnabled(false);
@@ -151,6 +151,10 @@ public class SendCommandPanel extends ContentPanel {
         instance(ApplicationEventBus.class).register(this);
         loadHistory();
         loadCommands();
+
+        descriptionField
+                .getDocument()
+                .addDocumentListener(handleDocumentChange(e -> updateButtonsState()));
 
         commandEdit
                 .getActionMap()
@@ -234,6 +238,7 @@ public class SendCommandPanel extends ContentPanel {
         commandListModel.insertElementAt(item, targetIndex);
         commandList.setSelectedIndex(targetIndex);
         commandList.ensureIndexIsVisible(targetIndex);
+        repaintList();
         updateButtonsState();
         saveCommands();
     }
@@ -253,7 +258,7 @@ public class SendCommandPanel extends ContentPanel {
     private void updateButtonsState() {
         CommandItem command = getCurrentCommand();
         boolean notBlank = isNotBlank(command.getCommand());
-        addButton.setEnabled(notBlank);
+        addButton.setEnabled(notBlank || isNotBlank(command.getDescription()));
         saveButton.setEnabled(notBlank && editedItem != null);
         int index = commandList.getSelectedIndex();
         if (index >= 0) {
@@ -284,6 +289,8 @@ public class SendCommandPanel extends ContentPanel {
         }
         editedItem = null;
         cellRenderer.setEditIndex(-1);
+
+        repaintList();
     }
 
     private void deleteCommand(ActionEvent actionEvent) {
@@ -293,14 +300,21 @@ public class SendCommandPanel extends ContentPanel {
             editedItem = null;
             saveCommands();
         }
+        repaintList();
+    }
+
+    private void repaintList() {
+        commandList.revalidate();
+        commandList.repaint();
     }
 
     private void addCommand(ActionEvent actionEvent) {
         CommandItem cmd = getCurrentCommand();
-        if (isNotBlank(cmd.getCommand())) {
+        if (isNotBlank(cmd.getCommand()) || isNotBlank(cmd.getDescription())) {
             commandListModel.add(0, cmd);
             saveCommands();
         }
+        repaintList();
     }
 
     private void executeCommand(ActionEvent actionEvent) {
@@ -308,9 +322,11 @@ public class SendCommandPanel extends ContentPanel {
     }
 
     private void executeCommand(CommandItem cmd) {
-        String lineEnding = getLineEnding();
-        instance(ApplicationEventBus.class).post(new ExecuteCommandEvent(cmd, lineEnding));
-        addToHistory(cmd.getCommand());
+        if (!cmd.getCommand().isEmpty()) {
+            String lineEnding = getLineEnding();
+            instance(ApplicationEventBus.class).post(new ExecuteCommandEvent(cmd, lineEnding));
+            addToHistory(cmd.getCommand());
+        }
     }
 
     private static JPanel createEditorPanel(JComboBox<String> commandField, JButton sendBtn,
