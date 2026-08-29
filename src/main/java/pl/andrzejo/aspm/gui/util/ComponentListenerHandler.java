@@ -49,6 +49,24 @@ public class ComponentListenerHandler {
         };
     }
 
+    public static MouseAdapter mouseExited(Consumer<MouseEvent> handler) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseExited(MouseEvent e) {
+                handler.accept(e);
+            }
+        };
+    }
+
+    public static MouseMotionAdapter mouseMoved(Consumer<MouseEvent> handler) {
+        return new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                handler.accept(e);
+            }
+        };
+    }
+
     public static WindowListener handleWindowClosed(Consumer<WindowEvent> handler) {
         return new WindowListener() {
             @Override

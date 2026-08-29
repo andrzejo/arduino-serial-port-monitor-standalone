@@ -27,7 +27,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -37,8 +39,7 @@ import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.*;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
-import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
-import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleDocumentChange;
+import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
 
 public class SendCommandPanel extends ContentPanel {
     private static final Logger logger = LoggerFactory.getLogger(SendCommandPanel.class);
@@ -151,78 +152,61 @@ public class SendCommandPanel extends ContentPanel {
         loadHistory();
         loadCommands();
 
-        commandEdit.getActionMap()
-                .put("enterPressed", new AbstractAction() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        sendBtn.doClick();
-                    }
-                });
+        commandEdit
+                .getActionMap()
+                .put("enterPressed", handleAction(e -> sendBtn.doClick()));
 
         JTextComponent editor = (JTextComponent) commandEdit.getEditor().getEditorComponent();
         editor
                 .getDocument()
-                .addDocumentListener(handleDocumentChange(e -> {
+                .addDocumentListener(handleDocumentChange(e -> updateButtonsState()));
+
+        commandList.addMouseListener(mouseClicked(e -> {
+            if (e.getClickCount() == 2) {
+                if (isOnActivePlayIcon(e)) {
+                    CommandItem cmd = commandList.getSelectedValue();
+                    executeCommand(cmd);
+                } else {
+                    editedItem = commandList.getSelectedValue();
+                    cellRenderer.setEditIndex(commandList.getSelectedIndex());
+                    commandEdit.getEditor().setItem(editedItem.getCommand());
+                    descriptionField.setText(editedItem.getDescription());
+                    commandEdit.requestFocusInWindow();
                     updateButtonsState();
+                }
+            }
+        }));
+
+        commandList
+                .addListSelectionListener(e -> {
+                    editedItem = null;
+                    cellRenderer.setEditIndex(-1);
+                    updateButtonsState();
+                });
+
+        commandList
+                .addMouseMotionListener(mouseMoved(e -> {
+                    if (isOnActivePlayIcon(e)) {
+                        commandList.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    } else {
+                        commandList.setCursor(Cursor.getDefaultCursor());
+                    }
                 }));
 
-        commandList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    if (isOnActivePlayIcon(e)) {
-                        CommandItem cmd = commandList.getSelectedValue();
-                        executeCommand(cmd);
-                    } else {
-                        editedItem = commandList.getSelectedValue();
-                        cellRenderer.setEditIndex(commandList.getSelectedIndex());
-                        commandEdit.getEditor().setItem(editedItem.getCommand());
-                        descriptionField.setText(editedItem.getDescription());
-                        commandEdit.requestFocusInWindow();
-                        updateButtonsState();
-                    }
-                }
-            }
-        });
-
-        commandList.addListSelectionListener(e -> {
-            editedItem = null;
-            cellRenderer.setEditIndex(-1);
-            updateButtonsState();
-        });
-
-        commandList.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                if (isOnActivePlayIcon(e)) {
-                    commandList.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                } else {
-                    commandList.setCursor(Cursor.getDefaultCursor());
-                }
-            }
-        });
-
-        commandList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                commandList.setCursor(Cursor.getDefaultCursor());
-            }
-        });
+        commandList
+                .addMouseListener(mouseExited(e -> commandList.setCursor(Cursor.getDefaultCursor())));
 
         commandList
                 .getInputMap(JComponent.WHEN_FOCUSED)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "executeCommand");
 
         commandList
-                .getActionMap().put("executeCommand", new AbstractAction() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (sendBtn.isEnabled()) {
-                            CommandItem cmd = commandList.getSelectedValue();
-                            executeCommand(cmd);
-                        }
+                .getActionMap().put("executeCommand", handleAction(e -> {
+                    if (sendBtn.isEnabled()) {
+                        CommandItem cmd = commandList.getSelectedValue();
+                        executeCommand(cmd);
                     }
-                });
+                }));
     }
 
     private void moveCommandDown(ActionEvent actionEvent) {
