@@ -11,11 +11,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @RequiredArgsConstructor
 public class SerialMessageReceivedEvent extends BusEvent {
     private final String value;
-    private final Date date = new Date();
+    private final Instant date = Instant.now();
 }

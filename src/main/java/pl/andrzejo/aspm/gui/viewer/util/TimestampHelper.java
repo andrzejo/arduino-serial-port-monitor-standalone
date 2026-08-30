@@ -7,18 +7,24 @@
 
 package pl.andrzejo.aspm.gui.viewer.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class TimestampHelper {
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+                    .withZone(ZoneId.systemDefault());
 
     public static String getTimestamp() {
-        return getTimestamp(new Date());
+        return getTimestamp(Instant.now());
     }
 
-    public static String getTimestamp(Date date) {
-        return simpleDateFormat.format(date);
+    public static String getTimestamp(Instant date) {
+        if (date == null) {
+            return "";
+        }
+        return FORMATTER.format(date);
     }
 
 }

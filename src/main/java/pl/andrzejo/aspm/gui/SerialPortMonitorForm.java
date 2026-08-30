@@ -21,9 +21,10 @@ import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.WindowAlwaysOnTopEvent;
 import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
+import pl.andrzejo.aspm.factory.BeanFactory;
 import pl.andrzejo.aspm.gui.cmd.SendCommandPanel;
-import pl.andrzejo.aspm.gui.viewer.SerialViewerColored;
-import pl.andrzejo.aspm.gui.viewer.Text;
+import pl.andrzejo.aspm.gui.viewer.MessagesViewer;
+import pl.andrzejo.aspm.gui.viewer.model.Message;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.WindowPositionSetting;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.WindowAlwaysOnTopSetting;
@@ -33,6 +34,8 @@ import pl.andrzejo.aspm.utils.Sleeper;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.awt.EventQueue.invokeLater;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -42,8 +45,10 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
 
 public class SerialPortMonitorForm {
     private final JFrame mainFrame;
-    private final SerialViewerColored viewer;
+    private final MessagesViewer viewer;
+    private final AtomicBoolean isCleanedUp = new AtomicBoolean(false);
     private JLabel statusLabel;
+
 
     public SerialPortMonitorForm() {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
@@ -56,14 +61,18 @@ public class SerialPortMonitorForm {
         DeviceSelectorPanel deviceSelector = new DeviceSelectorPanel();
         SendCommandPanel sendCommandPanel = new SendCommandPanel();
 
-        viewer = new SerialViewerColored(new OutputLogger());
+        OutputLogger outputLogger = BeanFactory.instance(OutputLogger.class);
+        eventBus.register(outputLogger);
+        viewer = new MessagesViewer(outputLogger);
 
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         mainFrame.getContentPane().add(deviceSelector, BorderLayout.NORTH);
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BorderLayout());
+
         centerPanel.add(viewer.getComponent(), BorderLayout.CENTER);
+
         centerPanel.add(new MonitorSettingsPanel(), BorderLayout.SOUTH);
 
         mainFrame.getContentPane().add(centerPanel, BorderLayout.CENTER);
@@ -77,12 +86,22 @@ public class SerialPortMonitorForm {
         Rectangle r = sizeSetting.get();
         mainFrame.setBounds(r);
         mainFrame.addComponentListener(handleMoved(e -> sizeSetting.set(mainFrame.getBounds())));
-        mainFrame.addWindowListener(handleWindowClosed((e) -> instance(ApplicationEventBus.class).post(new ApplicationClosingEvent())));
+        mainFrame.addWindowListener(handleWindowClosed((e) -> applicationOnExitCleanup()));
 
         mainFrame.setAlwaysOnTop(alwaysOnTop.get());
 
         MainWindowContainer.setMainWindowComponent(mainFrame);
         eventBus.post(new ApplicationStartedEvent());
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::applicationOnExitCleanup, "Shutdown-Hook-Thread"));
+    }
+
+    private void applicationOnExitCleanup() {
+        if (isCleanedUp.compareAndSet(false, true)) {
+            instance(ApplicationEventBus.class).post(new ApplicationClosingEvent());
+            mainFrame.dispose();
+            System.exit(0);
+        }
     }
 
     private void setupStatusPanel(JPanel statusPanel) {
@@ -105,12 +124,16 @@ public class SerialPortMonitorForm {
         about.addMouseListener(mouseClicked((e) -> new AboutForm(mainFrame).showModal()));
     }
 
-    private void addText(String text) {
-        viewer.appendText(Text.appMessage(text));
+    private void addText(String msg) {
+        viewer.addMessage(Message.info(msg));
     }
 
-    private void addText(Text text) {
-        viewer.appendText(text);
+    private void addText(Message msg) {
+        viewer.addMessage(msg);
+    }
+
+    private void addSerialLog(String msg, Instant date) {
+        viewer.addSerialLog(msg, date);
     }
 
     @Subscribe
@@ -121,7 +144,7 @@ public class SerialPortMonitorForm {
         if (isNotBlank(desc)) {
             desc = "(" + desc + ") ";
         }
-        addText(Text.info("Execute command: " + desc + "[" + event.getCommand().getCommand() + ending + "]"));
+        addText(Message.info("Execute command: " + desc + "[" + event.getCommand().getCommand() + ending + "]"));
     }
 
     private String decodedEnding(String lineEnding) {
@@ -136,7 +159,7 @@ public class SerialPortMonitorForm {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(SerialMessageReceivedEvent event) {
-        addText(Text.message(event.getValue(), event.getDate()));
+        addSerialLog(event.getValue(), event.getDate());
     }
 
     @Subscribe
@@ -163,7 +186,7 @@ public class SerialPortMonitorForm {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(DeviceErrorEvent event) {
-        addText(Text.error("Serial error: " + event.getMessage()));
+        addText(Message.error("Serial error: " + event.getMessage()));
         setStatus("Device error");
     }
 
@@ -175,7 +198,7 @@ public class SerialPortMonitorForm {
     @SuppressWarnings("unused")
     public void handleEvent(ApiExecuteCommand event) {
         String body = isBlank(event.getBody()) ? "" : " - " + event.getBody();
-        addText(Text.info("Remote command: " + event.getCommand() + body));
+        addText(Message.info("Remote command: " + event.getCommand() + body));
     }
 
     @Subscribe
