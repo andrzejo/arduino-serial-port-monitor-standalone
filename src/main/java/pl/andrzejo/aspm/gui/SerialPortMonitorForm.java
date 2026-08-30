@@ -49,7 +49,6 @@ public class SerialPortMonitorForm {
     private final AtomicBoolean isCleanedUp = new AtomicBoolean(false);
     private JLabel statusLabel;
 
-
     public SerialPortMonitorForm() {
         WindowPositionSetting sizeSetting = AppSettingsFactory.create(WindowPositionSetting.class);
         WindowAlwaysOnTopSetting alwaysOnTop = AppSettingsFactory.create(WindowAlwaysOnTopSetting.class);
@@ -61,9 +60,7 @@ public class SerialPortMonitorForm {
         DeviceSelectorPanel deviceSelector = new DeviceSelectorPanel();
         SendCommandPanel sendCommandPanel = new SendCommandPanel();
 
-        OutputLogger outputLogger = BeanFactory.instance(OutputLogger.class);
-        eventBus.register(outputLogger);
-        viewer = new MessagesViewer(outputLogger);
+        viewer = new MessagesViewer(BeanFactory.instance(OutputLogger.class));
 
         mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 

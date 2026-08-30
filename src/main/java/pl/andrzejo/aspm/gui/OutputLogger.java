@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.viewer.model.Message;
@@ -25,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class OutputLogger {
     private static final Logger log = LoggerFactory.getLogger(OutputLogger.class);
@@ -42,6 +46,7 @@ public class OutputLogger {
     public OutputLogger() {
         saveLogToFile = AppSettingsFactory.create(SaveLogToFile.class);
         FileUtils.forceMkdir(logFile.getParentFile());
+        instance(ApplicationEventBus.class).register(this);
     }
 
     public void log(List<Message> messages) {
@@ -49,7 +54,11 @@ public class OutputLogger {
             return;
         }
         List<Message> batch = new ArrayList<>(messages);
-        diskWriterExecutor.submit(() -> writeBatchToFile(batch));
+        try {
+            diskWriterExecutor.submit(() -> writeBatchToFile(batch));
+        } catch (RejectedExecutionException e) {
+            log.warn("Failed to write batch to file, executor is shutting down");
+        }
     }
 
     private void writeBatchToFile(List<Message> batch) {

@@ -9,18 +9,25 @@ package pl.andrzejo.aspm.gui.viewer.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import pl.andrzejo.aspm.gui.viewer.util.TextEscapeUtils;
 import pl.andrzejo.aspm.gui.viewer.util.TimestampHelper;
 
 import java.time.Instant;
 import java.util.Date;
 
 @Getter
-@RequiredArgsConstructor
 public class Message {
     private final long timestamp;
     private final String text;
     private final MessageType type;
     private transient String formattedTime;
+    private transient String escapedText;
+
+    public Message(long timestamp, String text, MessageType type) {
+        this.timestamp = timestamp;
+        this.text = text;
+        this.type = type;
+    }
 
     public static Message info(String msg) {
         return new Message(System.currentTimeMillis(), msg, MessageType.INTERNAL_INFO);
@@ -39,5 +46,16 @@ public class Message {
             formattedTime = TimestampHelper.getTimestamp(Instant.ofEpochMilli(timestamp));
         }
         return formattedTime;
+    }
+
+    public String getEscapedText() {
+        if (escapedText == null) {
+            escapedText = TextEscapeUtils.escapeText(text);
+        }
+        return escapedText;
+    }
+
+    public boolean isInternal() {
+        return type == MessageType.INTERNAL_INFO || type == MessageType.INTERNAL_ERROR;
     }
 }

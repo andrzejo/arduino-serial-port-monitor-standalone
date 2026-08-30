@@ -43,7 +43,6 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.*;
 
 public class SendCommandPanel extends ContentPanel {
     private static final Logger logger = LoggerFactory.getLogger(SendCommandPanel.class);
-
     private static final int MAX_HIST_ITEMS = 30;
     public static final Color DARK_GREEN = new Color(0, 100, 0);
     private final File histFile;
@@ -251,7 +250,7 @@ public class SendCommandPanel extends ContentPanel {
         }
 
         Rectangle cell = commandList.getCellBounds(index, index);
-        Rectangle playBounds = new Rectangle(cell.x + 4, cell.y + 22, 16, 16);
+        Rectangle playBounds = new Rectangle(cell.x + 2, cell.y + 12, 22, 22);
         return playBounds.contains(e.getPoint());
     }
 

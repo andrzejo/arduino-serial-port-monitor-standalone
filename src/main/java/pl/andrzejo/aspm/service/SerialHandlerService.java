@@ -32,6 +32,7 @@ import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Supplier;
 

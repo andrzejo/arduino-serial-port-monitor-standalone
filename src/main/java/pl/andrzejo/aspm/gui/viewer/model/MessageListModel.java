@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class MessageListModel extends AbstractListModel<Message> {
@@ -88,5 +90,19 @@ public class MessageListModel extends AbstractListModel<Message> {
         size = 0;
         incompleteMessage = null;
         fireContentsChanged(this, 0, 0);
+    }
+
+    public synchronized void forEach(Consumer<? super Message> action) {
+        Objects.requireNonNull(action, "Action cannot be null");
+        for (int i = 0; i < size; i++) {
+            int actualIndex = (head + i) % capacity;
+            Message msg = buffer[actualIndex];
+            if (msg != null) {
+                action.accept(msg);
+            }
+        }
+        if (incompleteMessage != null) {
+            action.accept(incompleteMessage);
+        }
     }
 }

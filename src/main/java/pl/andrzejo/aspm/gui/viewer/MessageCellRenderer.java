@@ -7,6 +7,8 @@
 
 package pl.andrzejo.aspm.gui.viewer;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.factory.BeanFactory;
 import pl.andrzejo.aspm.gui.viewer.model.Message;
 
@@ -15,23 +17,16 @@ import java.awt.*;
 
 import static pl.andrzejo.aspm.gui.viewer.model.MessageType.TIME;
 
-public class MessageCellRenderer extends JPanel implements ListCellRenderer<Message> {
+public class MessageCellRenderer extends JComponent implements ListCellRenderer<Message> {
+    private final Styles styles = BeanFactory.instance(Styles.class);
     private Message currentMessage;
     private boolean isSelected;
     private Color listBg, listSelectionBg, listSelectionFg;
     private boolean renderTimestamp;
-    private final Styles styles = BeanFactory.instance(Styles.class);
+    private Boolean escapeChars;
 
     public MessageCellRenderer() {
-        //setLayout(new BorderLayout(8, 0));
         setOpaque(true);
-/*
-        timestampLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        timestampLabel.setForeground(Color.GRAY);
-
-        add(timestampLabel, BorderLayout.WEST);
-        add(textLabel, BorderLayout.CENTER);
-*/
     }
 
     @Override
@@ -48,46 +43,15 @@ public class MessageCellRenderer extends JPanel implements ListCellRenderer<Mess
         this.listBg = list.getBackground();
         this.listSelectionBg = list.getSelectionBackground();
         this.listSelectionFg = list.getSelectionForeground();
-        /*
-        timestampLabel.setText(entry.getFormattedTimestamp());
-        textLabel.setText(entry.getText());
-
-        if (isSelected) {
-            setBackground(list.getSelectionBackground());
-            timestampLabel.setForeground(list.getSelectionForeground());
-            textLabel.setForeground(list.getSelectionForeground());
-        } else {
-            setBackground(list.getBackground());
-            timestampLabel.setForeground(Color.GRAY);
-            applyStyle(entry.getStyle(), list);
-        }
-*/
         return this;
     }
 
-    /*
-        private void applyStyle(MessageType type, JList<?> list) {
-            switch (type) {
-                case INTERNAL_ERROR:
-                    textLabel.setForeground(new Color(139, 0, 0));
-                    break;
-
-                case INTERNAL_INFO:
-                    textLabel.setForeground(new Color(0, 100, 0));
-                    break;
-
-                case INTERNAL_MESSAGE:
-                    textLabel.setForeground(new Color(0, 80, 180));
-                    break;
-
-                default:
-                    textLabel.setForeground(list.getForeground());
-            }
-        }
-    */
     public void renderTimestamp(boolean renderTimestamp) {
         this.renderTimestamp = renderTimestamp;
-//        timestampLabel.setVisible(renderTimestamp);
+    }
+
+    public void escapeChars(Boolean escapeChars) {
+        this.escapeChars = escapeChars;
     }
 
     @Override
@@ -103,6 +67,7 @@ public class MessageCellRenderer extends JPanel implements ListCellRenderer<Mess
 
         int width = getWidth();
         int height = getHeight();
+        DisplayData display = DisplayData.forMessage(currentMessage, renderTimestamp, escapeChars);
 
         g.setColor(isSelected ? listSelectionBg : listBg);
         g.fillRect(0, 0, width, height);
@@ -111,17 +76,26 @@ public class MessageCellRenderer extends JPanel implements ListCellRenderer<Mess
         int textY = (height - fm.getHeight()) / 2 + fm.getAscent();
         int currentX = 5;
 
-        String timestampStr = renderTimestamp ? currentMessage.getFormattedTimestamp() + " " : "";
-
         if (isSelected) {
             g.setColor(listSelectionFg);
-            String fullLine = timestampStr + currentMessage.getText();
+            String fullLine = display.fullLine();
             g.drawString(fullLine, currentX, textY);
             return;
         }
 
-        currentX += drawString(g, currentX, textY, styles.get(TIME), timestampStr);
-        drawString(g, currentX, textY, styles.get(currentMessage.getType()), currentMessage.getText());
+        currentX += drawString(g, currentX, textY, styles.get(TIME), display.getTimestamp());
+        drawString(g, currentX, textY, styles.get(currentMessage.getType()), display.getText());
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        if (currentMessage == null) {
+            return new Dimension(100, 16);
+        }
+        FontMetrics fm = getFontMetrics(getFont());
+        DisplayData display = DisplayData.forMessage(currentMessage, renderTimestamp, escapeChars);
+        int width = fm.stringWidth(display.fullLine()) + 25;
+        return new Dimension(width, fm.getHeight());
     }
 
     private int drawString(Graphics g, int currentX, int textY, Styles.Style style, String str) {
@@ -152,5 +126,28 @@ public class MessageCellRenderer extends JPanel implements ListCellRenderer<Mess
 
     @Override
     public void revalidate() {
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    private static class DisplayData {
+        private final String timestamp;
+        private final String text;
+
+        public static DisplayData forMessage(Message msg, boolean renderTimestamp, boolean escape) {
+            String timestamp = renderTimestamp ? msg.getFormattedTimestamp() + " " : "";
+            return new DisplayData(timestamp, getTextToDisplay(msg, escape));
+        }
+
+        private static String getTextToDisplay(Message msg, boolean escape) {
+            if (msg.isInternal()) {
+                return msg.getText();
+            }
+            return escape ? msg.getEscapedText() : msg.getText();
+        }
+
+        public String fullLine() {
+            return timestamp + text;
+        }
     }
 }

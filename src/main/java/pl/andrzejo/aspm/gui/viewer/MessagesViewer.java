@@ -41,6 +41,8 @@ import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
 public class MessagesViewer {
     private static final int MAX_LINES = 20_000;
     private static final int FLUSH_INTERVAL_MS = 40; // ~25 FPS
+    private static final Logger log = LoggerFactory.getLogger(MessagesViewer.class);
+    private final SerialMessageTypeResolver msgTypeResolver = BeanFactory.instance(SerialMessageTypeResolver.class);
     private final MessageListModel messagesListModel = new MessageListModel(MAX_LINES);
     private final JList<Message> messagesList = new JList<>(messagesListModel);
     private final JScrollPane scrollPane;
@@ -50,20 +52,18 @@ public class MessagesViewer {
     private final StringBuilder parseBuffer = new StringBuilder(4096);
     private final OutputLogger outputLogger;
     private Instant lineStartTimestamp = null;
-
-    private final SerialMessageTypeResolver msgTypeResolver = BeanFactory.instance(SerialMessageTypeResolver.class);
-    private static final Logger log = LoggerFactory.getLogger(MessagesViewer.class);
-
     private boolean isAutoScroll = get(AutoscrollSetting.class);
-    private boolean isEscapeChars = get(EscapeCharsSetting.class);
 
     public MessagesViewer(OutputLogger outputLogger) {
         this.outputLogger = outputLogger;
         cellRenderer = new MessageCellRenderer();
+        cellRenderer.renderTimestamp(get(AddTimestampSetting.class));
+        cellRenderer.escapeChars(get(EscapeCharsSetting.class));
+
         messagesList.setCellRenderer(cellRenderer);
         messagesList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         messagesList.setVisibleRowCount(-1);
-        cellRenderer.renderTimestamp(get(AddTimestampSetting.class));
+
         scrollPane = new JScrollPane(messagesList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         setFont(AppSettingsFactory.create(FontNameSetting.class).get(), AppSettingsFactory.create(FontSizeSetting.class).get());
         instance(ApplicationEventBus.class).register(this);
@@ -168,14 +168,14 @@ public class MessagesViewer {
     @SuppressWarnings("unused")
     public void handleEvent(AddTimestampSetting event) {
         cellRenderer.renderTimestamp(event.get());
-        messagesList.revalidate();
-        messagesList.repaint();
+        repaint();
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(EscapeCharsSetting event) {
-        isEscapeChars = event.get();
+        cellRenderer.escapeChars(event.get());
+        repaint();
     }
 
     @Subscribe
@@ -187,11 +187,18 @@ public class MessagesViewer {
     @Subscribe
     @SuppressWarnings("unused")
     public String handleEvent(GetMonitorOutputEvent event) {
-        //todo:
-        if (event.isWithMessages()) {
-            return "TODO:";
-        }
-        return "TODO:";
+        StringBuilder sb = new StringBuilder();
+        boolean withMessages = event.isWithMessages();
+        messagesListModel.forEach(msg -> {
+            if (!withMessages && msg.isInternal()) {
+                return;
+            }
+            sb.append(msg.getFormattedTimestamp());
+            sb.append(": ");
+            sb.append(msg.getText());
+            sb.append("\n");
+        });
+        return sb.toString();
     }
 
     @Subscribe
@@ -199,6 +206,11 @@ public class MessagesViewer {
     private void handleEvent(ApplicationClosingEvent event) {
         log.info("Shutting down the message queue");
         flushQueueToModel();
+    }
+
+    private void repaint() {
+        messagesList.revalidate();
+        messagesList.repaint();
     }
 
     private void scrollToEnd() {
@@ -243,8 +255,7 @@ public class MessagesViewer {
         int height = messagesList.getFontMetrics(font1).getHeight();
         messagesList.setFixedCellHeight(height);
         scrollPane.getVerticalScrollBar().setUnitIncrement(height * 3);
-        messagesList.revalidate();
-        messagesList.repaint();
+        repaint();
     }
 
     @RequiredArgsConstructor
