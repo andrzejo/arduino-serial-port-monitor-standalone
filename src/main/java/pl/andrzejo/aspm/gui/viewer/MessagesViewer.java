@@ -119,7 +119,7 @@ public class MessagesViewer {
                     }
 
                     MessageType type = msgTypeResolver.resolve(fullLine);
-                    completedMessages.add(new Message(msgTime.getEpochSecond(), fullLine, type));
+                    completedMessages.add(new Message(msgTime.toEpochMilli(), fullLine, type));
                     parseBuffer.setLength(0);
                     lineStartTimestamp = null;
                     start = i + 1;
@@ -138,7 +138,7 @@ public class MessagesViewer {
         if (parseBuffer.length() > 0) {
             String remainingText = parseBuffer.toString();
             Instant timestamp = lineStartTimestamp == null ? Instant.now() : lineStartTimestamp;
-            incompleteMsg = new Message(timestamp.getEpochSecond(), remainingText, msgTypeResolver.resolve(remainingText));
+            incompleteMsg = new Message(timestamp.toEpochMilli(), remainingText, msgTypeResolver.resolve(remainingText));
         }
 
         JScrollBar vBar = scrollPane.getVerticalScrollBar();

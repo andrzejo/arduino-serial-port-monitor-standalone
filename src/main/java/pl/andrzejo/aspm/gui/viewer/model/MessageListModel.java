@@ -86,10 +86,13 @@ public class MessageListModel extends AbstractListModel<Message> {
     }
 
     public synchronized void clear() {
+        int oldSize = getSize();
         head = 0;
         size = 0;
         incompleteMessage = null;
-        fireContentsChanged(this, 0, 0);
+        if (oldSize > 0) {
+            fireContentsChanged(this, 0, oldSize - 1);
+        }
     }
 
     public synchronized void forEach(Consumer<? super Message> action) {

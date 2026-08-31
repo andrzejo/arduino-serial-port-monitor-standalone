@@ -23,8 +23,8 @@ public class SerialMessageTypeResolver {
     public SerialMessageTypeResolver() {
         msgStylesPrefixes.put(SERIAL_DEBUG, Arrays.asList("I", "INFO"));
         msgStylesPrefixes.put(SERIAL_INFO, Arrays.asList("I", "INFO"));
-        msgStylesPrefixes.put(SERIAL_WARN, Arrays.asList("E", "ERROR", "ERR"));
-        msgStylesPrefixes.put(SERIAL_ERROR, Arrays.asList("W", "WARN"));
+        msgStylesPrefixes.put(SERIAL_ERROR, Arrays.asList("E", "ERROR", "ERR"));
+        msgStylesPrefixes.put(SERIAL_WARN, Arrays.asList("W", "WARN"));
     }
 
     public MessageType resolve(String text) {

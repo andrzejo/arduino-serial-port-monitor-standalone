@@ -8,7 +8,6 @@
 package pl.andrzejo.aspm.gui.viewer;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import pl.andrzejo.aspm.factory.BeanFactory;
 import pl.andrzejo.aspm.gui.viewer.model.Message;
 
@@ -19,6 +18,7 @@ import static pl.andrzejo.aspm.gui.viewer.model.MessageType.TIME;
 
 public class MessageCellRenderer extends JComponent implements ListCellRenderer<Message> {
     private final Styles styles = BeanFactory.instance(Styles.class);
+    private final DisplayData display = new DisplayData();
     private Message currentMessage;
     private boolean isSelected;
     private Color listBg, listSelectionBg, listSelectionFg;
@@ -43,6 +43,9 @@ public class MessageCellRenderer extends JComponent implements ListCellRenderer<
         this.listBg = list.getBackground();
         this.listSelectionBg = list.getSelectionBackground();
         this.listSelectionFg = list.getSelectionForeground();
+        if (entry != null) {
+            display.update(entry, renderTimestamp, escapeChars);
+        }
         return this;
     }
 
@@ -67,7 +70,6 @@ public class MessageCellRenderer extends JComponent implements ListCellRenderer<
 
         int width = getWidth();
         int height = getHeight();
-        DisplayData display = DisplayData.forMessage(currentMessage, renderTimestamp, escapeChars);
 
         g.setColor(isSelected ? listSelectionBg : listBg);
         g.fillRect(0, 0, width, height);
@@ -78,12 +80,17 @@ public class MessageCellRenderer extends JComponent implements ListCellRenderer<
 
         if (isSelected) {
             g.setColor(listSelectionFg);
-            String fullLine = display.fullLine();
-            g.drawString(fullLine, currentX, textY);
+            if (display.isWithTimestamp()) {
+                g.drawString(display.getTimestamp(), currentX, textY);
+                currentX += fm.stringWidth(display.getTimestamp());
+            }
+            g.drawString(display.getText(), currentX, textY);
             return;
         }
 
-        currentX += drawString(g, currentX, textY, styles.get(TIME), display.getTimestamp());
+        if (display.isWithTimestamp()) {
+            currentX += drawString(g, currentX, textY, styles.get(TIME), display.getTimestamp());
+        }
         drawString(g, currentX, textY, styles.get(currentMessage.getType()), display.getText());
     }
 
@@ -93,8 +100,7 @@ public class MessageCellRenderer extends JComponent implements ListCellRenderer<
             return new Dimension(100, 16);
         }
         FontMetrics fm = getFontMetrics(getFont());
-        DisplayData display = DisplayData.forMessage(currentMessage, renderTimestamp, escapeChars);
-        int width = fm.stringWidth(display.fullLine()) + 25;
+        int width = 5 + display.calculateWidth(fm) + 20;
         return new Dimension(width, fm.getHeight());
     }
 
@@ -129,25 +135,33 @@ public class MessageCellRenderer extends JComponent implements ListCellRenderer<
     }
 
     @Getter
-    @RequiredArgsConstructor
     private static class DisplayData {
-        private final String timestamp;
-        private final String text;
+        private String timestamp = "";
+        private String text = "";
+        private boolean withTimestamp = false;
 
-        public static DisplayData forMessage(Message msg, boolean renderTimestamp, boolean escape) {
-            String timestamp = renderTimestamp ? msg.getFormattedTimestamp() + " " : "";
-            return new DisplayData(timestamp, getTextToDisplay(msg, escape));
-        }
-
-        private static String getTextToDisplay(Message msg, boolean escape) {
-            if (msg.isInternal()) {
-                return msg.getText();
+        public void update(Message msg, boolean renderTimestamp, boolean escape) {
+            if (renderTimestamp) {
+                this.timestamp = msg.getFormattedTimestamp() + " ";
+                this.withTimestamp = true;
+            } else {
+                this.timestamp = "";
+                this.withTimestamp = false;
             }
-            return escape ? msg.getEscapedText() : msg.getText();
+
+            if (msg.isInternal()) {
+                this.text = msg.getText();
+            } else {
+                this.text = escape ? msg.getEscapedText() : msg.getText();
+            }
         }
 
-        public String fullLine() {
-            return timestamp + text;
+        public int calculateWidth(FontMetrics fm) {
+            int w = fm.stringWidth(text);
+            if (withTimestamp) {
+                w += fm.stringWidth(timestamp);
+            }
+            return w;
         }
     }
 }
