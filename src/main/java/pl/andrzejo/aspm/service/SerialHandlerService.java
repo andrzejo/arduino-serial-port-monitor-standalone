@@ -7,6 +7,8 @@
 
 package pl.andrzejo.aspm.service;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,45 +246,10 @@ public class SerialHandlerService {
         return new Status(openDeviceConfig, isOpen());
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public static class Status {
         private final DeviceConfig config;
         private final boolean isOpen;
-
-        public Status(DeviceConfig config, boolean isOpen) {
-            this.config = config;
-            this.isOpen = isOpen;
-        }
-
-        public DeviceConfig getConfig() {
-            return config;
-        }
-
-        public boolean isOpen() {
-            return isOpen;
-        }
-
-        public String toHumanReadableString() {
-            StringBuilder builder = new StringBuilder();
-            addLine(builder, "DeviceOpen", isOpen);
-            if (isOpen) {
-                addLine(builder, "Device", config.getDevice());
-                addLine(builder, "Baud", config.getBaud());
-                addLine(builder, "Parity", config.getParity());
-                addLine(builder, "DataBits", config.getDataBits());
-                addLine(builder, "StopBits", config.getStopBits());
-                addLine(builder, "DTR", config.isDTR());
-                addLine(builder, "RTS", config.isRTS());
-            }
-
-            return builder.toString();
-        }
-
-        private void addLine(StringBuilder builder, String label, Object value) {
-            builder
-                    .append(label)
-                    .append(": ")
-                    .append(value)
-                    .append("\n");
-        }
     }
 }

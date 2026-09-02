@@ -9,10 +9,10 @@ package pl.andrzejo.aspm.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+
 import java.lang.reflect.Type;
 
-public class Serialization {
+public class Serializer {
     private final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();

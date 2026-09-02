@@ -20,6 +20,7 @@ import pl.andrzejo.aspm.eventbus.events.gui.GetMonitorOutputEvent;
 import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 import pl.andrzejo.aspm.utils.OsInfo;
+import pl.andrzejo.aspm.utils.Serializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +36,12 @@ public class AppApiService {
     private final ApplicationEventBus eventBus;
     private final List<Endpoint> endpoints = new ArrayList<>();
     private final ApiIndex apiIndex;
+    private final Serializer serializer;
 
     public AppApiService() {
         apiIndex = instance(ApiIndex.class);
         eventBus = instance(ApplicationEventBus.class);
+        serializer = instance(Serializer.class);
     }
 
     public static String getRootEndpointAddress() {
@@ -148,12 +151,12 @@ public class AppApiService {
 
     private String handleStatus(Request request) {
         SerialHandlerService.Status status = instance(SerialHandlerService.class).getStatus();
-        return status.toHumanReadableString();
+        return serializer.serialize(status);
     }
 
     private String handleDevices(Request request) {
         List<String> list = instance(SerialPorts.class).getList();
-        return String.join("\n", list);
+        return serializer.serialize(list);
     }
 
     @Getter

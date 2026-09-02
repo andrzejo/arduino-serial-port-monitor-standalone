@@ -21,7 +21,7 @@ import pl.andrzejo.aspm.gui.setting.LineEndingSettingHandler;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.monitor.LineEndingSetting;
 import pl.andrzejo.aspm.utils.AppFiles;
-import pl.andrzejo.aspm.utils.Serialization;
+import pl.andrzejo.aspm.utils.Serializer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -60,11 +60,11 @@ public class SendCommandPanel extends ContentPanel {
     private final JButton delButton = new JButton("\uD83D\uDDD1");
     private final JButton upButton = new JButton("⇧");
     private final JButton downButton = new JButton("⇩");
-    private final Serialization serialization;
+    private final Serializer serialization;
     private CommandItem editedItem;
 
     public SendCommandPanel() {
-        serialization = instance(Serialization.class);
+        serialization = instance(Serializer.class);
         histFile = new File(AppFiles.getAppConfigDir(), "history.txt");
         cmdFile = new File(AppFiles.getAppConfigDir(), "commands.json");
         commandEdit.setEditable(true);
