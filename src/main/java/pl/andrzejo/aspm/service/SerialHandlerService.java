@@ -21,7 +21,7 @@ import pl.andrzejo.aspm.eventbus.events.device.*;
 import pl.andrzejo.aspm.eventbus.events.serial.SerialMessageReceivedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.factory.BeanFactory;
-import pl.andrzejo.aspm.serial.Serial;
+import pl.andrzejo.aspm.serial.Serial2;
 import pl.andrzejo.aspm.serial.SerialException;
 import pl.andrzejo.aspm.serial.SerialPorts;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingGetter;
@@ -32,7 +32,6 @@ import pl.andrzejo.aspm.settings.appsettings.items.monitor.AutoOpenSetting;
 import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -43,7 +42,7 @@ public class SerialHandlerService {
     private static final Logger logger = LoggerFactory.getLogger(SerialHandlerService.class);
     private final ApplicationEventBus eventBus;
     private final LastDeviceSetting lastDeviceSetting;
-    private Serial serial;
+    private Serial2 serial;
     private DeviceConfig config;
     private DeviceConfig openDeviceConfig;
     private boolean autoOpen;
@@ -68,7 +67,7 @@ public class SerialHandlerService {
     private void openSerial(DeviceConfig config) {
         try {
             logger.info("Open serial: {}", config);
-            serial = BeanFactory.newInstance(Serial.class, createSerial(config));
+            serial = BeanFactory.newInstance(Serial2.class, createSerial(config));
             openDeviceConfig = config;
             eventBus.post(new DeviceOpenEvent(config));
         } catch (Exception e) {
@@ -80,10 +79,10 @@ public class SerialHandlerService {
         }
     }
 
-    private Supplier<Serial> createSerial(DeviceConfig config) {
+    private Supplier<Serial2> createSerial(DeviceConfig config) {
         return () -> {
             try {
-                return new Serial(config.getDevice(), config.getBaud(), config.getParity(), config.getDataBits(), config.getStopBits(), config.isRTS(), config.isDTR()) {
+                return new Serial2(config) {
                     @Override
                     protected void message(char[] buff, int n) {
                         String msg = new String(buff);
