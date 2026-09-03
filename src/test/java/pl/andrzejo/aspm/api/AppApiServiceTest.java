@@ -23,7 +23,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +141,17 @@ class AppApiServiceTest {
         MethodDefinition definition = getMethodDefinition(Get, "/api/device/status");
 
         String response = invokeHandler(definition, null);
-        assertThat(response).isEqualTo("DeviceOpen: false\n");
+        assertThat(response).isEqualTo("{\n" +
+                "  \"config\": {\n" +
+                "    \"baud\": 0,\n" +
+                "    \"parity\": \"\\u0000\",\n" +
+                "    \"dataBits\": 0,\n" +
+                "    \"stopBits\": 0.0,\n" +
+                "    \"RTS\": false,\n" +
+                "    \"DTR\": false\n" +
+                "  },\n" +
+                "  \"isOpen\": false\n" +
+                "}");
     }
 
     @Test
@@ -160,21 +170,25 @@ class AppApiServiceTest {
         MethodDefinition definition = getMethodDefinition(Get, "/api/device/status");
 
         String response = invokeHandler(definition, null);
-        assertThat(response).isEqualTo("DeviceOpen: true\n" +
-                "Device: COM1\n" +
-                "Baud: 192000\n" +
-                "Parity: N\n" +
-                "DataBits: 0\n" +
-                "StopBits: 0.0\n" +
-                "DTR: false\n" +
-                "RTS: false\n");
+        assertThat(response).isEqualTo("{\n" +
+                "  \"config\": {\n" +
+                "    \"device\": \"COM1\",\n" +
+                "    \"baud\": 192000,\n" +
+                "    \"parity\": \"N\",\n" +
+                "    \"dataBits\": 0,\n" +
+                "    \"stopBits\": 0.0,\n" +
+                "    \"RTS\": false,\n" +
+                "    \"DTR\": false\n" +
+                "  },\n" +
+                "  \"isOpen\": true\n" +
+                "}");
     }
 
     @Test
     void shouldTestDevicesEndpoint() {
         //given
         SerialPorts ports = mock(SerialPorts.class);
-        when(ports.getList()).thenReturn(Arrays.asList("COM1", "COM3", "COM4"));
+        when(ports.getList()).thenReturn(Collections.singletonList(new SerialPorts.Port("COM1", "Some com port")));
         BeanFactory.overrideInstance(SerialPorts.class, ports);
 
         //when
@@ -184,7 +198,7 @@ class AppApiServiceTest {
         MethodDefinition definition = getMethodDefinition(Get, "/api/device/list");
 
         String response = invokeHandler(definition, null);
-        assertThat(response).isEqualTo("COM1\nCOM3\nCOM4");
+        assertThat(response).isEqualTo("{\n  \"COM1\": \"Some com port\"\n}");
     }
 
     @Test

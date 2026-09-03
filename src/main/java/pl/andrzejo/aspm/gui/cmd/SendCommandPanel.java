@@ -310,7 +310,8 @@ public class SendCommandPanel extends ContentPanel {
     private void addCommand(ActionEvent actionEvent) {
         CommandItem cmd = getCurrentCommand();
         if (isNotBlank(cmd.getCommand()) || isNotBlank(cmd.getDescription())) {
-            commandListModel.add(0, cmd);
+            int idx = commandList.getSelectedIndex();
+            commandListModel.add(idx + 1, cmd);
             saveCommands();
         }
         repaintList();

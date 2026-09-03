@@ -100,7 +100,7 @@ public class MessageCellRenderer extends JComponent implements ListCellRenderer<
             return new Dimension(100, 16);
         }
         FontMetrics fm = getFontMetrics(getFont());
-        int width = 5 + display.calculateWidth(fm) + 20;
+        int width = 5 + display.calculateWidth(fm) + 30;
         return new Dimension(width, fm.getHeight());
     }
 

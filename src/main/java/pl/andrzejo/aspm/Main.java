@@ -10,12 +10,13 @@ package pl.andrzejo.aspm;
 import com.formdev.flatlaf.FlatLightLaf;
 import pl.andrzejo.aspm.api.AppApiService;
 import pl.andrzejo.aspm.error.DefaultErrorHandler;
+import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
 import pl.andrzejo.aspm.gui.SerialPortMonitorForm;
 import pl.andrzejo.aspm.service.DeviceWatcherService;
 import pl.andrzejo.aspm.service.SerialHandlerService;
 
 import javax.swing.*;
-import java.awt.*;
 
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
@@ -38,6 +39,7 @@ public class Main {
 
         DefaultErrorHandler handler = new DefaultErrorHandler();
         Thread.setDefaultUncaughtExceptionHandler(handler);
+        instance(ApplicationEventBus.class).post(new ApplicationStartedEvent());
         System.out.println("---- APPLICATION STARTED ----");
         form.show();
     }

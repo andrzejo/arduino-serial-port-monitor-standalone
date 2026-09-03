@@ -8,16 +8,14 @@
 package pl.andrzejo.aspm.gui;
 
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.BusEvent;
-import pl.andrzejo.aspm.eventbus.impl.EventBus;
 import pl.andrzejo.aspm.settings.appsettings.AppSetting;
-import pl.andrzejo.aspm.settings.types.StringSetting;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.function.Consumer;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class ContentPanel extends JPanel {
@@ -60,9 +58,32 @@ public class ContentPanel extends JPanel {
         JPanel panel = new JPanel();
         GridLayout layout = new GridLayout(2, 1);
         panel.setLayout(layout);
-        panel.add(new JLabel(label));
+        panel.add(setComponentName(new JLabel(label), label));
         panel.add(component);
         return panel;
+    }
+
+    protected JComponent setComponentName(JComponent component, String text) {
+        if (component != null) {
+            String prefix = component.getClass().getSimpleName();
+            if (component instanceof JLabel) {
+                prefix = "lbl_";
+            }
+            if (component instanceof JComboBox) {
+                prefix = "combo_";
+            }
+            if (component instanceof JCheckBox) {
+                prefix = "cb_";
+            }
+            String name = prefix + text
+                    .replaceAll("\\W", "_")
+                    .replaceAll("_+$", "")
+                    .toLowerCase();
+            if (isNotBlank(name)) {
+                component.setName(name);
+            }
+        }
+        return component;
     }
 
     protected void setComboItems(JComboBox<String> combo, String[] items) {

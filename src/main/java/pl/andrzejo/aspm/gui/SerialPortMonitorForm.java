@@ -11,7 +11,6 @@ import pl.andrzejo.aspm.App;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationClosingEvent;
-import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.command.CommandExecutedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceErrorEvent;
@@ -88,8 +87,6 @@ public class SerialPortMonitorForm {
         mainFrame.setAlwaysOnTop(alwaysOnTop.get());
 
         MainWindowContainer.setMainWindowComponent(mainFrame);
-        eventBus.post(new ApplicationStartedEvent());
-
         Runtime.getRuntime().addShutdownHook(new Thread(this::applicationOnExitCleanup, "Shutdown-Hook-Thread"));
     }
 

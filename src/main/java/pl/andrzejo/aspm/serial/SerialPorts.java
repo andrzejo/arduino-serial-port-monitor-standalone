@@ -7,15 +7,28 @@
 
 package pl.andrzejo.aspm.serial;
 
-import jssc.SerialPortList;
+
+import com.fazecast.jSerialComm.SerialPort;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SerialPorts {
 
-    public List<String> getList() {
-        return Arrays.asList(SerialPortList.getPortNames());
+    public List<Port> getList() {
+        return Arrays.stream(SerialPort.getCommPorts())
+                .map(p -> new Port(p.getSystemPortPath(), p.getDescriptivePortName()))
+                .collect(Collectors.toList());
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class Port {
+        private final String name;
+        private final String desc;
     }
 
 }

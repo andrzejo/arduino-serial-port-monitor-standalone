@@ -2,7 +2,7 @@
  * Arduino Serial Port Monitor - Standalone (https://github.com/andrzejo/arduino-serial-port-monitor-standalone)
  * This is free software (GPL v.2).
  *
- * Copyright (c) Andrzej Oczkowicz 2022.
+ * Copyright (c) Andrzej Oczkowicz 2026.
  */
 
 package pl.andrzejo.aspm.service;
@@ -14,33 +14,36 @@ import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceDescriptionEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceListChangedEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
-import pl.andrzejo.aspm.serial.PortDescriptionFetcher;
 import pl.andrzejo.aspm.serial.SerialPorts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class DeviceWatcherService {
     private static final Logger logger = LoggerFactory.getLogger(DeviceWatcherService.class);
     private final ScheduledExecutorService watcherExecutor;
-    private final ExecutorService descProviderExecutor;
     private final ApplicationEventBus eventBus;
     private final List<String> lastDevices = new ArrayList<>();
     private final Map<String, String> lastDesc = new HashMap<>();
-    private final PortDescriptionFetcher descriptionFetcher;
-    private Future<?> descFetcherFuture;
+    private final SerialPorts serialPorts;
 
     private DeviceWatcherService() {
-        watcherExecutor = Executors.newSingleThreadScheduledExecutor();
-        descProviderExecutor = Executors.newSingleThreadExecutor();
+        watcherExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "DeviceWatcher-Thread");
+            t.setDaemon(true);
+            return t;
+        });
+        serialPorts = instance(SerialPorts.class);
         eventBus = instance(ApplicationEventBus.class);
         eventBus.register(this);
-        descriptionFetcher = new PortDescriptionFetcher();
     }
 
     public void start() {
@@ -49,46 +52,35 @@ public class DeviceWatcherService {
 
     public void checkDevices() {
         try {
-            List<String> newDevices = instance(SerialPorts.class).getList();
+            List<SerialPorts.Port> ports = serialPorts.getList();
+            List<String> newDevices = ports.stream()
+                    .map(SerialPorts.Port::getName)
+                    .collect(Collectors.toList());
+
             if (!lastDevices.equals(newDevices)) {
                 logger.info("TTY devices list changed: {} -> {} ", lastDevices, newDevices);
-                setNewDevices(newDevices);
-                fetchDeviceDescriptions(newDevices);
-                triggerEvent();
+                lastDevices.clear();
+                lastDevices.addAll(newDevices);
+
+                Map<String, String> desc = new HashMap<>();
+                for (SerialPorts.Port p : ports) {
+                    desc.put(p.getName(), p.getDesc());
+                }
+
+                lastDesc.clear();
+                lastDesc.putAll(desc);
+
+                eventBus.post(new DeviceDescriptionEvent(lastDesc));
+                eventBus.post(new DeviceListChangedEvent(lastDevices));
             }
         } catch (Exception e) {
             logger.error("checkDevices error", e);
         }
     }
 
-    private void fetchDeviceDescriptions(List<String> newDevices) {
-        if (descFetcherFuture != null) {
-            descFetcherFuture.cancel(true);
-        }
-        descFetcherFuture = descProviderExecutor.submit(() -> {
-            Map<String, String> desc = descriptionFetcher.fetch(newDevices);
-            if (!lastDesc.equals(desc)) {
-                logger.info("TTY device desc changed: {} -> {} ", lastDesc, desc);
-                lastDesc.clear();
-                lastDesc.putAll(desc);
-                eventBus.post(new DeviceDescriptionEvent(lastDesc));
-            }
-        });
-    }
-
-    private void setNewDevices(List<String> newDevices) {
-        lastDevices.clear();
-        lastDevices.addAll(newDevices);
-    }
-
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(ApplicationStartedEvent event) {
-        triggerEvent();
+        checkDevices();
     }
-
-    private void triggerEvent() {
-        eventBus.post(new DeviceListChangedEvent(lastDevices));
-    }
-
 }

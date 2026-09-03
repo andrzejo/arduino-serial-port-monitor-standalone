@@ -17,7 +17,7 @@ public class BaudSettingHandler extends ListSettingHandler<DeviceConfig, Integer
     protected static Integer[] serialRates = {300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 1000000, 2000000};
 
     public BaudSettingHandler(TtyDeviceSetting setting, DeviceConfig config, DeviceConfig defValue) {
-        super(setting, config, config::setBaud, config::getBaud, defValue.getBaud(), false);
+        super(setting, config, config::setBaud, config::getBaud, defValue.getBaud(), true);
     }
 
     @Override

@@ -20,6 +20,7 @@ import pl.andrzejo.aspm.gui.OutputLogger;
 import pl.andrzejo.aspm.gui.viewer.model.Message;
 import pl.andrzejo.aspm.gui.viewer.model.MessageListModel;
 import pl.andrzejo.aspm.gui.viewer.model.MessageType;
+import pl.andrzejo.aspm.settings.appsettings.AppSettingGetter;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.*;
 
@@ -51,14 +52,16 @@ public class MessagesViewer {
     private final ConcurrentLinkedQueue<Message> directMessageQueue = new ConcurrentLinkedQueue<>();
     private final StringBuilder parseBuffer = new StringBuilder(4096);
     private final OutputLogger outputLogger;
+    private final Boolean renderTimestamps = AppSettingGetter.get(AddTimestampSetting.class);
+    private final Boolean escapeChars = AppSettingGetter.get(EscapeCharsSetting.class);
     private Instant lineStartTimestamp = null;
     private boolean isAutoScroll = get(AutoscrollSetting.class);
 
     public MessagesViewer(OutputLogger outputLogger) {
         this.outputLogger = outputLogger;
         cellRenderer = new MessageCellRenderer();
-        cellRenderer.renderTimestamp(get(AddTimestampSetting.class));
-        cellRenderer.escapeChars(get(EscapeCharsSetting.class));
+        cellRenderer.renderTimestamp(renderTimestamps);
+        cellRenderer.escapeChars(escapeChars);
 
         messagesList.setCellRenderer(cellRenderer);
         messagesList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -239,7 +242,11 @@ public class MessagesViewer {
         }
 
         String text = selected.stream()
-                .map(message -> message.getText().trim())
+                .map(message -> {
+                    String stmp = renderTimestamps ? message.getFormattedTimestamp() + " " : "";
+                    String msg = escapeChars ? message.getEscapedText() : message.getText();
+                    return stmp + msg;
+                })
                 .collect(Collectors.joining(System.lineSeparator()));
 
         Toolkit.getDefaultToolkit()

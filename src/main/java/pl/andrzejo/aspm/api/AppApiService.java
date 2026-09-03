@@ -23,7 +23,9 @@ import pl.andrzejo.aspm.utils.OsInfo;
 import pl.andrzejo.aspm.utils.Serializer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -155,8 +157,10 @@ public class AppApiService {
     }
 
     private String handleDevices(Request request) {
-        List<String> list = instance(SerialPorts.class).getList();
-        return serializer.serialize(list);
+        List<SerialPorts.Port> list = instance(SerialPorts.class).getList();
+        Map<String, String> desc = new HashMap<>();
+        list.forEach(p -> desc.put(p.getName(), p.getDesc()));
+        return serializer.serialize(desc);
     }
 
     @Getter

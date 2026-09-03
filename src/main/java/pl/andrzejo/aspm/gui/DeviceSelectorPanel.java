@@ -183,7 +183,7 @@ public class DeviceSelectorPanel extends ContentPanel {
 
     private void setupComboBoxSetting(String label, JPanel settingPanel, ListSettingHandler<?, ?> handler) {
         JComboBox<String> combo = new JComboBox<>();
-        setPreferredWidthSize(combo);
+        setPreferredWidthSize(setComponentName(combo, label));
         JPanel panel = createLabeled(label, combo);
         settingPanel.add(panel);
         handler.setupComponent(combo);

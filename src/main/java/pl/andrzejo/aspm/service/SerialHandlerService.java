@@ -36,6 +36,7 @@ import pl.andrzejo.aspm.settings.types.DeviceConfig;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
@@ -169,8 +170,11 @@ public class SerialHandlerService {
     }
 
     private boolean isValidDevice(String device) {
-        List<String> devices = instance(SerialPorts.class).getList();
-        return devices.contains(device);
+        List<SerialPorts.Port> devices = instance(SerialPorts.class).getList();
+        return devices.stream()
+                .map(SerialPorts.Port::getName)
+                .collect(Collectors.toList())
+                .contains(device);
     }
 
     private boolean isValidDevice() {
