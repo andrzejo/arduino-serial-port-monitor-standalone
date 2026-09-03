@@ -34,6 +34,17 @@ public class ApplicationEventBus {
         return eventBus.triggerAndWaitForResults(msg);
     }
 
+    public <T> T postForSingleResult(BusEvent msg) {
+        List<Object> results = eventBus.triggerAndWaitForResults(msg);
+        if (results.size() > 1) {
+            throw new IllegalStateException("More than one result returned for " + msg.getClass().getSimpleName());
+        }
+        if (results.isEmpty()) {
+            return null;
+        }
+        return (T) results.get(0);
+    }
+
     public void post(AppSetting<?> msg) {
         eventBus.trigger(msg);
     }

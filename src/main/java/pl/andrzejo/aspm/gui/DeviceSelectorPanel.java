@@ -115,7 +115,7 @@ public class DeviceSelectorPanel extends ContentPanel {
     }
 
     private void setDeviceStatus(boolean isOpen) {
-        String path = isOpen ? "images/controller-on.png" : "images/controller-off.png";
+        String path = isOpen ? "html/images/controller-on.png" : "html/images/controller-off.png";
         String label = isOpen ? "OPEN" : "CLOSED";
         String hint = isOpen ? "Device is open" : "Device is closed";
         String buttonAction = isOpen ? "Close" : "Open";

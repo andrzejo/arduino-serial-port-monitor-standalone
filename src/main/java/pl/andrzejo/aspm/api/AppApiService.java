@@ -9,41 +9,31 @@ package pl.andrzejo.aspm.api;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.BooleanUtils;
+import pl.andrzejo.aspm.api.endpoints.*;
+import pl.andrzejo.aspm.api.handler.AbstractApiHandler;
+import pl.andrzejo.aspm.api.handler.ApiEndpoint;
+import pl.andrzejo.aspm.api.handler.MethodInvoker;
+import pl.andrzejo.aspm.api.server.SimpleHttpServer;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
-import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiExecuteCommand;
-import pl.andrzejo.aspm.eventbus.events.api.commands.ApiOpenDeviceEvent;
-import pl.andrzejo.aspm.eventbus.events.gui.BringWindowToTopEvent;
-import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
-import pl.andrzejo.aspm.eventbus.events.gui.GetMonitorOutputEvent;
-import pl.andrzejo.aspm.serial.SerialPorts;
-import pl.andrzejo.aspm.service.SerialHandlerService;
-import pl.andrzejo.aspm.utils.OsInfo;
-import pl.andrzejo.aspm.utils.Serializer;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang.StringUtils.contains;
-import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
-import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
+import static org.apache.commons.lang.StringUtils.*;
+import static pl.andrzejo.aspm.api.server.SimpleHttpServer.Method.Post;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class AppApiService {
     private final ApplicationEventBus eventBus;
     private final List<Endpoint> endpoints = new ArrayList<>();
-    private final ApiIndex apiIndex;
-    private final Serializer serializer;
 
     public AppApiService() {
-        apiIndex = instance(ApiIndex.class);
         eventBus = instance(ApplicationEventBus.class);
-        serializer = instance(Serializer.class);
     }
 
     public static String getRootEndpointAddress() {
@@ -52,179 +42,104 @@ public class AppApiService {
 
     public void start() {
         SimpleHttpServer server = instance(SimpleHttpServer.class);
-        builder()
-                .method(Post)
-                .path("/api/device/open")
-                .handler(this::handleOpen)
-                .description("Open device. Specify device in request body. If device is not specified opens first selected.")
-                .bodyExample(getBodyExample())
-                .build(server);
-
-        builder()
-                .method(Post)
-                .path("/api/device/close")
-                .handler(this::handleClose)
-                .description("Close device.")
-                .build(server);
-
-        builder()
-                .method(Get)
-                .path("/api/device/status")
-                .handler(this::handleStatus)
-                .description("Get device status.")
-                .build(server);
-
-        builder()
-                .method(Get)
-                .path("/api/device/list")
-                .handler(this::handleDevices)
-                .description("Get available devices.")
-                .build(server);
-
-        builder()
-                .method(Get)
-                .path("/api/window/focus")
-                .handler(this::handleWindowFocus)
-                .description("Bring app window to top.")
-                .build(server);
-
-        builder()
-                .method(Post)
-                .path("/api/monitor/clear")
-                .handler(this::handleMonitorOutputClear)
-                .description("Clear monitor output.")
-                .build(server);
-
-        builder()
-                .method(Get)
-                .path("/api/monitor/output")
-                .handler(this::handleGetMonitorOutput)
-                .description("Get monitor output.")
-                .queryParams("with_messages")
-                .build(server);
-
-        builder()
-                .method(Get)
-                .handler(this::handleRoot)
-                .description("Get endpoints.")
-                .build(server);
+        server.handleResources();
+        run(server,
+                new DeviceApi(),
+                new WindowApi(),
+                new MonitorApi(),
+                new CmdApi(),
+                new RootApi(endpoints)
+        );
     }
 
-    private Builder builder() {
-        return new Builder();
-    }
-
-    private static String getBodyExample() {
-        if (OsInfo.CurrentOs == OsInfo.OsName.Windows) {
-            return "COM1";
+    private void run(SimpleHttpServer server, AbstractApiHandler... apis) {
+        for (AbstractApiHandler api : apis) {
+            try {
+                List<Endpoint> handlers = getEndpoints(api);
+                handlers.forEach(h -> {
+                    endpoints.add(h);
+                    MethodInvoker invoker = new MethodInvoker(api, h.getHandlerMethod());
+                    server.addEndpoint(h.getMethod(), h.getPath(), (request) -> {
+                        if (h.getMethod() == Post) {
+                            eventBus.post(new ApiExecuteCommand(h.getPath(), request.getBody()));
+                        }
+                        return invoker.invoke(request);
+                    });
+                });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
-        return "/dev/ttyUSB0";
     }
 
-    private String handleRoot(Request request) {
-        return apiIndex.getHtml(endpoints);
+    private List<Endpoint> getEndpoints(AbstractApiHandler instance) {
+        String basepath = handlerBasePath(instance);
+        return Arrays.stream(instance.getClass().getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(ApiEndpoint.class))
+                .filter(m -> {
+                    Class<?>[] types = m.getParameterTypes();
+                    if (types.length == 0) {
+                        return true;
+                    }
+                    if (types[0].equals(Request.class)) {
+                        return true;
+                    }
+                    return types.length == 1;
+                })
+                .filter(m -> {
+                    Class<?> returnType = m.getReturnType();
+                    return returnType.equals(String.class) || returnType.equals(void.class);
+                })
+                .map(m -> {
+                    ApiEndpoint annotation = m.getAnnotation(ApiEndpoint.class);
+                    return Endpoint.fromAnnotation(basepath, m, annotation);
+                })
+                .sorted(Comparator.comparingInt(c -> c.getDescription().getOrder()))
+                .collect(Collectors.toList());
+
     }
 
-    private String handleMonitorOutputClear(Request request) {
-        eventBus.post(new ClearMonitorOutputEvent());
-        return null;
+    private String handlerBasePath(AbstractApiHandler instance) {
+        String basePath = instance.getBasePath();
+        if (isNotBlank(basePath)) {
+            return basePath;
+        }
+        return instance.getClass().getSimpleName().toLowerCase().replace("api", "");
     }
 
-    private String handleGetMonitorOutput(Request request) {
-        boolean withMessages = contains(request.getRequestURI().getQuery(), "with_messages");
-        List<Object> objects = eventBus.postForResult(new GetMonitorOutputEvent(withMessages));
-        return objects.stream().map(Object::toString).collect(Collectors.joining());
-    }
-
-    private String handleWindowFocus(Request request) {
-        eventBus.post(new BringWindowToTopEvent(BooleanUtils.toBoolean(request.getBody())));
-        return null;
-    }
-
-    private String handleClose(Request request) {
-        eventBus.post(new ApiCloseDeviceEvent());
-        return null;
-    }
-
-    private String handleOpen(Request request) {
-        eventBus.post(new ApiOpenDeviceEvent(request.getBody()));
-        return null;
-    }
-
-    private String handleStatus(Request request) {
-        SerialHandlerService.Status status = instance(SerialHandlerService.class).getStatus();
-        return serializer.serialize(status);
-    }
-
-    private String handleDevices(Request request) {
-        List<SerialPorts.Port> list = instance(SerialPorts.class).getList();
-        Map<String, String> desc = new HashMap<>();
-        list.forEach(p -> desc.put(p.getName(), p.getDesc()));
-        return serializer.serialize(desc);
+    private static String fullApiPath(String path, String path1) {
+        path = strip(trimToEmpty(path), "/");
+        path1 = strip(trimToEmpty(path1), "/");
+        if (path.isEmpty() && path1.isEmpty()) {
+            return "/";
+        }
+        return "/api/" + path + "/" + path1;
     }
 
     @Getter
     @RequiredArgsConstructor
     public static class EndpointDescription {
+        private final String group;
         private final String desc;
         private final String bodyExample;
         private final String queryParams;
+        private final int order;
     }
 
     @Getter
     @RequiredArgsConstructor
     public static class Endpoint {
+        private final Method handlerMethod;
         private final SimpleHttpServer.Method method;
         private final String path;
         private final EndpointDescription description;
-    }
 
-    private class Builder {
-        private String path;
-        private SimpleHttpServer.Method method;
-        private String description;
-        private String bodyExample;
-        private String queryParams;
-        private Function<Request, String> handler;
-
-        public Builder path(String path) {
-            this.path = path;
-            return this;
-        }
-
-        public Builder method(SimpleHttpServer.Method method) {
-            this.method = method;
-            return this;
-        }
-
-        public Builder handler(Function<Request, String> handler) {
-            this.handler = handler;
-            return this;
-        }
-
-        public Builder description(String description) {
-            this.description = description;
-            return this;
-        }
-
-        public Builder bodyExample(String bodyExample) {
-            this.bodyExample = bodyExample;
-            return this;
-        }
-
-        public Builder queryParams(String queryParams) {
-            this.queryParams = queryParams;
-            return this;
-        }
-
-        public void build(SimpleHttpServer server) {
-            endpoints.add(new Endpoint(method, path, new EndpointDescription(description, bodyExample, queryParams)));
-            server.addEndpoint(method, path, (request) -> {
-                if (method == Post) {
-                    eventBus.post(new ApiExecuteCommand(path, request.getBody()));
-                }
-                return handler.apply(request);
-            });
+        public static Endpoint fromAnnotation(String basepath, Method handler, ApiEndpoint annotation) {
+            String pathSuffix = isBlank(annotation.path()) ? handler.getName() : annotation.path();
+            String path = fullApiPath(basepath, pathSuffix);
+            EndpointDescription description = new EndpointDescription(basepath, annotation.description(),
+                    annotation.bodyExample(), annotation.queryParams(), annotation.order());
+            return new Endpoint(handler, annotation.method(), path, description);
         }
     }
 }

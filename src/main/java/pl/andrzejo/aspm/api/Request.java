@@ -9,6 +9,7 @@ package pl.andrzejo.aspm.api;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import pl.andrzejo.aspm.api.server.SimpleHttpServer;
 
 import java.net.URI;
 

@@ -55,9 +55,9 @@ public class SerialPortMonitorForm {
         eventBus.register(this);
 
         mainFrame = new JFrame(App.Name);
-        mainFrame.setIconImage(Images.fromResource("images/icon.png"));
+        mainFrame.setIconImage(Images.fromResource("html/images/icon.png"));
         DeviceSelectorPanel deviceSelector = new DeviceSelectorPanel();
-        SendCommandPanel sendCommandPanel = new SendCommandPanel();
+        SendCommandPanel sendCommandPanel = instance(SendCommandPanel.class);
 
         viewer = new MessagesViewer(BeanFactory.instance(OutputLogger.class));
 
@@ -82,7 +82,10 @@ public class SerialPortMonitorForm {
         Rectangle r = sizeSetting.get();
         mainFrame.setBounds(r);
         mainFrame.addComponentListener(handleMoved(e -> sizeSetting.set(mainFrame.getBounds())));
-        mainFrame.addWindowListener(handleWindowClosed((e) -> applicationOnExitCleanup()));
+        mainFrame.addWindowListener(handleWindowClosed((e) -> {
+            applicationOnExitCleanup();
+            System.exit(0);
+        }));
 
         mainFrame.setAlwaysOnTop(alwaysOnTop.get());
 
@@ -94,7 +97,6 @@ public class SerialPortMonitorForm {
         if (isCleanedUp.compareAndSet(false, true)) {
             instance(ApplicationEventBus.class).post(new ApplicationClosingEvent());
             mainFrame.dispose();
-            System.exit(0);
         }
     }
 
@@ -221,7 +223,6 @@ public class SerialPortMonitorForm {
     public void handleEvent(WindowAlwaysOnTopEvent event) {
         invokeLater(() -> mainFrame.setAlwaysOnTop(event.isAlwaysOnTop()));
     }
-
 
     public void show() {
         mainFrame.setVisible(true);

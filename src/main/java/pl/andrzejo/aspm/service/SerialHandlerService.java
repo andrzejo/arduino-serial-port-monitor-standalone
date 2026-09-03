@@ -250,6 +250,10 @@ public class SerialHandlerService {
         return new Status(openDeviceConfig, isOpen());
     }
 
+    public List<SerialPorts.Port> getDevices() {
+        return instance(SerialPorts.class).getList();
+    }
+
     @Getter
     @RequiredArgsConstructor
     public static class Status {

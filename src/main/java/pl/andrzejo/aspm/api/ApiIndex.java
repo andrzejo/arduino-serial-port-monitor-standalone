@@ -8,28 +8,27 @@
 package pl.andrzejo.aspm.api;
 
 import pl.andrzejo.aspm.App;
+import pl.andrzejo.aspm.api.server.SimpleHttpServer;
 import pl.andrzejo.aspm.utils.AppFiles;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.trimToEmpty;
 import static org.apache.commons.lang.text.StrSubstitutor.replace;
+import static pl.andrzejo.aspm.utils.MapUtil.map;
 
 public class ApiIndex {
     private static final Map<SimpleHttpServer.Method, String> templates = new HashMap<>();
 
     static {
-        templates.put(SimpleHttpServer.Method.Get, AppFiles.readResources("api/method.get.html"));
-        templates.put(SimpleHttpServer.Method.Post, AppFiles.readResources("api/method.post.html"));
+        templates.put(SimpleHttpServer.Method.Get, AppFiles.readResources("html/api/method.get.html"));
+        templates.put(SimpleHttpServer.Method.Post, AppFiles.readResources("html/api/method.post.html"));
     }
 
     public String getHtml(List<AppApiService.Endpoint> endpoints) {
-        String html = AppFiles.readResources("api/index.html");
+        String html = AppFiles.readResources("html/api/index.html");
         String endpointsHtml = getEndpointsHtml(endpoints);
         Map<String, String> map = new HashMap<>();
         map.put("APP", App.Name);
@@ -42,7 +41,28 @@ public class ApiIndex {
     }
 
     private String getEndpointsHtml(List<AppApiService.Endpoint> endpoints) {
-        return endpoints.stream().map(this::getEndpointHtml).collect(Collectors.joining());
+        final String groupHtml = AppFiles.readResources("html/api/group.html");
+        Map<String, List<AppApiService.Endpoint>> grouped = groupEndpoints(endpoints);
+
+        StringBuilder allHtml = new StringBuilder();
+
+        grouped.forEach((group, methods) -> {
+            String epHtml = methods.stream().map(this::getEndpointHtml).collect(Collectors.joining());
+            String html = replace(groupHtml, map("TITLE", group, "ENDPOINTS", epHtml));
+            allHtml.append(html).append("\n");
+        });
+
+        return allHtml.toString();
+    }
+
+    private static Map<String, List<AppApiService.Endpoint>> groupEndpoints(List<AppApiService.Endpoint> endpoints) {
+        Map<String, List<AppApiService.Endpoint>> grouped = new LinkedHashMap<>();
+        for (AppApiService.Endpoint endpoint : endpoints) {
+            String group = endpoint.getDescription().getGroup();
+            String displayGroup = group.equals("/") ? "ROOT" : group;
+            grouped.computeIfAbsent(displayGroup, k -> new ArrayList<>()).add(endpoint);
+        }
+        return grouped;
     }
 
     private String getEndpointHtml(AppApiService.Endpoint endpoint) {
@@ -61,7 +81,7 @@ public class ApiIndex {
         map.put("DESC", trimToEmpty(description.getDesc()));
         map.put("QUERY", trimToEmpty(description.getQueryParams()));
         String curl = "curl -X " + endpoint.getMethod().name().toUpperCase() + " " + href;
-        if (endpoint.getMethod() != SimpleHttpServer.Method.Get && description.getBodyExample() != null) {
+        if (endpoint.getMethod() != SimpleHttpServer.Method.Get && isNotBlank(description.getBodyExample())) {
             curl += String.format(" -d '%s' ", description.getBodyExample());
         }
         map.put("CMD", curl);

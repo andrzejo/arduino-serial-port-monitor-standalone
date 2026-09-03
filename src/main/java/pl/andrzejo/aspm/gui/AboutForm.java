@@ -76,7 +76,7 @@ public class AboutForm extends JDialog {
     }
 
     private JPanel iconPanel() {
-        ImageIcon icon = new ImageIcon(Images.fromResource("images/big.png"));
+        ImageIcon icon = new ImageIcon(Images.fromResource("html/images/big.png"));
         JPanel panel = new JPanel();
         JLabel label = new JLabel(App.Name);
         label.setHorizontalAlignment(JLabel.CENTER);

@@ -13,6 +13,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.andrzejo.aspm.api.server.SimpleHttpServer;
 import pl.andrzejo.aspm.factory.BeanFactory;
 
 import java.io.ByteArrayInputStream;
@@ -25,8 +26,8 @@ import java.util.concurrent.Executor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
-import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
+import static pl.andrzejo.aspm.api.server.SimpleHttpServer.Method.Get;
+import static pl.andrzejo.aspm.api.server.SimpleHttpServer.Method.Post;
 
 class SimpleHttpServerTest {
 

@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
+import pl.andrzejo.aspm.eventbus.events.api.cmd.ApiExecuteCommandEvent;
 import pl.andrzejo.aspm.eventbus.events.command.ExecuteCommandEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceCloseEvent;
 import pl.andrzejo.aspm.eventbus.events.device.DeviceOpenEvent;
@@ -48,10 +49,9 @@ public class SendCommandPanel extends ContentPanel {
     private final File histFile;
     private final File cmdFile;
     private final LineEndingSetting lineEndingSetting;
-    private final DefaultListModel<CommandItem> commandListModel = new DefaultListModel<>();
-    private final JList<CommandItem> commandList = new JList<>(commandListModel);
+    private final DefaultListModel<CommandItem> commandListModel;
+    private final JList<CommandItem> commandList;
     private final CommandItemRenderer cellRenderer = new CommandItemRenderer();
-    private final JComboBox<String> lineEndingComboBox = new JComboBox<>();
     private final JComboBox<String> commandEdit = new JComboBox<>();
     private final JTextField descriptionField = new JTextField();
     private final JButton sendBtn = new JButton("Send");
@@ -67,7 +67,10 @@ public class SendCommandPanel extends ContentPanel {
         serialization = instance(Serializer.class);
         histFile = new File(AppFiles.getAppConfigDir(), "history.txt");
         cmdFile = new File(AppFiles.getAppConfigDir(), "commands.json");
+        commandListModel = instance(DefaultListModel.class);
+        commandList = new JList<>(commandListModel);
         commandEdit.setEditable(true);
+        JComboBox<String> lineEndingComboBox = new JComboBox<>();
         setPreferredWidthSize(lineEndingComboBox);
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(5, 10, 0, 10));
@@ -414,6 +417,14 @@ public class SendCommandPanel extends ContentPanel {
     @SuppressWarnings("unused")
     public void handleEvent(DeviceOpenEvent event) {
         toggleEnabled(true);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleEvent(ApiExecuteCommandEvent event) {
+        String lineEnding = getLineEnding();
+        CommandItem cmd = new CommandItem(event.getCommand(), "API command");
+        instance(ApplicationEventBus.class).post(new ExecuteCommandEvent(cmd, lineEnding));
     }
 
     private void toggleEnabled(boolean enabled) {

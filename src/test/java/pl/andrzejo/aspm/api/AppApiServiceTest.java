@@ -8,9 +8,12 @@
 package pl.andrzejo.aspm.api;
 
 import com.sun.net.httpserver.HttpServer;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import pl.andrzejo.aspm.api.server.SimpleHttpServer;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.BusEvent;
 import pl.andrzejo.aspm.eventbus.events.api.commands.ApiCloseDeviceEvent;
@@ -35,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Get;
-import static pl.andrzejo.aspm.api.SimpleHttpServer.Method.Post;
+import static pl.andrzejo.aspm.api.server.SimpleHttpServer.Method.Get;
+import static pl.andrzejo.aspm.api.server.SimpleHttpServer.Method.Post;
 
 class AppApiServiceTest {
     private ApplicationEventBus bus;
@@ -209,7 +212,7 @@ class AppApiServiceTest {
         service.start();
 
         //then
-        MethodDefinition definition = getMethodDefinition(Get, null);
+        MethodDefinition definition = getMethodDefinition(Get, "/");
 
         String response = invokeHandler(definition, null);
         assertThat(response).isEqualTo("API INDEX");
@@ -220,7 +223,7 @@ class AppApiServiceTest {
         ArgumentCaptor<List<AppApiService.Endpoint>> captor = ArgumentCaptor.forClass(listClass);
         verify(apiIndex).getHtml(captor.capture());
         List<AppApiService.Endpoint> list = captor.getValue();
-        assertThat(list).hasSize(8);
+        assertThat(list).hasSize(10);
     }
 
     @Test
@@ -249,6 +252,7 @@ class AppApiServiceTest {
         return definition.getHandler().apply(request);
     }
 
+    @Getter
     static class SimpleHttpServerTesting extends SimpleHttpServer {
         private final Map<String, MethodDefinition> methods = new HashMap<>();
 
@@ -257,32 +261,13 @@ class AppApiServiceTest {
             methods.put(name, new MethodDefinition(method, name, handler));
         }
 
-        public Map<String, MethodDefinition> getMethods() {
-            return methods;
-        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     static class MethodDefinition {
         private final SimpleHttpServer.Method method;
         private final String name;
         private final Function<Request, String> handler;
-
-        MethodDefinition(SimpleHttpServer.Method method, String name, Function<Request, String> handler) {
-            this.method = method;
-            this.name = name;
-            this.handler = handler;
-        }
-
-        public SimpleHttpServer.Method getMethod() {
-            return method;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Function<Request, String> getHandler() {
-            return handler;
-        }
     }
 }

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="128x128" href="/html/images/big.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/html/images/icon.png">
+    <link rel="stylesheet" href="/html/api/api.css">
+    <title>${APP} - API Docs</title>
+</head>
+<body>
+<div class="main">
+    <div class="page-header">
+        <img class="app-logo" src="/html/images/big.png" alt="">
+        <h2>
+            <span>${APP} - ${VERSION}</span>
+            <span class="app-version">build: ${VERSION_DATE}</span>
+        </h2>
+    </div>
+
+    <h3>API Endpoints</h3>
+
+    <div class="content">
+        <div class="header">
+            <div class="method">Method</div>
+            <div class="path">Path</div>
+            <div class="desc">Description</div>
+            <div class="query">Query params</div>
+            <!--            <div class="curl">Curl command</div>-->
+        </div>
+        <div class="groups">
+            ${ENDPOINTS}
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div>Copyright © Andrzej Oczkowicz ${BUILD_YEAR}</div>
+    <div><a href="${URL}" target="_blank" rel="noopener noreferrer">${URL}</a></div>
+</div>
+</body>
+</html>

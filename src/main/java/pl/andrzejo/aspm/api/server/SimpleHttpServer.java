@@ -2,10 +2,10 @@
  * Arduino Serial Port Monitor - Standalone (https://github.com/andrzejo/arduino-serial-port-monitor-standalone)
  * This is free software (GPL v.2).
  *
- * Copyright (c) Andrzej Oczkowicz 2022.
+ * Copyright (c) Andrzej Oczkowicz 2026.
  */
 
-package pl.andrzejo.aspm.api;
+package pl.andrzejo.aspm.api.server;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -13,9 +13,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.andrzejo.aspm.api.Request;
 import pl.andrzejo.aspm.factory.BeanFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -77,6 +79,38 @@ public class SimpleHttpServer {
                 sendResponse(exchange, 500, "Request failed");
             }
         });
+    }
+
+    public void handleResources() {
+        if (server == null) {
+            return;
+        }
+        server.createContext("/html/", exchange -> {
+            String path = exchange.getRequestURI().getPath();
+            String resourcePath = path.substring(1);
+
+            if (resourcePath.isEmpty() || resourcePath.contains("..")) {
+                notFound(exchange);
+                return;
+            }
+
+            try (InputStream is = SimpleHttpServer.class.getClassLoader().getResourceAsStream(resourcePath)) {
+                if (is == null) {
+                    notFound(exchange);
+                    return;
+                }
+                byte[] data = IOUtils.toByteArray(is);
+                exchange.getResponseHeaders().set("Content-Type", ContentTypeResolver.resolve(resourcePath));
+                exchange.sendResponseHeaders(200, data.length);
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(data);
+                }
+            }
+        });
+    }
+
+    private void notFound(HttpExchange exchange) {
+        sendResponse(exchange, 404, "Not found");
     }
 
     private void sendResponse(HttpExchange exchange, int httpCode, String message) {
