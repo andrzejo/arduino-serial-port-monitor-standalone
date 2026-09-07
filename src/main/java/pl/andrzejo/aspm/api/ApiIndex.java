@@ -7,6 +7,7 @@
 
 package pl.andrzejo.aspm.api;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import pl.andrzejo.aspm.App;
 import pl.andrzejo.aspm.api.server.SimpleHttpServer;
 import pl.andrzejo.aspm.utils.AppFiles;
@@ -25,6 +26,8 @@ public class ApiIndex {
     static {
         templates.put(SimpleHttpServer.Method.Get, AppFiles.readResources("html/api/method.get.html"));
         templates.put(SimpleHttpServer.Method.Post, AppFiles.readResources("html/api/method.post.html"));
+        templates.put(SimpleHttpServer.Method.Put, AppFiles.readResources("html/api/method.put.html"));
+        templates.put(SimpleHttpServer.Method.Delete, AppFiles.readResources("html/api/method.delete.html"));
     }
 
     public String getHtml(List<AppApiService.Endpoint> endpoints) {
@@ -67,25 +70,30 @@ public class ApiIndex {
 
     private String getEndpointHtml(AppApiService.Endpoint endpoint) {
         String html = templates.get(endpoint.getMethod());
+        Objects.requireNonNull(html, "No template found for method: " + endpoint.getMethod());
         Map<String, String> replacements = getReplacements(endpoint);
         return replace(html, replacements);
     }
 
     private Map<String, String> getReplacements(AppApiService.Endpoint endpoint) {
         HashMap<String, String> map = new HashMap<>();
-        String suffix = endpoint.getPath() == null ? "/" : endpoint.getPath();
+        String suffix = endpoint.getPath() == null ? "/" : endpoint.getDisplayPath();
         String href = SimpleHttpServer.getAddress() + suffix;
         map.put("HREF", href);
-        map.put("PATH", suffix);
+        map.put("PATH", escape(suffix));
         AppApiService.EndpointDescription description = endpoint.getDescription();
-        map.put("DESC", trimToEmpty(description.getDesc()));
-        map.put("QUERY", trimToEmpty(description.getQueryParams()));
+        map.put("DESC", escape(trimToEmpty(description.getDesc())));
+        map.put("QUERY", escape(trimToEmpty(description.getQueryParams())));
         String curl = "curl -X " + endpoint.getMethod().name().toUpperCase() + " " + href;
         if (endpoint.getMethod() != SimpleHttpServer.Method.Get && isNotBlank(description.getBodyExample())) {
             curl += String.format(" -d '%s' ", description.getBodyExample());
         }
-        map.put("CMD", curl);
+        map.put("CMD", escape(curl));
         return map;
+    }
+
+    private String escape(String html) {
+        return StringEscapeUtils.escapeHtml(html);
     }
 
 

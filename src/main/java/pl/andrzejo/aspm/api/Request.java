@@ -19,4 +19,5 @@ public class Request {
     private final String body;
     private final SimpleHttpServer.Method method;
     private final URI requestURI;
+    private final Integer pathId;
 }

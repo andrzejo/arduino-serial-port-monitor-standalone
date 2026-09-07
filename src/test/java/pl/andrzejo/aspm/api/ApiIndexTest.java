@@ -25,9 +25,9 @@ class ApiIndexTest {
         //given
         ApiIndex index = new ApiIndex();
         Method handler = getClass().getDeclaredMethod("handler");
-        AppApiService.EndpointDescription desc = new AppApiService.EndpointDescription("Some endpoint.", "BODY", "", 1);
+        AppApiService.EndpointDescription desc = new AppApiService.EndpointDescription("test", "Some endpoint.", "BODY", "", 1);
         List<AppApiService.Endpoint> endpoints = Collections.singletonList(
-                new AppApiService.Endpoint(handler, Post, "/api/endpoint", desc)
+                new AppApiService.Endpoint(handler, Post, "/api/endpoint", "", desc)
         );
 
         //when

@@ -487,4 +487,23 @@ public class SendCommandPanel extends ContentPanel {
         return hists;
     }
 
+    public List<CommandItem> getCommands() {
+        return Collections.list(commandListModel.elements());
+    }
+
+    public void updateCmd(int index, CommandItem cmd) {
+        commandListModel.set(index, cmd);
+        saveCommands();
+    }
+
+    public void removeCmd(int index) {
+        commandListModel.remove(index);
+        saveCommands();
+    }
+
+    public int addCmd(CommandItem cmd) {
+        commandListModel.addElement(cmd);
+        saveCommands();
+        return commandListModel.size() - 1;
+    }
 }

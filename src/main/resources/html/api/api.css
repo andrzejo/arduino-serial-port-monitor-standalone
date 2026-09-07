@@ -12,13 +12,25 @@
     --primary-hover: #1d4ed8;
     --section-accent: rgba(37, 99, 235, 0.65);
 
+    /* GET */
     --get-bg: #eff6ff;
     --get-text: #2563eb;
     --get-border: #bfdbfe;
 
+    /* POST */
     --post-bg: #ecfdf5;
     --post-text: #059669;
     --post-border: #a7f3d0;
+
+    /* PUT */
+    --put-bg: #fffbeb;
+    --put-text: #d97706;
+    --put-border: #fde68a;
+
+    /* DELETE */
+    --delete-bg: #fef2f2;
+    --delete-text: #dc2626;
+    --delete-border: #fecaca;
 }
 
 * {
@@ -179,12 +191,6 @@ h3 {
     letter-spacing: 0.06em;
 }
 
-/*
- * Ważne:
- * style .item .path dotyczą tylko endpointów,
- * więc PATH w headerze zachowuje kolor nagłówka.
- */
-
 /* --------------------------------------------------------------------------
    Groups
    -------------------------------------------------------------------------- */
@@ -311,16 +317,36 @@ h3 {
     border-radius: 6px;
 }
 
+/* GET */
+
 .item .method.get span {
     color: var(--get-text);
     background-color: var(--get-bg);
     border: 1px solid var(--get-border);
 }
 
+/* POST */
+
 .item .method.post span {
     color: var(--post-text);
     background-color: var(--post-bg);
     border: 1px solid var(--post-border);
+}
+
+/* PUT */
+
+.item .method.put span {
+    color: var(--put-text);
+    background-color: var(--put-bg);
+    border: 1px solid var(--put-border);
+}
+
+/* DELETE */
+
+.item .method.delete span {
+    color: var(--delete-text);
+    background-color: var(--delete-bg);
+    border: 1px solid var(--delete-border);
 }
 
 /* --------------------------------------------------------------------------

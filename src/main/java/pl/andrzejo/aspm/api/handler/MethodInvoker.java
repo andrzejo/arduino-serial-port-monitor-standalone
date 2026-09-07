@@ -7,9 +7,9 @@
 
 package pl.andrzejo.aspm.api.handler;
 
-import lombok.SneakyThrows;
 import pl.andrzejo.aspm.api.Request;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class MethodInvoker {
@@ -25,12 +25,22 @@ public class MethodInvoker {
         this.passRequest = handlerMethod.getParameterCount() == 1 && handlerMethod.getParameterTypes()[0].equals(Request.class);
     }
 
-    @SneakyThrows
     public String invoke(Request request) {
-        Object result = passRequest ? handlerMethod.invoke(handler, request) : handlerMethod.invoke(handler);
-        if (returnStr) {
-            return (String) result;
+        try {
+            Object result = passRequest
+                    ? handlerMethod.invoke(handler, request)
+                    : handlerMethod.invoke(handler);
+
+            return returnStr ? (String) result : null;
+
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 }

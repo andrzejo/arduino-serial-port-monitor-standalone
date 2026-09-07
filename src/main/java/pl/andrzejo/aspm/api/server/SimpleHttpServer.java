@@ -29,7 +29,7 @@ public class SimpleHttpServer {
     public static final int PORT = 4255;
 
     public enum Method {
-        Get, Post
+        Get, Put, Post, Delete
     }
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleHttpServer.class);
@@ -71,14 +71,36 @@ public class SimpleHttpServer {
                 return;
             }
             try {
-                Request r = new Request(body, method, exchange.getRequestURI());
+                Integer pathId = null;
+                if (methodRequirePathId(method)) {
+                    String requestPath = exchange.getRequestURI().getPath();
+                    String id = StringUtils.substring(requestPath, path.length());
+                    String cleanId = StringUtils.strip(id, "/\\");
+                    if (StringUtils.isBlank(cleanId)) {
+                        sendResponse(exchange, 400, "Path id is required");
+                        return;
+                    }
+                    if (!StringUtils.isNumeric(cleanId)) {
+                        sendResponse(exchange, 400, "Path id must be numeric");
+                        return;
+                    }
+                    pathId = Integer.parseInt(cleanId);
+                }
+                Request r = new Request(body, method, exchange.getRequestURI(), pathId);
                 String response = handler.apply(r);
                 sendResponse(exchange, 200, response);
+            } catch (NotFoundException e) {
+                logger.error("Item not found: {}", exchange.getRequestURI(), e);
+                notFound(exchange);
             } catch (Exception e) {
-                logger.error("Request handler failed: " + exchange.getRequestURI(), e);
+                logger.error("Request handler failed: {}", exchange.getRequestURI(), e);
                 sendResponse(exchange, 500, "Request failed");
             }
         });
+    }
+
+    public static boolean methodRequirePathId(Method method) {
+        return method.equals(Method.Delete) || method.equals(Method.Put);
     }
 
     public void handleResources() {

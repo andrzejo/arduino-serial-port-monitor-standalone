@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang.StringUtils.*;
 import static pl.andrzejo.aspm.api.server.SimpleHttpServer.Method.Post;
+import static pl.andrzejo.aspm.api.server.SimpleHttpServer.methodRequirePathId;
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class AppApiService {
@@ -132,14 +133,23 @@ public class AppApiService {
         private final Method handlerMethod;
         private final SimpleHttpServer.Method method;
         private final String path;
+        private final String pathParam;
         private final EndpointDescription description;
+
+        public String getDisplayPath() {
+            if (methodRequirePathId(method)) {
+                String p = isNotBlank(pathParam) ? pathParam : "id";
+                return path + "/<" + p + ">";
+            }
+            return path;
+        }
 
         public static Endpoint fromAnnotation(String basepath, Method handler, ApiEndpoint annotation) {
             String pathSuffix = isBlank(annotation.path()) ? handler.getName() : annotation.path();
             String path = fullApiPath(basepath, pathSuffix);
             EndpointDescription description = new EndpointDescription(basepath, annotation.description(),
                     annotation.bodyExample(), annotation.queryParams(), annotation.order());
-            return new Endpoint(handler, annotation.method(), path, description);
+            return new Endpoint(handler, annotation.method(), path, annotation.pathParam(), description);
         }
     }
 }

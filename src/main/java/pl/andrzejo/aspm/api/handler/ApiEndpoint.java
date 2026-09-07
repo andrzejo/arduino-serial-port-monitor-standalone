@@ -29,4 +29,6 @@ public @interface ApiEndpoint {
     String bodyExample() default "";
 
     String queryParams() default "";
+
+    String pathParam() default "";
 }

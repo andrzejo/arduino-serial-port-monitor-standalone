@@ -88,7 +88,7 @@ class AppApiServiceTest {
         //then
         MethodDefinition definition = getMethodDefinition(Post, "/api/device/open");
 
-        String response = invokeHandler(definition, new Request("COM1", Post, new URI("")));
+        String response = invokeHandler(definition, new Request("COM1", Post, new URI(""), null));
         assertThat(response).isNull();
 
         List<BusEvent> events = verifyMethodPostEventBusEvents(bus);
@@ -118,7 +118,7 @@ class AppApiServiceTest {
         //then
         MethodDefinition definition = getMethodDefinition(Post, "/api/device/close");
 
-        String response = invokeHandler(definition, new Request(null, Post, null));
+        String response = invokeHandler(definition, new Request(null, Post, null, null));
         assertThat(response).isNull();
 
         List<BusEvent> events = verifyMethodPostEventBusEvents(bus);
@@ -223,7 +223,7 @@ class AppApiServiceTest {
         ArgumentCaptor<List<AppApiService.Endpoint>> captor = ArgumentCaptor.forClass(listClass);
         verify(apiIndex).getHtml(captor.capture());
         List<AppApiService.Endpoint> list = captor.getValue();
-        assertThat(list).hasSize(10);
+        assertThat(list).hasSize(13);
     }
 
     @Test

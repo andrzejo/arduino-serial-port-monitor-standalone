@@ -7,17 +7,36 @@
 
 package pl.andrzejo.aspm.gui.cmd;
 
-import javax.swing.*;
-import java.util.Collections;
+import pl.andrzejo.aspm.api.server.NotFoundException;
+
 import java.util.List;
 
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 public class CommandsListApiBridge {
-    private final DefaultListModel<CommandItem> commandListModel = instance(DefaultListModel.class);
+    private final SendCommandPanel sendCommandPanel = instance(SendCommandPanel.class);
 
     public List<CommandItem> getCommands() {
-        return Collections.list(commandListModel.elements());
+        return sendCommandPanel.getCommands();
     }
 
+    public void update(int index, CommandItem cmd) {
+        validateIndex(index);
+        sendCommandPanel.updateCmd(index, cmd);
+    }
+
+    public void delete(int index) {
+        validateIndex(index);
+        sendCommandPanel.removeCmd(index);
+    }
+
+    public int add(CommandItem cmd) {
+        return sendCommandPanel.addCmd(cmd);
+    }
+
+    private void validateIndex(int index) {
+        if (index < 0 || index >= getCommands().size()) {
+            throw new NotFoundException();
+        }
+    }
 }
