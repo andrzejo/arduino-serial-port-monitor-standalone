@@ -7,6 +7,7 @@
 
 package pl.andrzejo.aspm.eventbus.impl;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +17,8 @@ import java.lang.reflect.Method;
 public class HandlerMethod {
     private final Object listener;
     private final Method method;
+    @Getter
+    private final int priority;
 
     public Object invoke(Object event) {
         try {

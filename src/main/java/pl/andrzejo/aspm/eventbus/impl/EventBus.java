@@ -64,8 +64,9 @@ public class EventBus {
             if (m.getParameterCount() != 1) {
                 throw new EventBusException(String.format("EventBus handler method (%s) must have only one parameter", getDescription(m)));
             }
+            int priority = m.getAnnotation(Subscribe.class).priority();
             Class<?> type = m.getParameterTypes()[0];
-            addHandler(type, new HandlerMethod(listener, m));
+            addHandler(type, new HandlerMethod(listener, m, priority));
         }
     }
 
@@ -85,6 +86,7 @@ public class EventBus {
     private void addHandler(Class<?> type, HandlerMethod handlerMethod) {
         List<HandlerMethod> typeHandlers = handlers.computeIfAbsent(type, k -> new ArrayList<>());
         typeHandlers.add(handlerMethod);
+        typeHandlers.sort(Comparator.comparingInt(HandlerMethod::getPriority));
     }
 
 }

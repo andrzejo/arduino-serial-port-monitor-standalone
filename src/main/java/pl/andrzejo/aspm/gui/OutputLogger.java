@@ -85,6 +85,7 @@ public class OutputLogger {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     private void handleEvent(ApplicationClosingEvent event) {
         log.info("Shutting down output logger");
         shutdown();

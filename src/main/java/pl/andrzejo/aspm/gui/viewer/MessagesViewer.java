@@ -204,7 +204,7 @@ public class MessagesViewer {
         return sb.toString();
     }
 
-    @Subscribe
+    @Subscribe(priority = -1)
     @SuppressWarnings("unused")
     private void handleEvent(ApplicationClosingEvent event) {
         log.info("Shutting down the message queue");
