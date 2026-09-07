@@ -19,9 +19,6 @@
     --post-bg: #ecfdf5;
     --post-text: #059669;
     --post-border: #a7f3d0;
-
-    --terminal-bg: #1e293b;
-    --terminal-text: #e2e8f0;
 }
 
 * {
@@ -55,6 +52,8 @@ body {
     background-color: var(--bg-color);
 }
 
+/* Background watermark */
+
 body::before {
     content: "";
 
@@ -66,7 +65,6 @@ body::before {
     height: 320px;
 
     background: url("/images/big.png") center / contain no-repeat;
-
     opacity: 0.035;
 
     pointer-events: none;
@@ -156,7 +154,7 @@ h3 {
     width: 100%;
 }
 
-/* Header kolumn */
+/* METHOD | PATH | DESCRIPTION | QUERY PARAMS */
 
 .header {
     display: grid;
@@ -180,6 +178,12 @@ h3 {
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
+
+/*
+ * Ważne:
+ * style .item .path dotyczą tylko endpointów,
+ * więc PATH w headerze zachowuje kolor nagłówka.
+ */
 
 /* --------------------------------------------------------------------------
    Groups
@@ -214,6 +218,9 @@ h3 {
 .group > .title::before {
     content: "";
 
+    position: relative;
+    top: -1px;
+
     width: 4px;
     height: 15px;
 
@@ -223,9 +230,6 @@ h3 {
 
     background: var(--section-accent);
     border-radius: 2px;
-
-    position: relative;
-    top: -1px;
 }
 
 /* --------------------------------------------------------------------------
@@ -257,7 +261,7 @@ h3 {
         minmax(360px, 1fr)
         140px;
 
-    gap: 10px 16px;
+    gap: 7px 16px;
     align-items: center;
 
     padding: 14px 18px;
@@ -286,11 +290,10 @@ h3 {
     align-items: center;
 }
 
-.method span {
+.item .method span {
     display: inline-block;
 
     width: 100%;
-
     padding: 4px 8px;
 
     text-align: center;
@@ -308,13 +311,13 @@ h3 {
     border-radius: 6px;
 }
 
-.method.get span {
+.item .method.get span {
     color: var(--get-text);
     background-color: var(--get-bg);
     border: 1px solid var(--get-border);
 }
 
-.method.post span {
+.item .method.post span {
     color: var(--post-text);
     background-color: var(--post-bg);
     border: 1px solid var(--post-border);
@@ -324,7 +327,7 @@ h3 {
    Path
    -------------------------------------------------------------------------- */
 
-.path {
+.item .path {
     font-family: ui-monospace,
     SFMono-Regular,
     Menlo,
@@ -333,20 +336,19 @@ h3 {
     monospace;
 
     font-weight: 600;
-
     color: var(--text-main);
 
     word-break: break-word;
 }
 
-.path a {
+.item .path a {
     color: var(--primary);
     text-decoration: none;
 
     transition: color 0.15s ease;
 }
 
-.path a:hover {
+.item .path a:hover {
     color: var(--primary-hover);
     text-decoration: underline;
 }
@@ -355,7 +357,7 @@ h3 {
    Description
    -------------------------------------------------------------------------- */
 
-.desc {
+.item .desc {
     color: var(--text-secondary);
 }
 
@@ -363,7 +365,7 @@ h3 {
    Query parameters
    -------------------------------------------------------------------------- */
 
-.query {
+.item .query {
     font-family: ui-monospace,
     SFMono-Regular,
     Menlo,
@@ -372,23 +374,22 @@ h3 {
     monospace;
 
     font-size: 0.75rem;
-
     color: var(--text-muted);
 
     white-space: nowrap;
 }
 
 /* --------------------------------------------------------------------------
-   CURL - drugi wiersz endpointu
+   CURL
    -------------------------------------------------------------------------- */
 
-.curl {
+.item .curl {
     grid-column: 2 / -1;
 
     display: flex;
     justify-content: flex-start;
 
-    margin-top: 2px;
+    margin-top: 0;
 }
 
 .item .curl span {
@@ -476,13 +477,13 @@ h3 {
             minmax(160px, 1fr);
     }
 
-    .desc,
-    .query,
-    .curl {
+    .item .desc,
+    .item .query,
+    .item .curl {
         grid-column: 2 / -1;
     }
 
-    .curl {
+    .item .curl {
         justify-content: flex-start;
     }
 
@@ -520,7 +521,7 @@ h3 {
             64px
             minmax(0, 1fr);
 
-        gap: 10px;
+        gap: 7px 10px;
         padding: 12px;
     }
 
