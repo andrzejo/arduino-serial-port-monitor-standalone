@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationClosingEvent;
 import pl.andrzejo.aspm.eventbus.events.gui.FontChangedEvent;
-import pl.andrzejo.aspm.eventbus.events.gui.GetMonitorOutputEvent;
 import pl.andrzejo.aspm.eventbus.impl.Subscribe;
-import pl.andrzejo.aspm.factory.BeanFactory;
 import pl.andrzejo.aspm.gui.OutputLogger;
 import pl.andrzejo.aspm.gui.viewer.model.Message;
 import pl.andrzejo.aspm.gui.viewer.model.MessageListModel;
@@ -40,11 +38,10 @@ import static pl.andrzejo.aspm.gui.util.ComponentListenerHandler.handleAction;
 import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
 
 public class MessagesViewer {
-    private static final int MAX_LINES = 20_000;
     private static final int FLUSH_INTERVAL_MS = 40; // ~25 FPS
     private static final Logger log = LoggerFactory.getLogger(MessagesViewer.class);
-    private final SerialMessageTypeResolver msgTypeResolver = BeanFactory.instance(SerialMessageTypeResolver.class);
-    private final MessageListModel messagesListModel = new MessageListModel(MAX_LINES);
+    private final SerialMessageTypeResolver msgTypeResolver = instance(SerialMessageTypeResolver.class);
+    private final MessageListModel messagesListModel = instance(MessageListModel.class);
     private final JList<Message> messagesList = new JList<>(messagesListModel);
     private final JScrollPane scrollPane;
     private final MessageCellRenderer cellRenderer;
@@ -185,23 +182,6 @@ public class MessagesViewer {
     @SuppressWarnings("unused")
     public void handleEvent(FontChangedEvent event) {
         setFont(event.getName(), event.getSize());
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public String handleEvent(GetMonitorOutputEvent event) {
-        StringBuilder sb = new StringBuilder();
-        boolean withMessages = event.isWithMessages();
-        messagesListModel.forEach(msg -> {
-            if (!withMessages && msg.isInternal()) {
-                return;
-            }
-            sb.append(msg.getFormattedTimestamp());
-            sb.append(": ");
-            sb.append(msg.getText());
-            sb.append("\n");
-        });
-        return sb.toString();
     }
 
     @Subscribe(priority = -1)

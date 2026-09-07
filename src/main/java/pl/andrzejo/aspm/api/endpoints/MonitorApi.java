@@ -11,16 +11,15 @@ import pl.andrzejo.aspm.api.Request;
 import pl.andrzejo.aspm.api.handler.AbstractApiHandler;
 import pl.andrzejo.aspm.api.handler.ApiEndpoint;
 import pl.andrzejo.aspm.eventbus.events.gui.ClearMonitorOutputEvent;
-import pl.andrzejo.aspm.eventbus.events.gui.GetMonitorOutputEvent;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import pl.andrzejo.aspm.gui.viewer.ViewerApiBridge;
 
 import static org.apache.commons.lang.StringUtils.contains;
 import static pl.andrzejo.aspm.api.server.SimpleHttpServer.Method.Post;
+import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
 @SuppressWarnings("unused")
 public class MonitorApi extends AbstractApiHandler {
+    private final ViewerApiBridge apiBridge = instance(ViewerApiBridge.class);
 
     @ApiEndpoint(
             description = "Get monitor output.",
@@ -29,8 +28,7 @@ public class MonitorApi extends AbstractApiHandler {
     )
     public String output(Request request) {
         boolean withMessages = contains(request.getRequestURI().getQuery(), "with_messages");
-        List<Object> objects = eventBus.postForResult(new GetMonitorOutputEvent(withMessages));
-        return objects.stream().map(Object::toString).collect(Collectors.joining());
+        return apiBridge.getOutput(withMessages);
     }
 
     @ApiEndpoint(

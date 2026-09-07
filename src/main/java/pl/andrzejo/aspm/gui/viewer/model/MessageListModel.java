@@ -7,26 +7,19 @@
 
 package pl.andrzejo.aspm.gui.viewer.model;
 
-import lombok.RequiredArgsConstructor;
-
 import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-@RequiredArgsConstructor
 public class MessageListModel extends AbstractListModel<Message> {
-    private final Message[] buffer;
-    private final int capacity;
+    private static final int MAX_LINES = 20_000;
+    private final Message[] buffer = new Message[MAX_LINES];
+    private final int capacity = MAX_LINES;
     private int head = 0;
     private int size = 0;
     private Message incompleteMessage = null;
-
-    public MessageListModel(int capacity) {
-        this.capacity = capacity;
-        this.buffer = new Message[capacity];
-    }
 
     @Override
     public synchronized int getSize() {
