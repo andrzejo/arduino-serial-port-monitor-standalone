@@ -25,7 +25,7 @@ if [[ -n "${1}" ]]; then
   readonly body=${3}
 
   if [[ -z "${res}" ]]; then
-    echo -e "Api usage:\n${0} ${grn}method${nc}(get|post) ${grn}resource${nc} [${grn}body${nc}] [--ignore-error]\n"
+    echo -e "Api usage:\n${0} ${grn}method${nc}(get|post|put|delete) ${grn}resource${nc} [${grn}body${nc}] [--ignore-error]\n"
     exit 1
   fi
   echo -e "Execute API request ${bld}${method}${nc} ${bld}${res}${nc} to ${grn}${url}${nc}\n"
