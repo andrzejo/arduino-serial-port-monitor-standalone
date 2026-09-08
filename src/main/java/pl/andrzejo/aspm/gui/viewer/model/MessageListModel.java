@@ -39,23 +39,27 @@ public class MessageListModel extends AbstractListModel<Message> {
     }
 
     public synchronized void appendBatch(List<Message> newMessages, Message newIncomplete) {
-        if (newMessages.isEmpty() && newIncomplete == incompleteMessage) {
+        if (newMessages.isEmpty() && Objects.equals(newIncomplete, incompleteMessage)) {
             return;
         }
 
-        int oldTotalSize = getSize();
+        int oldLogicalSize = getSize();
         boolean hadIncomplete = (incompleteMessage != null);
         this.incompleteMessage = newIncomplete;
+        boolean hasIncompleteNow = (incompleteMessage != null);
 
         if (newMessages.isEmpty()) {
-            if (oldTotalSize > 0) {
-                fireContentsChanged(this, oldTotalSize - 1, oldTotalSize - 1);
-            } else if (incompleteMessage != null) {
-                fireIntervalAdded(this, 0, 0);
+            if (!hadIncomplete && hasIncompleteNow) {
+                fireIntervalAdded(this, oldLogicalSize, oldLogicalSize);
+            } else if (hadIncomplete && !hasIncompleteNow) {
+                fireIntervalRemoved(this, oldLogicalSize - 1, oldLogicalSize - 1);
+            } else if (hadIncomplete) {
+                fireContentsChanged(this, oldLogicalSize - 1, oldLogicalSize - 1);
             }
             return;
         }
 
+        int oldSize = size;
         for (Message msg : newMessages) {
             if (size < capacity) {
                 int insertIndex = (head + size) % capacity;
@@ -67,10 +71,10 @@ public class MessageListModel extends AbstractListModel<Message> {
             }
         }
 
-        if (size < capacity && !hadIncomplete) {
-            fireIntervalAdded(this, oldTotalSize, getSize() - 1);
+        if (oldSize + newMessages.size() <= capacity && !hadIncomplete && !hasIncompleteNow) {
+            fireIntervalAdded(this, oldLogicalSize, getSize() - 1);
         } else {
-            fireContentsChanged(this, 0, getSize() - 1);
+            fireContentsChanged(this, 0, Math.max(oldLogicalSize, getSize()) - 1);
         }
     }
 
@@ -84,7 +88,7 @@ public class MessageListModel extends AbstractListModel<Message> {
         size = 0;
         incompleteMessage = null;
         if (oldSize > 0) {
-            fireContentsChanged(this, 0, oldSize - 1);
+            fireIntervalRemoved(this, 0, oldSize - 1);
         }
     }
 

@@ -65,6 +65,9 @@ public class MessagesViewer {
         messagesList.setVisibleRowCount(-1);
 
         scrollPane = new JScrollPane(messagesList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getViewport().setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
+        scrollPane.getViewport().setOpaque(true);
+        messagesList.setOpaque(true);
         setFont(AppSettingsFactory.create(FontNameSetting.class).get(), AppSettingsFactory.create(FontSizeSetting.class).get());
         instance(ApplicationEventBus.class).register(this);
         setupHandlers();
@@ -113,13 +116,15 @@ public class MessagesViewer {
                     Instant msgTime = (lineStartTimestamp != null) ? lineStartTimestamp : chunkTime;
                     int end = (i > start && text.charAt(i - 1) == '\r') ? i - 1 : i;
                     parseBuffer.append(text, start, end);
+
                     String fullLine = parseBuffer.toString();
                     if (fullLine.endsWith("\r")) {
                         fullLine = fullLine.substring(0, fullLine.length() - 1);
                     }
-
-                    MessageType type = msgTypeResolver.resolve(fullLine);
-                    completedMessages.add(new Message(msgTime.toEpochMilli(), fullLine, type));
+                    if (!fullLine.isEmpty()) {
+                        MessageType type = msgTypeResolver.resolve(fullLine);
+                        completedMessages.add(new Message(msgTime.toEpochMilli(), fullLine, type));
+                    }
                     parseBuffer.setLength(0);
                     lineStartTimestamp = null;
                     start = i + 1;
@@ -137,8 +142,14 @@ public class MessagesViewer {
         Message incompleteMsg = null;
         if (parseBuffer.length() > 0) {
             String remainingText = parseBuffer.toString();
-            Instant timestamp = lineStartTimestamp == null ? Instant.now() : lineStartTimestamp;
-            incompleteMsg = new Message(timestamp.toEpochMilli(), remainingText, msgTypeResolver.resolve(remainingText));
+            if (remainingText.endsWith("\r")) {
+                remainingText = remainingText.substring(0, remainingText.length() - 1);
+            }
+
+            if (!remainingText.isEmpty()) {
+                Instant timestamp = (lineStartTimestamp == null) ? Instant.now() : lineStartTimestamp;
+                incompleteMsg = new Message(timestamp.toEpochMilli(), remainingText, msgTypeResolver.resolve(remainingText));
+            }
         }
 
         JScrollBar vBar = scrollPane.getVerticalScrollBar();
