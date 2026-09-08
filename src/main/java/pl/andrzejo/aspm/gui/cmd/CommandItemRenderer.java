@@ -7,6 +7,8 @@
 
 package pl.andrzejo.aspm.gui.cmd;
 
+import lombok.Setter;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -23,6 +25,7 @@ final class CommandItemRenderer extends JPanel implements ListCellRenderer<Comma
     private final JPanel groupPanel = new JPanel(new BorderLayout());
     private final JLabel groupIconLabel = new JLabel("☰");
     private final JLabel groupLabel = new JLabel();
+    @Setter
     private int editIndex = -1;
 
     private static final Color EDIT_COLOR = Color.BLUE;
@@ -116,7 +119,4 @@ final class CommandItemRenderer extends JPanel implements ListCellRenderer<Comma
         descriptionLabel.setEnabled(enabled);
     }
 
-    public void setEditIndex(int selectedIndex) {
-        this.editIndex = selectedIndex;
-    }
 }

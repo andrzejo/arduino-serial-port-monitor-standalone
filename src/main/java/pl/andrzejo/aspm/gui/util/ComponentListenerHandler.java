@@ -49,6 +49,15 @@ public class ComponentListenerHandler {
         };
     }
 
+    public static MouseAdapter mousePressed(Consumer<MouseEvent> handler) {
+        return new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                handler.accept(e);
+            }
+        };
+    }
+
     public static MouseAdapter mouseExited(Consumer<MouseEvent> handler) {
         return new MouseAdapter() {
             @Override

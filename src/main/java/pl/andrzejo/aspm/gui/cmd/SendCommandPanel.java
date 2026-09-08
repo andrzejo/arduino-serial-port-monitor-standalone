@@ -26,6 +26,7 @@ import pl.andrzejo.aspm.utils.Serializer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -183,12 +184,13 @@ public class SendCommandPanel extends ContentPanel {
             }
         }));
 
-        commandList
-                .addListSelectionListener(e -> {
-                    editedItem = null;
-                    cellRenderer.setEditIndex(-1);
-                    updateButtonsState();
-                });
+        commandList.addMouseListener(mousePressed(e -> {
+            if (SwingUtilities.isRightMouseButton(e)) {
+                exitEditing();
+            }
+        }));
+
+        commandList.addListSelectionListener(this::valueChanged);
 
         commandList
                 .addMouseMotionListener(mouseMoved(e -> {
@@ -213,6 +215,15 @@ public class SendCommandPanel extends ContentPanel {
                         executeCommand(cmd);
                     }
                 }));
+    }
+
+    private void exitEditing() {
+        editedItem = null;
+        cellRenderer.setEditIndex(-1);
+        cellRenderer.revalidate();
+        commandList.revalidate();
+        commandList.repaint();
+        updateButtonsState();
     }
 
     private void moveCommandDown(ActionEvent actionEvent) {
@@ -505,5 +516,9 @@ public class SendCommandPanel extends ContentPanel {
         commandListModel.addElement(cmd);
         saveCommands();
         return commandListModel.size() - 1;
+    }
+
+    private void valueChanged(ListSelectionEvent e) {
+        exitEditing();
     }
 }
