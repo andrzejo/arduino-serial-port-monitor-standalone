@@ -21,6 +21,10 @@ public class OsInfo {
         }
     }
 
+    public static boolean isLinux() {
+        return CurrentOs == OsName.Linux;
+    }
+
     public enum OsName {
         Linux, Windows, Other
     }

@@ -11,7 +11,9 @@ package pl.andrzejo.aspm.serial;
 import com.fazecast.jSerialComm.SerialPort;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import pl.andrzejo.aspm.utils.OsInfo;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,8 +22,16 @@ public class SerialPorts {
 
     public List<Port> getList() {
         return Arrays.stream(SerialPort.getCommPorts())
+                .filter(this::portAvailable)
                 .map(p -> new Port(p.getSystemPortPath(), p.getDescriptivePortName()))
                 .collect(Collectors.toList());
+    }
+
+    private boolean portAvailable(SerialPort port) {
+        if (OsInfo.isLinux()) {
+            return new File(port.getSystemPortPath()).exists();
+        }
+        return true;
     }
 
     @Getter

@@ -154,6 +154,10 @@ public class MessagesViewer {
     }
 
     public void clear() {
+        parseBuffer.setLength(0);
+        rawQueue.clear();
+        directMessageQueue.clear();
+        lineStartTimestamp = null;
         SwingUtilities.invokeLater(messagesListModel::clear);
     }
 
