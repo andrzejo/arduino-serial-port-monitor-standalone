@@ -7,6 +7,25 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/html/images/icon.png">
     <link rel="stylesheet" href="/html/api/api.css">
     <title>${APP} - API Docs</title>
+    <script>
+        function toggleCurl(button) {
+            const item = button.closest(".item");
+            item.classList.toggle("curl-expanded");
+            const expanded = item.classList.contains("curl-expanded");
+            button.title = expanded ? "Hide curl" : "Show curl";
+        }
+
+        window.addEventListener("load", function () {
+            const getElements = document.querySelectorAll(".item.get .path");
+            getElements.forEach(function (link) {
+                const a = document.createElement("a");
+                a.target = "_blank";
+                a.href = link.attributes['data-href'].value;
+                a.textContent = link.textContent;
+                link.innerHTML = a.outerHTML;
+            });
+        });
+    </script>
 </head>
 <body>
 <div class="main">

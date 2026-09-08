@@ -1,0 +1,18 @@
+<div class="item ${METHOD}">
+    <div class="method ${METHOD}">
+        <span>${METHOD}</span>
+    </div>
+    <div class="path" data-href="${HREF}">
+        ${PATH}
+    </div>
+    <div class="desc">${DESC}</div>
+    <div class="query">${QUERY}</div>
+    <div class="curl-row">
+        <button class="curl-toggle" type="button" title="Show curl" onclick="toggleCurl(this)">
+            <span class="terminal-icon">&gt;_</span>
+        </button>
+        <div class="curl">
+            <span>${CMD}</span>
+        </div>
+    </div>
+</div>

@@ -35,11 +35,12 @@ class ApiIndexTest {
 
         //then
         assertThat(html)
-                .contains("<div class=\"item\">")
-                .contains("<div class=\"method post\"><span>POST</span></div>")
-                .contains("<div class=\"path\">/api/endpoint</div>")
+                .contains("<div class=\"item post\">")
+                .contains("<div class=\"method post\">")
+                .contains("<div class=\"path\"")
+                .contains("/api/endpoint")
                 .contains("<div class=\"desc\">Some endpoint.</div>")
-                .contains("<div class=\"curl\"><span>curl -X POST http://localhost:4255/api/endpoint -d 'BODY' </span></div>");
+                .contains("curl -X POST http://localhost:4255/api/endpoint -d 'BODY'");
     }
 
     private void handler() {

@@ -21,17 +21,10 @@ import static org.apache.commons.lang.text.StrSubstitutor.replace;
 import static pl.andrzejo.aspm.utils.MapUtil.map;
 
 public class ApiIndex {
-    private static final Map<SimpleHttpServer.Method, String> templates = new HashMap<>();
-
-    static {
-        templates.put(SimpleHttpServer.Method.Get, AppFiles.readResources("html/api/method.get.html"));
-        templates.put(SimpleHttpServer.Method.Post, AppFiles.readResources("html/api/method.post.html"));
-        templates.put(SimpleHttpServer.Method.Put, AppFiles.readResources("html/api/method.put.html"));
-        templates.put(SimpleHttpServer.Method.Delete, AppFiles.readResources("html/api/method.delete.html"));
-    }
 
     public String getHtml(List<AppApiService.Endpoint> endpoints) {
         String html = AppFiles.readResources("html/api/index.html");
+        String btnHtml = AppFiles.readResources("html/api/curl.toogle.html");
         String endpointsHtml = getEndpointsHtml(endpoints);
         Map<String, String> map = new HashMap<>();
         map.put("APP", App.Name);
@@ -40,6 +33,7 @@ public class ApiIndex {
         map.put("BUILD_YEAR", App.Version.getYear());
         map.put("URL", App.GitHubUrl);
         map.put("ENDPOINTS", endpointsHtml);
+        map.put("TOGGLE_BTN", btnHtml);
         return replace(html, map);
     }
 
@@ -69,8 +63,7 @@ public class ApiIndex {
     }
 
     private String getEndpointHtml(AppApiService.Endpoint endpoint) {
-        String html = templates.get(endpoint.getMethod());
-        Objects.requireNonNull(html, "No template found for method: " + endpoint.getMethod());
+        String html = AppFiles.readResources("html/api/endpoint.html");
         Map<String, String> replacements = getReplacements(endpoint);
         return replace(html, replacements);
     }
@@ -80,6 +73,7 @@ public class ApiIndex {
         String suffix = endpoint.getPath() == null ? "/" : endpoint.getDisplayPath();
         String href = SimpleHttpServer.getAddress() + suffix;
         map.put("HREF", href);
+        map.put("METHOD", endpoint.getMethod().name().toLowerCase());
         map.put("PATH", escape(suffix));
         AppApiService.EndpointDescription description = endpoint.getDescription();
         map.put("DESC", escape(trimToEmpty(description.getDesc())));
