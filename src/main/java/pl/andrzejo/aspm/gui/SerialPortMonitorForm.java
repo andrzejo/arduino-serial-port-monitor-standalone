@@ -138,9 +138,9 @@ public class SerialPortMonitorForm {
         String ending = decodedEnding(event.getLineEnding());
         String desc = event.getCommand().getDescription();
         if (isNotBlank(desc)) {
-            desc = "(" + desc + ") ";
+            desc = " - " + desc;
         }
-        addText(Message.info("Execute command: " + desc + "[" + event.getCommand().getCommand() + ending + "]"));
+        addText(Message.info("Execute command: [" + event.getCommand().getCommand() + ending + "]" + desc));
     }
 
     private String decodedEnding(String lineEnding) {
