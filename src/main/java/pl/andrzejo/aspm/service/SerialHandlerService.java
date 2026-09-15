@@ -71,6 +71,7 @@ public class SerialHandlerService {
         try {
             logger.info("Open serial: {}", config);
             serial = BeanFactory.newInstance(Serial2.class, createSerial(config));
+            serial.discardBuffers();
             openDeviceConfig = config;
             eventBus.post(new DeviceOpenEvent(config));
         } catch (Exception e) {

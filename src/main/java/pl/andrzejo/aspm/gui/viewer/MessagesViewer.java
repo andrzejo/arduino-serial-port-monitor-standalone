@@ -53,6 +53,7 @@ public class MessagesViewer {
     private final Boolean escapeChars = AppSettingGetter.get(EscapeCharsSetting.class);
     private Instant lineStartTimestamp = null;
     private boolean isAutoScroll = get(AutoscrollSetting.class);
+    private final Object clearLock = new Object();
 
     public MessagesViewer(OutputLogger outputLogger) {
         this.outputLogger = outputLogger;
@@ -88,88 +89,92 @@ public class MessagesViewer {
     }
 
     private void flushQueueToModel() {
-        if (rawQueue.isEmpty() && directMessageQueue.isEmpty()) {
-            return;
-        }
-
-        List<Message> completedMessages = new ArrayList<>();
-
-        Message directMsg;
-        while ((directMsg = directMessageQueue.poll()) != null) {
-            completedMessages.add(directMsg);
-        }
-
-        RawChunk chunk;
-        while ((chunk = rawQueue.poll()) != null) {
-            String text = chunk.text;
-            if (text == null || text.isEmpty()) {
-                continue;
+        synchronized (clearLock) {
+            if (rawQueue.isEmpty() && directMessageQueue.isEmpty()) {
+                return;
             }
 
-            Instant chunkTime = chunk.timestamp;
-            int len = text.length();
-            int start = 0;
+            List<Message> completedMessages = new ArrayList<>();
 
-            for (int i = 0; i < len; i++) {
-                char c = text.charAt(i);
-                if (c == '\n') {
-                    Instant msgTime = (lineStartTimestamp != null) ? lineStartTimestamp : chunkTime;
-                    int end = (i > start && text.charAt(i - 1) == '\r') ? i - 1 : i;
-                    parseBuffer.append(text, start, end);
+            Message directMsg;
+            while ((directMsg = directMessageQueue.poll()) != null) {
+                completedMessages.add(directMsg);
+            }
 
-                    String fullLine = parseBuffer.toString();
-                    if (fullLine.endsWith("\r")) {
-                        fullLine = fullLine.substring(0, fullLine.length() - 1);
+            RawChunk chunk;
+            while ((chunk = rawQueue.poll()) != null) {
+                String text = chunk.text;
+                if (text == null || text.isEmpty()) {
+                    continue;
+                }
+
+                Instant chunkTime = chunk.timestamp;
+                int len = text.length();
+                int start = 0;
+
+                for (int i = 0; i < len; i++) {
+                    char c = text.charAt(i);
+                    if (c == '\n') {
+                        Instant msgTime = (lineStartTimestamp != null) ? lineStartTimestamp : chunkTime;
+                        int end = (i > start && text.charAt(i - 1) == '\r') ? i - 1 : i;
+                        parseBuffer.append(text, start, end);
+
+                        String fullLine = parseBuffer.toString();
+                        if (fullLine.endsWith("\r")) {
+                            fullLine = fullLine.substring(0, fullLine.length() - 1);
+                        }
+                        if (!fullLine.isEmpty()) {
+                            MessageType type = msgTypeResolver.resolve(fullLine);
+                            completedMessages.add(new Message(msgTime.toEpochMilli(), fullLine, type));
+                        }
+                        parseBuffer.setLength(0);
+                        lineStartTimestamp = null;
+                        start = i + 1;
                     }
-                    if (!fullLine.isEmpty()) {
-                        MessageType type = msgTypeResolver.resolve(fullLine);
-                        completedMessages.add(new Message(msgTime.toEpochMilli(), fullLine, type));
+                }
+
+                if (start < len) {
+                    if (lineStartTimestamp == null) {
+                        lineStartTimestamp = chunkTime;
                     }
-                    parseBuffer.setLength(0);
-                    lineStartTimestamp = null;
-                    start = i + 1;
+                    parseBuffer.append(text, start, len);
                 }
             }
 
-            if (start < len) {
-                if (lineStartTimestamp == null) {
-                    lineStartTimestamp = chunkTime;
+            Message incompleteMsg = null;
+            if (parseBuffer.length() > 0) {
+                String remainingText = parseBuffer.toString();
+                if (remainingText.endsWith("\r")) {
+                    remainingText = remainingText.substring(0, remainingText.length() - 1);
                 }
-                parseBuffer.append(text, start, len);
-            }
-        }
 
-        Message incompleteMsg = null;
-        if (parseBuffer.length() > 0) {
-            String remainingText = parseBuffer.toString();
-            if (remainingText.endsWith("\r")) {
-                remainingText = remainingText.substring(0, remainingText.length() - 1);
+                if (!remainingText.isEmpty()) {
+                    Instant timestamp = (lineStartTimestamp == null) ? Instant.now() : lineStartTimestamp;
+                    incompleteMsg = new Message(timestamp.toEpochMilli(), remainingText, msgTypeResolver.resolve(remainingText));
+                }
             }
 
-            if (!remainingText.isEmpty()) {
-                Instant timestamp = (lineStartTimestamp == null) ? Instant.now() : lineStartTimestamp;
-                incompleteMsg = new Message(timestamp.toEpochMilli(), remainingText, msgTypeResolver.resolve(remainingText));
+            JScrollBar vBar = scrollPane.getVerticalScrollBar();
+            int tolerance = messagesList.getFixedCellHeight() * 2;
+            boolean isAtBottom = (vBar.getValue() + vBar.getVisibleAmount()) >= (vBar.getMaximum() - tolerance);
+
+            messagesListModel.appendBatch(completedMessages, incompleteMsg);
+            outputLogger.log(completedMessages);
+
+            if (isAutoScroll && isAtBottom && messagesListModel.getSize() > 0) {
+                scrollToEnd();
             }
-        }
-
-        JScrollBar vBar = scrollPane.getVerticalScrollBar();
-        int tolerance = messagesList.getFixedCellHeight() * 2;
-        boolean isAtBottom = (vBar.getValue() + vBar.getVisibleAmount()) >= (vBar.getMaximum() - tolerance);
-
-        messagesListModel.appendBatch(completedMessages, incompleteMsg);
-        outputLogger.log(completedMessages);
-
-        if (isAutoScroll && isAtBottom && messagesListModel.getSize() > 0) {
-            scrollToEnd();
         }
     }
 
     public void clear() {
-        parseBuffer.setLength(0);
-        rawQueue.clear();
-        directMessageQueue.clear();
-        lineStartTimestamp = null;
-        SwingUtilities.invokeLater(messagesListModel::clear);
+        synchronized (clearLock) {
+            SwingUtilities.invokeLater(messagesListModel::clear);
+            rawQueue.clear();
+            directMessageQueue.clear();
+            parseBuffer.setLength(0);
+            lineStartTimestamp = null;
+        }
     }
 
     @Subscribe

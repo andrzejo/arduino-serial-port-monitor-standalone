@@ -57,6 +57,10 @@ public class Serial2 implements Closeable {
             port.setParity(mapParity(parity));
             port.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
 
+            if (!port.openPort()) {
+                throw new SerialException("Failed to open serial port: " + portName);
+            }
+
             if (setDTR) {
                 port.setDTR();
             } else {
@@ -69,9 +73,8 @@ public class Serial2 implements Closeable {
                 port.clearRTS();
             }
 
-            if (!port.openPort()) {
-                throw new SerialException("Failed to open serial port: " + portName);
-            }
+            inByteBuffer.clear();
+            outCharBuffer.clear();
 
             port.addDataListener(new SerialPortDataListener() {
                 @Override
@@ -92,6 +95,12 @@ public class Serial2 implements Closeable {
             String errorMsg = String.format("Error opening serial port '%s': %s", portName, e.getMessage());
             log.error(errorMsg, e);
             throw new SerialException(errorMsg, e);
+        }
+    }
+
+    public synchronized void discardBuffers() {
+        if (port != null && port.isOpen()) {
+            port.flushIOBuffers();
         }
     }
 
@@ -147,23 +156,30 @@ public class Serial2 implements Closeable {
     }
 
     @Override
-    public synchronized void close() throws IOException {
+    public void close() throws IOException {
         dispose();
     }
 
-    public synchronized void dispose() throws IOException {
-        if (port != null) {
-            try {
-                if (port.isOpen()) {
-                    port.removeDataListener();
-                    port.closePort();
-                    log.info("Serial port closed.");
-                }
-            } catch (Exception e) {
-                throw new IOException("Failed to close serial port", e);
-            } finally {
-                port = null;
+    public void dispose() throws IOException {
+        SerialPort portToClose;
+
+        synchronized (this) {
+            portToClose = port;
+            port = null;
+        }
+
+        if (portToClose == null) {
+            return;
+        }
+
+        try {
+            if (portToClose.isOpen()) {
+                portToClose.removeDataListener();
+                portToClose.closePort();
+                log.info("Serial port closed.");
             }
+        } catch (Exception e) {
+            throw new IOException("Failed to close serial port", e);
         }
     }
 
