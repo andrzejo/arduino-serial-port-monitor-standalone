@@ -9,6 +9,7 @@ package pl.andrzejo.aspm;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import pl.andrzejo.aspm.api.AppApiService;
+import pl.andrzejo.aspm.error.DeadlockDetectorService;
 import pl.andrzejo.aspm.error.DefaultErrorHandler;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
 import pl.andrzejo.aspm.eventbus.events.app.ApplicationStartedEvent;
@@ -33,6 +34,7 @@ public class Main {
 
         SerialPortMonitorForm form = new SerialPortMonitorForm();
 
+        instance(DeadlockDetectorService.class).start();
         instance(SerialHandlerService.class).start();
         instance(DeviceWatcherService.class).start();
         instance(AppApiService.class).start();
