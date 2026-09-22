@@ -52,100 +52,160 @@ class DeadlockDetectorServiceTest {
 
     @Test
     void shouldKeepOnlyOneUnansweredProbe() {
+        //given
         check.run();
+
+        //when
         advanceSeconds(5);
         check.run();
         advanceSeconds(5);
         check.run();
 
+        //then
         assertEquals(1, edtQueue.size());
         assertEquals(0, terminations.get());
     }
 
     @Test
     void shouldAllowFullGracePeriodAfterTimeoutAndTerminateOnlyOnce() {
+        //given
         check.run();
+
+        //when
         advanceSeconds(15);
         check.run();
+
+        //then
         assertEquals(0, terminations.get());
 
+        //when
         advanceSeconds(14);
         check.run();
+
+        //then
         assertEquals(0, terminations.get());
 
+        //when
         advanceSeconds(1);
         check.run();
         check.run();
+
+        //then
         assertEquals(1, terminations.get());
         verify(executors.get(0)).shutdown();
     }
 
     @Test
     void shouldStartGracePeriodWhenWarningIsActuallyReported() {
+        //given
         check.run();
+
+        //when
         advanceSeconds(120);
         check.run();
+
+        //then
         assertEquals(0, terminations.get());
 
+        //when
         advanceSeconds(14);
         check.run();
+
+        //then
         assertEquals(0, terminations.get());
+
+        //when
         advanceSeconds(1);
         check.run();
+
+        //then
         assertEquals(1, terminations.get());
     }
 
     @Test
     void shouldCancelShutdownWhenEdtRecoversAndResetNextProbeDeadline() {
+        //given
         check.run();
         advanceSeconds(15);
         check.run();
+
+        //when
         edtQueue.remove().run();
         advanceSeconds(15);
         check.run();
+
+        //then
         assertEquals(0, terminations.get());
         assertEquals(1, edtQueue.size());
 
+        //when
         advanceSeconds(15);
         check.run();
+
+        //then
         assertEquals(0, terminations.get());
+
+        //when
         advanceSeconds(15);
         check.run();
+
+        //then
         assertEquals(1, terminations.get());
     }
 
     @Test
     void shouldNotBlameResponsiveEdtForDelayedDetectorOrDelayedStart() {
+        //given
+
+        //when
         advanceSeconds(3600);
         check.run();
         edtQueue.remove().run();
         advanceSeconds(3600);
         check.run();
 
+        //then
         assertEquals(0, terminations.get());
         assertEquals(1, edtQueue.size());
     }
 
     @Test
     void shouldHandleNanoTimeWraparound() {
+        //given
         clock.set(Long.MAX_VALUE - TimeUnit.SECONDS.toNanos(10));
         check.run();
+
+        //when
         advanceSeconds(15);
         check.run();
+
+        //then
         assertEquals(0, terminations.get());
+
+        //when
         advanceSeconds(15);
         check.run();
+
+        //then
         assertEquals(1, terminations.get());
     }
 
     @Test
     void shouldStartOnlyOneExecutorAndIgnoreChecksAfterStop() {
+        //given
+
+        //when
         service.start();
+
+        //then
         assertEquals(1, executors.size());
+
+        //when
         service.stop();
         service.stop();
         check.run();
 
+        //then
         verify(executors.get(0)).shutdownNow();
         verify(threads, never()).findDeadlockedThreads();
         assertTrue(edtQueue.isEmpty());
@@ -154,8 +214,11 @@ class DeadlockDetectorServiceTest {
 
     @Test
     void shouldIgnorePreviousRunChecksAndEdtRepliesAfterRestart() {
+        //given
         check.run();
         Runnable oldReply = edtQueue.remove();
+
+        //when
         service.stop();
         service.start();
         Runnable restartedCheck = scheduledCheck(executors.get(1));
@@ -165,70 +228,99 @@ class DeadlockDetectorServiceTest {
         advanceSeconds(15);
         check.run();
         restartedCheck.run();
+
+        //then
         assertEquals(0, terminations.get());
         assertEquals(1, edtQueue.size());
+
+        //when
         advanceSeconds(15);
         restartedCheck.run();
+
+        //then
         assertEquals(1, terminations.get());
     }
 
     @Test
     void shouldTerminateImmediatelyOnConfirmedDeadlock() {
+        //given
         long[] ids = {42};
         when(threads.findDeadlockedThreads()).thenReturn(ids);
         when(threads.getThreadInfo(ids, true, true)).thenReturn(new ThreadInfo[0]);
 
+        //when
         check.run();
 
+        //then
         assertEquals(1, terminations.get());
         assertTrue(edtQueue.isEmpty());
     }
 
     @Test
     void shouldStillTerminateWhenDeadlockDiagnosticsFail() {
+        //given
         long[] ids = {42};
         when(threads.findDeadlockedThreads()).thenReturn(ids);
         when(threads.getThreadInfo(ids, true, true)).thenThrow(new SecurityException("No thread details"));
 
+        //when
         check.run();
 
+        //then
         assertEquals(1, terminations.get());
     }
 
     @Test
     void shouldCheckEdtEvenWhenDeadlockScanFails() {
+        //given
         when(threads.findDeadlockedThreads()).thenThrow(new SecurityException("No thread access"));
+
+        //when
         check.run();
         advanceSeconds(15);
         check.run();
         advanceSeconds(15);
         check.run();
 
+        //then
         assertEquals(1, terminations.get());
     }
 
     @Test
     void shouldFallBackToMonitorDeadlocksWhenSynchronizersAreUnsupported() {
+        //given
         when(threads.isSynchronizerUsageSupported()).thenReturn(false);
         long[] ids = {42};
         when(threads.findMonitorDeadlockedThreads()).thenReturn(ids);
         when(threads.getThreadInfo(ids, true, false)).thenReturn(new ThreadInfo[0]);
 
+        //when
         check.run();
 
+        //then
         verify(threads, never()).findDeadlockedThreads();
         assertEquals(1, terminations.get());
     }
 
     @Test
     void shouldRunShutdownHooksDuringNormalTermination() throws Exception {
+        //given
+
+        //when
         String output = runShutdownProcess("normal");
+
+        //then
         assertTrue(output.contains("hook-completed"), output);
     }
 
     @Test
     void shouldForceExitWhenShutdownHookHangs() throws Exception {
+        //given
+
+        //when
         String output = runShutdownProcess("blocked");
+
+        //then
         assertTrue(output.contains("hook-started"), output);
         assertFalse(output.contains("hook-completed"), output);
     }

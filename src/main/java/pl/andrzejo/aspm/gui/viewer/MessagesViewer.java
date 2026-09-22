@@ -7,7 +7,6 @@
 
 package pl.andrzejo.aspm.gui.viewer;
 
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.andrzejo.aspm.eventbus.ApplicationEventBus;
@@ -17,7 +16,6 @@ import pl.andrzejo.aspm.eventbus.impl.Subscribe;
 import pl.andrzejo.aspm.gui.OutputLogger;
 import pl.andrzejo.aspm.gui.viewer.model.Message;
 import pl.andrzejo.aspm.gui.viewer.model.MessageListModel;
-import pl.andrzejo.aspm.gui.viewer.model.MessageType;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingGetter;
 import pl.andrzejo.aspm.settings.appsettings.AppSettingsFactory;
 import pl.andrzejo.aspm.settings.appsettings.items.viewer.*;
@@ -28,9 +26,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
@@ -40,20 +36,16 @@ import static pl.andrzejo.aspm.settings.appsettings.AppSettingGetter.get;
 public class MessagesViewer {
     private static final int FLUSH_INTERVAL_MS = 40; // ~25 FPS
     private static final Logger log = LoggerFactory.getLogger(MessagesViewer.class);
-    private final SerialMessageTypeResolver msgTypeResolver = instance(SerialMessageTypeResolver.class);
     private final MessageListModel messagesListModel = instance(MessageListModel.class);
     private final JList<Message> messagesList = new JList<>(messagesListModel);
     private final JScrollPane scrollPane;
     private final MessageCellRenderer cellRenderer;
-    private final ConcurrentLinkedQueue<RawChunk> rawQueue = new ConcurrentLinkedQueue<>();
-    private final ConcurrentLinkedQueue<Message> directMessageQueue = new ConcurrentLinkedQueue<>();
-    private final StringBuilder parseBuffer = new StringBuilder(4096);
+    private final MessageInputBuffer inputBuffer = new MessageInputBuffer(instance(SerialMessageTypeResolver.class));
+    private final Timer flushTimer;
     private final OutputLogger outputLogger;
-    private final Boolean renderTimestamps = AppSettingGetter.get(AddTimestampSetting.class);
-    private final Boolean escapeChars = AppSettingGetter.get(EscapeCharsSetting.class);
-    private Instant lineStartTimestamp = null;
+    private boolean renderTimestamps = AppSettingGetter.get(AddTimestampSetting.class);
+    private boolean escapeChars = AppSettingGetter.get(EscapeCharsSetting.class);
     private boolean isAutoScroll = get(AutoscrollSetting.class);
-    private final Object clearLock = new Object();
 
     public MessagesViewer(OutputLogger outputLogger) {
         this.outputLogger = outputLogger;
@@ -72,7 +64,7 @@ public class MessagesViewer {
         setFont(AppSettingsFactory.create(FontNameSetting.class).get(), AppSettingsFactory.create(FontSizeSetting.class).get());
         instance(ApplicationEventBus.class).register(this);
         setupHandlers();
-        Timer flushTimer = new Timer(FLUSH_INTERVAL_MS, e -> flushQueueToModel());
+        flushTimer = new Timer(FLUSH_INTERVAL_MS, e -> flushQueueToModel());
         flushTimer.start();
     }
 
@@ -80,135 +72,108 @@ public class MessagesViewer {
         return scrollPane;
     }
 
-    public void addSerialLog(String log, Instant date) {
-        rawQueue.offer(new RawChunk(date != null ? date : Instant.now(), log));
+    public void addSerialLog(String text, Instant date) {
+        inputBuffer.addSerialLog(text, date);
     }
 
     public void addMessage(Message message) {
-        directMessageQueue.offer(message);
+        inputBuffer.addMessage(message);
     }
 
-    private void flushQueueToModel() {
-        synchronized (clearLock) {
-            if (rawQueue.isEmpty() && directMessageQueue.isEmpty()) {
+    void flushQueueToModel() {
+        MessageInputBuffer.Batch batch;
+        synchronized (inputBuffer) {
+            if (inputBuffer.isClosed() || !inputBuffer.hasPending()) {
                 return;
             }
+            batch = inputBuffer.drain();
+            outputLogger.log(batch.completed);
+        }
+        if (inputBuffer.isClosed()) {
+            return;
+        }
 
-            List<Message> completedMessages = new ArrayList<>();
+        JScrollBar vBar = scrollPane.getVerticalScrollBar();
+        int tolerance = messagesList.getFixedCellHeight() * 2;
+        boolean isAtBottom = (vBar.getValue() + vBar.getVisibleAmount()) >= (vBar.getMaximum() - tolerance);
 
-            Message directMsg;
-            while ((directMsg = directMessageQueue.poll()) != null) {
-                completedMessages.add(directMsg);
-            }
-
-            RawChunk chunk;
-            while ((chunk = rawQueue.poll()) != null) {
-                String text = chunk.text;
-                if (text == null || text.isEmpty()) {
-                    continue;
-                }
-
-                Instant chunkTime = chunk.timestamp;
-                int len = text.length();
-                int start = 0;
-
-                for (int i = 0; i < len; i++) {
-                    char c = text.charAt(i);
-                    if (c == '\n') {
-                        Instant msgTime = (lineStartTimestamp != null) ? lineStartTimestamp : chunkTime;
-                        int end = (i > start && text.charAt(i - 1) == '\r') ? i - 1 : i;
-                        parseBuffer.append(text, start, end);
-
-                        String fullLine = parseBuffer.toString();
-                        if (fullLine.endsWith("\r")) {
-                            fullLine = fullLine.substring(0, fullLine.length() - 1);
-                        }
-                        if (!fullLine.isEmpty()) {
-                            MessageType type = msgTypeResolver.resolve(fullLine);
-                            completedMessages.add(new Message(msgTime.toEpochMilli(), fullLine, type));
-                        }
-                        parseBuffer.setLength(0);
-                        lineStartTimestamp = null;
-                        start = i + 1;
-                    }
-                }
-
-                if (start < len) {
-                    if (lineStartTimestamp == null) {
-                        lineStartTimestamp = chunkTime;
-                    }
-                    parseBuffer.append(text, start, len);
-                }
-            }
-
-            Message incompleteMsg = null;
-            if (parseBuffer.length() > 0) {
-                String remainingText = parseBuffer.toString();
-                if (remainingText.endsWith("\r")) {
-                    remainingText = remainingText.substring(0, remainingText.length() - 1);
-                }
-
-                if (!remainingText.isEmpty()) {
-                    Instant timestamp = (lineStartTimestamp == null) ? Instant.now() : lineStartTimestamp;
-                    incompleteMsg = new Message(timestamp.toEpochMilli(), remainingText, msgTypeResolver.resolve(remainingText));
-                }
-            }
-
-            JScrollBar vBar = scrollPane.getVerticalScrollBar();
-            int tolerance = messagesList.getFixedCellHeight() * 2;
-            boolean isAtBottom = (vBar.getValue() + vBar.getVisibleAmount()) >= (vBar.getMaximum() - tolerance);
-
-            messagesListModel.appendBatch(completedMessages, incompleteMsg);
-            outputLogger.log(completedMessages);
-
-            if (isAutoScroll && isAtBottom && messagesListModel.getSize() > 0) {
-                scrollToEnd();
-            }
+        if (batch.clearModel) {
+            messagesListModel.clear();
+        }
+        messagesListModel.appendBatch(batch.completed, batch.incomplete);
+        if (isAutoScroll && isAtBottom && messagesListModel.getSize() > 0) {
+            scrollToEnd();
         }
     }
 
     public void clear() {
-        synchronized (clearLock) {
-            SwingUtilities.invokeLater(messagesListModel::clear);
-            rawQueue.clear();
-            directMessageQueue.clear();
-            parseBuffer.setLength(0);
-            lineStartTimestamp = null;
-        }
+        inputBuffer.clear();
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(AutoscrollSetting event) {
-        isAutoScroll = event.get();
-        SwingUtilities.invokeLater(this::scrollToEnd);
+        boolean enabled = event.get();
+        onEdt(() -> {
+            isAutoScroll = enabled;
+            if (enabled) {
+                scrollToEnd();
+            }
+        });
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(AddTimestampSetting event) {
-        cellRenderer.renderTimestamp(event.get());
-        repaint();
+        boolean enabled = event.get();
+        onEdt(() -> {
+            renderTimestamps = enabled;
+            cellRenderer.renderTimestamp(enabled);
+            repaint();
+        });
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(EscapeCharsSetting event) {
-        cellRenderer.escapeChars(event.get());
-        repaint();
+        boolean enabled = event.get();
+        onEdt(() -> {
+            escapeChars = enabled;
+            cellRenderer.escapeChars(enabled);
+            repaint();
+        });
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(FontChangedEvent event) {
-        setFont(event.getName(), event.getSize());
+        onEdt(() -> setFont(event.getName(), event.getSize()));
     }
 
-    @Subscribe(priority = -1)
+    @Subscribe(priority = 10) // After serial input stops, before OutputLogger shuts down.
     @SuppressWarnings("unused")
     private void handleEvent(ApplicationClosingEvent event) {
         log.info("Shutting down the message queue");
-        flushQueueToModel();
+        shutdown();
+    }
+
+    public void shutdown() {
+        synchronized (inputBuffer) {
+            inputBuffer.close();
+            flushTimer.stop();
+            // No Swing model updates: this also works from the JVM shutdown hook.
+            while (inputBuffer.hasPending()) {
+                outputLogger.log(inputBuffer.drain().completed);
+            }
+        }
+    }
+
+    private static void onEdt(Runnable action) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            action.run();
+        } else {
+            SwingUtilities.invokeLater(action);
+        }
     }
 
     private void repaint() {
@@ -235,23 +200,23 @@ public class MessagesViewer {
     }
 
     private void copySelectedLogs() {
-        List<Message> selected = messagesList.getSelectedValuesList();
-
-        if (selected.isEmpty()) {
+        if (messagesList.isSelectionEmpty()) {
             return;
         }
-
-        String text = selected.stream()
-                .map(message -> {
-                    String stmp = renderTimestamps ? message.getFormattedTimestamp() + " " : "";
-                    String msg = escapeChars ? message.getEscapedText() : message.getText();
-                    return stmp + msg;
-                })
-                .collect(Collectors.joining(System.lineSeparator()));
-
         Toolkit.getDefaultToolkit()
                 .getSystemClipboard()
-                .setContents(new StringSelection(text), null);
+                .setContents(new StringSelection(selectedLogsText()), null);
+    }
+
+    String selectedLogsText() {
+        List<Message> selected = messagesList.getSelectedValuesList();
+        return selected.stream()
+                .map(message -> {
+                    String timestamp = renderTimestamps ? message.getFormattedTimestamp() + " " : "";
+                    String text = escapeChars && !message.isInternal() ? message.getEscapedText() : message.getText();
+                    return timestamp + text;
+                })
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 
     private void setFont(String name, Integer size) {
@@ -265,9 +230,4 @@ public class MessagesViewer {
         repaint();
     }
 
-    @RequiredArgsConstructor
-    private static final class RawChunk {
-        final Instant timestamp;
-        final String text;
-    }
 }

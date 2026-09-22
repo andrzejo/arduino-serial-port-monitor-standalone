@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 
@@ -34,6 +35,7 @@ public class OutputLogger {
     private static final Logger log = LoggerFactory.getLogger(OutputLogger.class);
 
     private final SaveLogToFile saveLogToFile;
+    private final File outputFile;
     @Getter
     private static final File logFile = new File(AppFiles.getAppConfigDir(), "aspm.log.txt");
     private final ExecutorService diskWriterExecutor = Executors.newSingleThreadExecutor(r -> {
@@ -42,11 +44,16 @@ public class OutputLogger {
         return t;
     });
 
-    @SneakyThrows
     public OutputLogger() {
-        saveLogToFile = AppSettingsFactory.create(SaveLogToFile.class);
-        FileUtils.forceMkdir(logFile.getParentFile());
+        this(logFile, AppSettingsFactory.create(SaveLogToFile.class));
         instance(ApplicationEventBus.class).register(this);
+    }
+
+    @SneakyThrows
+    OutputLogger(File outputFile, SaveLogToFile saveLogToFile) {
+        this.outputFile = outputFile;
+        this.saveLogToFile = saveLogToFile;
+        FileUtils.forceMkdir(outputFile.getAbsoluteFile().getParentFile());
     }
 
     public void log(List<Message> messages) {
@@ -72,19 +79,27 @@ public class OutputLogger {
             }
             writer.flush();
         } catch (Exception e) {
-            log.error("Failed to save output log: {}", e.getMessage());
+            log.error("Failed to save output log: {}", e.getMessage(), e);
         }
     }
 
-    private static BufferedWriter createWriter() throws FileNotFoundException {
-        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8), 16 * 1024);
+    private BufferedWriter createWriter() throws FileNotFoundException {
+        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile, true), StandardCharsets.UTF_8), 16 * 1024);
     }
 
     public void shutdown() {
         diskWriterExecutor.shutdown();
+        try {
+            if (!diskWriterExecutor.awaitTermination(3, TimeUnit.SECONDS)) {
+                log.warn("Timed out waiting for pending log writes");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Interrupted while waiting for pending log writes");
+        }
     }
 
-    @Subscribe
+    @Subscribe(priority = 20)
     @SuppressWarnings("unused")
     private void handleEvent(ApplicationClosingEvent event) {
         log.info("Shutting down output logger");

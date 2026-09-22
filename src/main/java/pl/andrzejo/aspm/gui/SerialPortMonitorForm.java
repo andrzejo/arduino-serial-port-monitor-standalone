@@ -96,7 +96,7 @@ public class SerialPortMonitorForm {
     private void applicationOnExitCleanup() {
         if (isCleanedUp.compareAndSet(false, true)) {
             instance(ApplicationEventBus.class).post(new ApplicationClosingEvent());
-            mainFrame.dispose();
+            invokeLater(mainFrame::dispose);
         }
     }
 
@@ -187,7 +187,7 @@ public class SerialPortMonitorForm {
     }
 
     private void setStatus(String msg) {
-        statusLabel.setText(msg);
+        invokeLater(() -> statusLabel.setText(msg));
     }
 
     @Subscribe

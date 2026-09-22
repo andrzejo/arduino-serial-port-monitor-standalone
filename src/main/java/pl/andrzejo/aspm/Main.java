@@ -24,6 +24,10 @@ import static pl.andrzejo.aspm.factory.BeanFactory.instance;
 public class Main {
 
     public static void main(String[] args) {
+        SwingUtilities.invokeLater(Main::startApplication);
+    }
+
+    private static void startApplication() {
 
         try {
             System.setProperty("awt.useSystemAAFontSettings", "on");
