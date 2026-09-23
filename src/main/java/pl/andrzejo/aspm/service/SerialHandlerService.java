@@ -68,17 +68,28 @@ public class SerialHandlerService {
     }
 
     private void openSerial(DeviceConfig config) {
+        Serial2 openedSerial = null;
         try {
             logger.info("Open serial: {}", config);
-            serial = BeanFactory.newInstance(Serial2.class, createSerial(config));
-            serial.discardBuffers();
+            openedSerial = BeanFactory.newInstance(Serial2.class, createSerial(config));
+            serial = openedSerial;
+            openedSerial.discardBuffers();
             openDeviceConfig = config;
             eventBus.post(new DeviceOpenEvent(config));
         } catch (Exception e) {
-            if (e.getCause() instanceof SerialException) {
-                eventBus.post(new DeviceErrorEvent(e.getMessage()));
-            } else {
-                eventBus.post(new DeviceCloseEvent(config));
+            disposeSerial(e, openedSerial);
+            logger.error("Failed to open serial port", e);
+            eventBus.post(new DeviceErrorEvent(e.getMessage()));
+        }
+    }
+
+    private void disposeSerial(Exception e, Serial2 openedSerial) {
+        if (openedSerial != null) {
+            try {
+                openedSerial.dispose();
+                serial = null;
+            } catch (IOException cleanupFailure) {
+                e.addSuppressed(cleanupFailure);
             }
         }
     }
@@ -89,7 +100,7 @@ public class SerialHandlerService {
                 return new Serial2(config) {
                     @Override
                     protected void message(char[] buff, int n) {
-                        String msg = new String(buff);
+                        String msg = new String(buff, 0, n);
                         eventBus.post(new SerialMessageReceivedEvent(msg));
                     }
                 };
@@ -140,10 +151,16 @@ public class SerialHandlerService {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleEvent(ExecuteCommandEvent event) {
-        if (serial != null) {
+        Serial2 currentSerial = serial;
+        if (currentSerial != null) {
             String command = event.getCommand().getCommand() + event.getLineEnding();
-            serial.write(command);
-            eventBus.post(new CommandExecutedEvent(event.getCommand(), event.getLineEnding()));
+            try {
+                currentSerial.write(command);
+                eventBus.post(new CommandExecutedEvent(event.getCommand(), event.getLineEnding()));
+            } catch (IOException e) {
+                logger.error("Failed to write to serial port", e);
+                eventBus.post(new DeviceErrorEvent(e.getMessage()));
+            }
         }
     }
 
@@ -186,22 +203,27 @@ public class SerialHandlerService {
     }
 
     private void reopenDevice() {
-        closeSerial();
-        openSerial();
+        if (closeSerial()) {
+            openSerial();
+        }
     }
 
-    private void closeSerial() {
-        if (isOpen()) {
-            try {
-                logger.info("Close serial");
-                serial.dispose();
-            } catch (IOException e) {
-                logger.warn("Failed to close device");
-            } finally {
-                serial = null;
-                eventBus.post(new DeviceCloseEvent(openDeviceConfig));
-            }
+    private boolean closeSerial() {
+        Serial2 currentSerial = serial;
+        if (currentSerial == null) {
+            return true;
         }
+        try {
+            logger.info("Close serial");
+            currentSerial.dispose();
+        } catch (IOException e) {
+            logger.warn("Failed to close device", e);
+            eventBus.post(new DeviceErrorEvent(e.getMessage()));
+            return false;
+        }
+        serial = null;
+        eventBus.post(new DeviceCloseEvent(openDeviceConfig));
+        return true;
     }
 
     @Subscribe
